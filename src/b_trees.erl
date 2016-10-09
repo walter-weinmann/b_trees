@@ -39,6 +39,9 @@
 %% - insert(X, V, T): inserts key X with value V into tree T; returns
 %%   the new tree. Assumes that the key is *not* present in the tree.
 %%
+%% - is_defined(X, T): returns `true' if key X is present in tree T, and
+%%   `false' otherwise.
+%%
 %% - is_empty(T): returns 'true' if T is an empty tree, and 'false'
 %%   otherwise.
 %%
@@ -47,6 +50,83 @@
 %%
 %% - size(T): returns the number of nodes in the tree as an integer.
 %%   Returns 0 (zero) if the tree is empty.
+%%
+
+
+
+%% - enter(X, V, T): inserts key X with value V into tree T if the key
+%%   is not present in the tree, otherwise updates key X to value V in
+%%   T. Returns the new tree.
+%%
+%% - from_orddict(L): turns an ordered list L of {Key, Value} pairs into
+%%   a tree. The list must not contain duplicate keys.
+%%
+%% - get(X, T): retreives the value stored with key X in tree T. Assumes
+%%   that the key is present in the tree.
+%%
+%% - iterator(T): returns an iterator that can be used for traversing
+%%   the entries of tree T; see `next'. The implementation of this is
+%%   very efficient; traversing the whole tree using `next' is only
+%%   slightly slower than getting the list of all elements using
+%%   `to_list' and traversing that. The main advantage of the iterator
+%%   approach is that it does not require the complete list of all
+%%   elements to be built in memory at one time.
+%%
+%% - iterator_from(K, T): returns an iterator that can be used for
+%%   traversing the entries of tree T with key greater than or
+%%   equal to K; see `next'.
+%%
+%% - keys(T): returns an ordered list of all keys in tree T.
+%%
+%% - largest(T): returns {X, V}, where X is the largest key in tree T,
+%%   and V is the value associated with X in T. Assumes that the tree T
+%%   is nonempty.
+%%
+%% - next(S): returns {X, V, S1} where X is the smallest key referred to
+%%   by the iterator S, and S1 is the new iterator to be used for
+%%   traversing the remaining entries, or the atom `none' if no entries
+%%   remain.
+%%
+%% - smallest(T): returns {X, V}, where X is the smallest key in tree T,
+%%   and V is the value associated with X in T. Assumes that the tree T
+%%   is nonempty.
+%%
+%% - to_list(T): returns an ordered list of {Key, Value} pairs for all
+%%   keys in tree T.
+%%
+%% - values(T): returns the list of values for all keys in tree T,
+%%   sorted by their corresponding keys. Duplicates are not removed.
+%%
+%% - update(X, V, T): updates key X to value V in tree T; returns the
+%%   new tree. Assumes that the key is present in the tree.
+%%
+
+
+
+%% - balance(T): rebalances tree T. Note that this is rarely necessary,
+%%   but may be motivated when a large number of entries have been
+%%   deleted from the tree without further insertions. Rebalancing could
+%%   then be forced in order to minimise lookup times, since deletion
+%%   only does not rebalance the tree.
+%%
+%% - delete(X, T): removes key X from tree T; returns new tree. Assumes
+%%   that the key is present in the tree.
+%%
+%% - delete_any(X, T): removes key X from tree T if the key is present
+%%   in the tree, otherwise does nothing; returns new tree.
+%%
+%% - map(F, T): maps the function F(K, V) -> V' to all key-value pairs
+%%   of the tree T and returns a new tree T' with the same set of keys
+%%   as T and the new set of values V'.
+%%
+%% - take_largest(T): returns {X, V, T1}, where X is the largest key
+%%   in tree T, V is the value associated with X in T, and T1 is the
+%%   tree T with key X deleted. Assumes that the tree T is nonempty.
+%%
+%% - take_smallest(T): returns {X, V, T1}, where X is the smallest key
+%%   in tree T, V is the value associated with X in T, and T1 is the
+%%   tree T with key X deleted. Assumes that the tree T is nonempty.
+%%
 
 -module(b_trees).
 
@@ -58,16 +138,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {Minimum, Order, Size, Tree}, where `Tree' is composed of nodes of the form:
-%%   - [{IsRoot, IsLeaf, Key, Value, Smaller, Bigger}, and the "empty tree" node:
-%%   - nil.
-%%
-%% I make no attempt to balance trees after deletions. Since deletions
-%% don't increase the height of a tree, I figure this is OK.
-%%
-%% Original balance condition h(T) <= ceil(c * log(|T|)) has been
-%% changed to the similar (but not quite equivalent) condition 2 ^ h(T)
-%% <= |T| ^ c. I figure this should also be OK.
+%% - {Tree, Minimum, Maximum}, where `Tree' is composed of nodes of the form:
+%%   - [{NodeId, Level, Parent, Children, KeyValues}.
 %%
 %% Performance is comparable to the AVL trees in the Erlang book (and
 %% faster in general due to less overhead); the difference is that
@@ -122,6 +194,28 @@ insert(Key, Value, BTree) ->
     % ?debugFmt("wwe debugging insert/3 ===> Start ~n Key: ~p~n Value: ~p~n BTree: ~p~n", [Key, Value, BTree]),
     insert_key_value_1(1, Key, Value, BTree).
 
+insert_key_value_1(NodeId, Key, Value, {Nodes, Min, Max} = BTree) ->
+    % ?debugFmt("wwe debugging insert_key_value_1/4 ===> Start ~n NodeId: ~p~n Key: ~p~n Value: ~p~n BTree: ~p~n", [NodeId, Key, Value, BTree]),
+    {NodeId, Level, Parent, Children, KeyValues} = lists:nth(NodeId, Nodes),
+    {ValueCurr, ChildNo} = binary_search(KeyValues, Key, 1, length(KeyValues)),
+    case ValueCurr of
+        none ->
+            case length(Children) of
+                0 ->
+                    KeyValuesNew = insert_key_value(KeyValues, [{Key, Value}], []),
+                    NodesNew = update_nodes(Nodes, {NodeId, Level, Parent, Children, KeyValuesNew}),
+                    BTreeNew = {NodesNew, Min, Max},
+                    case length(KeyValuesNew) > Max of
+                        true -> node_split(BTreeNew, NodeId);
+                        _ -> BTreeNew
+                    end;
+                _ ->
+                    insert_key_value_1(lists:nth(ChildNo, Children), Key, Value, BTree)
+            end;
+        _ ->
+            erlang:error({key_exists, Key})
+    end.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%-spec is_empty(Tree) -> boolean() when
@@ -148,6 +242,24 @@ lookup(Key, BTree) ->
 %% and '>' first is statistically better than testing for
 %% equality, and also allows us to skip the test completely in the
 %% remaining case.
+
+lookup_nodes(NodeId, Key, {Nodes, _, _} = BTree) ->
+    % ?debugFmt("wwe debugging lookup_nodes/3 ===> Start ~n NodeId: ~p~n Key: ~p~n BTree: ~p~n Nodes: ~p~n", [NodeId, Key, BTree, Nodes]),
+    {_, _, _, Children, KeyValues} = lists:nth(NodeId, Nodes),
+    % ?debugFmt("wwe debugging lookup_nodes/3 ===> ~n Children: ~p~n KeyValues: ~p~n", [Children, KeyValues]),
+    {Value, ChildNo} = binary_search(KeyValues, Key, 1, length(KeyValues)),
+    % ?debugFmt("wwe debugging lookup_nodes/3 ===> ~n Value: ~p~n Index: ~p~n", [Value, ChildNo]),
+    case Value of
+        none ->
+            case length(Children) of
+                0 ->
+                    none;
+                _ ->
+                    lookup_nodes(lists:nth(ChildNo, Children), Key, BTree)
+            end;
+        _ ->
+            Value
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -187,95 +299,14 @@ binary_search(Node, Key, Lower, Upper) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-generate_b_tree_from_number(Order, Number, Width) when Order > 2, Number >= 0 ->
-    % ?debugFmt("wwe debugging generate_b_tree_from_number/3 ===> Start B Tree ~n Order : ~p~n Number: ~p~n Width : ~p~n", [Order, Number, Width]),
-    generate_b_tree_1(lists:seq(1, Number), Width, empty(Order)).
-generate_b_tree_from_number(Order, b_star, Number, Width) when Order > 2, Number >= 0 ->
-    % ?debugFmt("wwe debugging generate_b_tree_from_number/3 ===> Start B* Tree ~n Order : ~p~n Number: ~p~n Width : ~p~n", [Order, Number, Width]),
-    generate_b_tree_1(lists:seq(1, Number), Width, empty(Order, b_star)).
-
-generate_b_tree_till_number(Order, Number, Width) when Order > 2, Number >= 0 ->
-    % ?debugFmt("wwe debugging generate_b_tree_from_number/3 ===> Start B Tree ~n Order : ~p~n Number: ~p~n Width : ~p~n", [Order, Number, Width]),
-    generate_b_tree_1(lists:seq(Number, 1, -1), Width, empty(Order)).
-generate_b_tree_till_number(Order, b_star, Number, Width) when Order > 2, Number >= 0 ->
-    % ?debugFmt("wwe debugging generate_b_tree_from_number/3 ===> Start B* Tree ~n Order : ~p~n Number: ~p~n Width : ~p~n", [Order, Number, Width]),
-    generate_b_tree_1(lists:seq(Number, 1, -1), Width, empty(Order, b_star)).
-
-generate_b_tree_1(Nodes, Width, BTree) ->
-    % ?debugFmt("wwe debugging generate_b_tree_1/3 ===> Start ~n Nodes : ~p~n", [Nodes]),
-    Format = "~" ++ integer_to_list(Width) ++ "..0B",
-    generate_b_tree_2(Nodes, Format, BTree).
-
-generate_b_tree_2([], _, BTree) ->
-    BTree;
-generate_b_tree_2([Node | Tail], Format, BTree) ->
-    LastString = lists:flatten(io_lib:format(Format, [Node])),
-    generate_b_tree_2(Tail, Format, insert("k_" ++ LastString, "v_" ++ LastString, BTree)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-generate_gb_tree_from_number(Number, Width) when Number >= 0 ->
-    % ?debugFmt("wwe debugging generate_gb_tree_from_number/3 ===> Start GB Tree ~n Order : ~p~n Number: ~p~n Width : ~p~n", [Order, Number, Width]),
-    generate_gb_tree_1(lists:seq(1, Number), Width, gb_trees:empty()).
-
-generate_gb_tree_1(Nodes, Width, GBTree) ->
-    % ?debugFmt("wwe debugging generate_gb_tree_1/3 ===> Start ~n Nodes : ~p~n", [Nodes]),
-    Format = "~" ++ integer_to_list(Width) ++ "..0B",
-    generate_gb_tree_2(Nodes, Format, GBTree).
-
-generate_gb_tree_2([], _, GBTree) ->
-    GBTree;
-generate_gb_tree_2([Node | Tail], Format, GBTree) ->
-    LastString = lists:flatten(io_lib:format(Format, [Node])),
-    generate_gb_tree_2(Tail, Format, gb_trees:insert("k_" ++ LastString, "v_" ++ LastString, GBTree)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-insert_key_value_1(NodeId, Key, Value, {Nodes, Min, Max} = BTree) ->
-    % ?debugFmt("wwe debugging insert_key_value_1/4 ===> Start ~n NodeId: ~p~n Key: ~p~n Value: ~p~n BTree: ~p~n", [NodeId, Key, Value, BTree]),
-    {NodeId, Level, Parent, Children, KeyValues} = lists:nth(NodeId, Nodes),
-    {ValueCurr, ChildNo} = binary_search(KeyValues, Key, 1, length(KeyValues)),
-    case ValueCurr of
-        none ->
-            case length(Children) of
-                0 ->
-                    KeyValuesNew = insert_new_key_value(KeyValues, {Key, Value}),
-                    NodesNew = update_nodes(Nodes, {NodeId, Level, Parent, Children, KeyValuesNew}),
-                    BTreeNew = {NodesNew, Min, Max},
-                    case length(KeyValuesNew) > Max of
-                        true -> node_split(BTreeNew, NodeId);
-                        _ -> BTreeNew
-                    end;
-                _ ->
-                    insert_key_value_1(lists:nth(ChildNo, Children), Key, Value, BTree)
-            end;
-        _ ->
-            erlang:error({key_exists, Key})
-    end.
-
-insert_new_key_value(KeyValues, KeyValueNew) ->
-    lists:sort(fun({Key1, _}, {Key2, _}) ->
-        Key1 < Key2
-               end, [KeyValueNew] ++ KeyValues).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-lookup_nodes(NodeId, Key, {Nodes, _, _} = BTree) ->
-    % ?debugFmt("wwe debugging lookup_nodes/3 ===> Start ~n NodeId: ~p~n Key: ~p~n BTree: ~p~n Nodes: ~p~n", [NodeId, Key, BTree, Nodes]),
-    {_, _, _, Children, KeyValues} = lists:nth(NodeId, Nodes),
-    % ?debugFmt("wwe debugging lookup_nodes/3 ===> ~n Children: ~p~n KeyValues: ~p~n", [Children, KeyValues]),
-    {Value, ChildNo} = binary_search(KeyValues, Key, 1, length(KeyValues)),
-    % ?debugFmt("wwe debugging lookup_nodes/3 ===> ~n Value: ~p~n Index: ~p~n", [Value, ChildNo]),
-    case Value of
-        none ->
-            case length(Children) of
-                0 ->
-                    none;
-                _ ->
-                    lookup_nodes(lists:nth(ChildNo, Children), Key, BTree)
-            end;
-        _ ->
-            Value
+insert_key_value([], [], KeyValuesAcc) ->
+    KeyValuesAcc;
+insert_key_value([], KeyValueNew, KeyValuesAcc) ->
+    KeyValuesAcc ++ KeyValueNew;
+insert_key_value([{KeyCurr, _} = KeyValueCurr | Tail] = KeyValuesCurr, [{KeyNew, _}] = KeyValueNew, KeyValuesAcc) ->
+    case KeyCurr < KeyNew of
+        true -> insert_key_value(Tail, KeyValueNew, KeyValuesAcc ++ [KeyValueCurr]);
+        _ -> insert_key_value([], [], KeyValuesAcc ++ KeyValueNew ++ KeyValuesCurr)
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -293,7 +324,7 @@ node_split({Nodes, Min, Max} = _BTree, NodeId) ->
                                                                                   true};
                                                                           _ ->
                                                                               {NodeIdParent, LevelParent, _, _, KeyValuesParent} = lists:nth(ParentSplit, Nodes),
-                                                                              KeyValuesParentNew = insert_new_key_value(KeyValuesParent, {KeyMiddle, ValueMiddle}),
+                                                                              KeyValuesParentNew = insert_key_value(KeyValuesParent, [{KeyMiddle, ValueMiddle}], []),
                                                                               {
                                                                                   {NodeIdParent, LevelParent, 0, [], KeyValuesParentNew},
                                                                                   case length(KeyValuesParentNew) > Max of

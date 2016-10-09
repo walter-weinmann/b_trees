@@ -71,29 +71,29 @@ empty_test() ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-insert_order_3_test() ->
-    ?assertEqual(b_trees:empty(3), b_trees:generate_b_tree_from_number(3, 0, 2)),
+insert_b_tree_order_3_test() ->
+    ?assertEqual(b_trees:empty(3), test_generator:generate_b_tree_from_number(3, 0, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [], [{"k_01", "v_01"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 1, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 1, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 2, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 2, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3], [{"k_02", "v_02"}]},
         {2, 2, 1, [], [{"k_01", "v_01"}]},
         {3, 2, 1, [], [{"k_03", "v_03"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 3, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 3, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3, 4], [{"k_02", "v_02"}, {"k_04", "v_04"}]},
         {2, 2, 1, [], [{"k_01", "v_01"}]},
         {3, 2, 1, [], [{"k_03", "v_03"}]},
         {4, 2, 1, [], [{"k_05", "v_05"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 5, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 5, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3], [{"k_04", "v_04"}]},
@@ -103,7 +103,7 @@ insert_order_3_test() ->
         {5, 3, 2, [], [{"k_03", "v_03"}]},
         {6, 3, 3, [], [{"k_05", "v_05"}]},
         {7, 3, 3, [], [{"k_07", "v_07"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 7, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 7, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3], [{"k_04", "v_04"}]},
@@ -114,7 +114,7 @@ insert_order_3_test() ->
         {6, 3, 3, [], [{"k_05", "v_05"}]},
         {7, 3, 3, [], [{"k_07", "v_07"}]},
         {8, 3, 3, [], [{"k_09", "v_09"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 9, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 9, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3, 4], [{"k_04", "v_04"}, {"k_08", "v_08"}]},
@@ -127,7 +127,7 @@ insert_order_3_test() ->
         {8, 3, 3, [], [{"k_07", "v_07"}]},
         {9, 3, 4, [], [{"k_09", "v_09"}]},
         {10, 3, 4, [], [{"k_11", "v_11"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 11, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 11, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3, 4], [{"k_04", "v_04"}, {"k_08", "v_08"}]},
@@ -141,7 +141,7 @@ insert_order_3_test() ->
         {9, 3, 4, [], [{"k_09", "v_09"}]},
         {10, 3, 4, [], [{"k_11", "v_11"}]},
         {11, 3, 4, [], [{"k_13", "v_13"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 13, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 13, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3], [{"k_08", "v_08"}]},
@@ -159,43 +159,43 @@ insert_order_3_test() ->
         {13, 4, 6, [], [{"k_11", "v_11"}]},
         {14, 4, 7, [], [{"k_13", "v_13"}]},
         {15, 4, 7, [], [{"k_15", "v_15"}]}
-    ], 1, 2}, b_trees:generate_b_tree_from_number(3, 15, 2)),
+    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 15, 2)),
 
     ok.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-insert_order_5_test() ->
-    ?assertEqual(b_trees:empty(5), b_trees:generate_b_tree_from_number(5, 0, 2)),
+insert_b_tree_order_5_test() ->
+    ?assertEqual(b_trees:empty(5), test_generator:generate_b_tree_from_number(5, 0, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [], [{"k_01", "v_01"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 1, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 1, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 2, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 2, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}, {"k_03", "v_03"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 3, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 3, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}, {"k_03", "v_03"}, {"k_04", "v_04"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 4, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 4, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3], [{"k_03", "v_03"}]},
         {2, 2, 1, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
         {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 5, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 5, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3, 4], [{"k_03", "v_03"}, {"k_06", "v_06"}]},
         {2, 2, 1, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
         {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]},
         {4, 2, 1, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 8, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 8, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3, 4, 5], [{"k_03", "v_03"}, {"k_06", "v_06"}, {"k_09", "v_09"}]},
@@ -203,7 +203,7 @@ insert_order_5_test() ->
         {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]},
         {4, 2, 1, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]},
         {5, 2, 1, [], [{"k_10", "v_10"}, {"k_11", "v_11"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 11, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 11, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3, 4, 5, 6], [{"k_03", "v_03"}, {"k_06", "v_06"}, {"k_09", "v_09"}, {"k_12", "v_12"}]},
@@ -212,7 +212,7 @@ insert_order_5_test() ->
         {4, 2, 1, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]},
         {5, 2, 1, [], [{"k_10", "v_10"}, {"k_11", "v_11"}]},
         {6, 2, 1, [], [{"k_13", "v_13"}, {"k_14", "v_14"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 14, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 14, 2)),
 
     ?assertEqual({[
         {1, 1, 0, [2, 3], [{"k_09", "v_09"}]},
@@ -224,15 +224,23 @@ insert_order_5_test() ->
         {7, 3, 3, [], [{"k_10", "v_10"}, {"k_11", "v_11"}]},
         {8, 3, 3, [], [{"k_13", "v_13"}, {"k_14", "v_14"}]},
         {9, 3, 3, [], [{"k_16", "v_16"}, {"k_17", "v_17"}]}
-    ], 2, 4}, b_trees:generate_b_tree_from_number(5, 17, 2)),
+    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 17, 2)),
 
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 5, 2), b_trees:generate_b_tree_till_number(5, 5, 2)),
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 8, 2), b_trees:generate_b_tree_till_number(5, 8, 2)),
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 11, 2), b_trees:generate_b_tree_till_number(5, 11, 2)),
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 17, 2), b_trees:generate_b_tree_till_number(5, 17, 2)),
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 26, 2), b_trees:generate_b_tree_till_number(5, 26, 2)),
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 35, 2), b_trees:generate_b_tree_till_number(5, 35, 2)),
-    ?assertEqual(b_trees:generate_b_tree_from_number(5, 44, 2), b_trees:generate_b_tree_till_number(5, 44, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 5, 2), test_generator:generate_b_tree_till_number(5, 5, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 8, 2), test_generator:generate_b_tree_till_number(5, 8, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 11, 2), test_generator:generate_b_tree_till_number(5, 11, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 17, 2), test_generator:generate_b_tree_till_number(5, 17, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 26, 2), test_generator:generate_b_tree_till_number(5, 26, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 35, 2), test_generator:generate_b_tree_till_number(5, 35, 2)),
+    ?assertEqual(test_generator:generate_b_tree_from_number(5, 44, 2), test_generator:generate_b_tree_till_number(5, 44, 2)),
+
+    ok.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+insert_key_exists_test() ->
+    BTree = test_generator:generate_b_tree_from_number(5, 5, 2),
+    ?assertException(error, {key_exists, "k_02"}, b_trees:insert("k_02", "v_02", BTree)),
 
     ok.
 
