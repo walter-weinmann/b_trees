@@ -53,7 +53,6 @@
 %%
 
 
-
 %% - enter(X, V, T): inserts key X with value V into tree T if the key
 %%   is not present in the tree, otherwise updates key X to value V in
 %%   T. Returns the new tree.
@@ -102,7 +101,6 @@
 %%
 
 
-
 %% - balance(T): rebalances tree T. Note that this is rarely necessary,
 %%   but may be motivated when a large number of entries have been
 %%   deleted from the tree without further insertions. Rebalancing could
@@ -138,43 +136,26 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {Tree, Minimum, Maximum}, where `Tree' is composed of nodes of the form:
+%% - {BTree, Minimum, Maximum}, where `BTree' is composed of nodes of the form:
 %%   - [{NodeId, Level, Parent, Children, KeyValues}.
-%%
-%% Performance is comparable to the AVL trees in the Erlang book (and
-%% faster in general due to less overhead); the difference is that
-%% deletion works for my trees, but not for the book's trees. Behaviour
-%% is logaritmic (as it should be).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Some macros.
-
-%%-define(p, 2). % It seems that p = 2 is optimal for sorted keys
-%%
-%%-define(pow(A, _), A * A). % correct with exponent as defined above.
-%%
-%%-define(div2(X), X bsr 1).
-%%
-%%-define(mul2(X), X bsl 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
 
-%%-export_type([tree/0, tree/2, iter/0, iter/2]).
-%%
-%%-type b_tree_node(K, V) :: {non_neg_integer(),non_neg_integer(),non_neg_integer(),[],[]}
-%%| {non_neg_integer(), non_neg_integer(),non_neg_integer(), [{K, V}, ...], [{'nil', 'nil'} | b_tree_node(K, V)]}.
-%%
-%%-opaque tree(Key, Value) :: {non_neg_integer(), non_neg_integer(), non_neg_integer(), b_tree_node(Key, Value)}.
-%%-type tree() :: tree(b_tree_node(Key, Value), _, {non_neg_integer(), non_neg_integer()}).
-%%
-%%-opaque iter(Key, Value) :: [b_tree_node(Key, Value)].
-%%-type iter() :: iter(_, _).
+-type children() :: [pos_integer(), ...].
+
+-type key_value() :: {any(), any()}.
+-type key_values() :: [key_value(), ...].
+
+-type b_tree_node() :: {pos_integer(), pos_integer(), non_neg_integer(), [pos_integer()], key_values()}.
+-type b_tree_nodes() :: [b_tree_node(), ...].
+
+-type b_tree() :: {b_tree_nodes(), pos_integer(), pos_integer()}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%-spec empty(pos_integer()) -> tree().
-%%-spec empty(pos_integer(), atom()) -> tree().
+-spec empty(pos_integer()) -> b_tree().
+-spec empty(pos_integer(), atom()) -> b_tree().
 
 empty(Order) when Order > 2 ->
     {[], Order div 2, Order - 1}.
@@ -183,9 +164,7 @@ empty(Order, b_star) when Order > 2 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%-spec insert(Key, Value, Tree1) -> Tree2 when
-%%    Tree1 :: tree(Key, Value),
-%%    Tree2 :: tree(Key, Value).
+-spec insert(any(), any(), b_tree()) -> b_tree().
 
 insert(Key, Value, {[], Min, Max} = _BTree) ->
     % ?debugFmt("wwe debugging insert/3 ===> Start ~n Key: ~p~n Value: ~p~n BTree: ~p~n", [Key, Value, _BTree]),
@@ -193,6 +172,8 @@ insert(Key, Value, {[], Min, Max} = _BTree) ->
 insert(Key, Value, BTree) ->
     % ?debugFmt("wwe debugging insert/3 ===> Start ~n Key: ~p~n Value: ~p~n BTree: ~p~n", [Key, Value, BTree]),
     insert_key_value_1(1, Key, Value, BTree).
+
+-spec insert_key_value_1(pos_integer(), any(), any(), b_tree()) -> b_tree().
 
 insert_key_value_1(NodeId, Key, Value, {Nodes, Min, Max} = BTree) ->
     % ?debugFmt("wwe debugging insert_key_value_1/4 ===> Start ~n NodeId: ~p~n Key: ~p~n Value: ~p~n BTree: ~p~n", [NodeId, Key, Value, BTree]),
@@ -218,8 +199,7 @@ insert_key_value_1(NodeId, Key, Value, {Nodes, Min, Max} = BTree) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%-spec is_empty(Tree) -> boolean() when
-%%    Tree :: tree().
+-spec is_empty(b_tree()) -> boolean().
 
 is_empty({[], _, _}) ->
     true;
@@ -228,8 +208,19 @@ is_empty(_) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%-spec lookup(Key, Tree) -> 'none' | {'value', Value} when
-%%    Tree :: tree(Key, Value).
+%%-spec keys(Tree) -> [Key] when
+%%    Tree :: tree(Key, Value :: term()).
+%%
+%%keys({_, T}) ->
+%%    keys(T, []).
+%%
+%%keys({Key, _Value, Small, Big}, L) ->
+%%    keys(Small, [Key | keys(Big, L)]);
+%%keys(nil, L) -> L.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec lookup(any(), b_tree()) -> 'none' | {'value', any()}.
 
 lookup(_, {[], _, _}) ->
     none;
@@ -242,6 +233,8 @@ lookup(Key, BTree) ->
 %% and '>' first is statistically better than testing for
 %% equality, and also allows us to skip the test completely in the
 %% remaining case.
+
+-spec lookup_nodes(pos_integer(), any(), b_tree()) -> none | {value, any()}.
 
 lookup_nodes(NodeId, Key, {Nodes, _, _} = BTree) ->
     % ?debugFmt("wwe debugging lookup_nodes/3 ===> Start ~n NodeId: ~p~n Key: ~p~n BTree: ~p~n Nodes: ~p~n", [NodeId, Key, BTree, Nodes]),
@@ -258,13 +251,12 @@ lookup_nodes(NodeId, Key, {Nodes, _, _} = BTree) ->
                     lookup_nodes(lists:nth(ChildNo, Children), Key, BTree)
             end;
         _ ->
-            Value
+            {value, Value}
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%-spec size(Tree) -> non_neg_integer() when
-%%    Tree :: tree().
+-spec size(b_tree()) -> non_neg_integer().
 
 size({Nodes, _, _}) ->
     length(Nodes).
@@ -272,6 +264,8 @@ size({Nodes, _, _}) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec binary_search(b_tree_node(), any(), pos_integer(), pos_integer()) -> {none, pos_integer()} | {any(), pos_integer()}.
 
 binary_search(Node, Key, Lower, Upper) when Lower > Upper ->
     % ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Node: ~p~n Key: ~p~n Lower: ~p~n Upper: ~p~n", [Node, Key, Lower, Upper]),
@@ -283,6 +277,15 @@ binary_search(Node, Key, Lower, Upper) when Lower > Upper ->
     case Key < KeyLast of
         true -> {none, ChildNo};
         _ -> {none, ChildNo + 1}
+    end;
+binary_search({_, _, _, _, [{KeyCurr, ValueCurr}]} = _Node, Key, _Lower, _Upper) ->
+    % ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Node: ~p~n Key: ~p~n Lower: ~p~n Upper: ~p~n", [_Node, Key, _Lower, _Upper]),
+    case Key == KeyCurr of
+        true -> {ValueCurr, 1};
+        _ -> case Key < KeyCurr of
+                 true -> {none, 1};
+                 _ -> {none, 2}
+             end
     end;
 binary_search(Node, Key, Lower, Upper) ->
     % ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Node: ~p~n Key: ~p~n Lower: ~p~n Upper: ~p~n", [Node, Key, Lower, Upper]),
@@ -299,6 +302,8 @@ binary_search(Node, Key, Lower, Upper) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec insert_key_value(key_values(), key_value(), key_values()) -> key_values().
+
 insert_key_value([], [], KeyValuesAcc) ->
     KeyValuesAcc;
 insert_key_value([], KeyValueNew, KeyValuesAcc) ->
@@ -310,6 +315,8 @@ insert_key_value([{KeyCurr, _} = KeyValueCurr | Tail] = KeyValuesCurr, [{KeyNew,
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec node_split(b_tree(), pos_integer()) -> b_tree().
 
 node_split({Nodes, Min, Max} = _BTree, NodeId) ->
     % ?debugFmt("wwe debugging node_split/2 ===> Start ~n BTree: ~p~n NodeId: ~p~n", [_BTree, NodeId]),
@@ -368,16 +375,24 @@ node_split({Nodes, Min, Max} = _BTree, NodeId) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec update_nodes(b_tree_nodes(), b_tree_node()) -> b_tree_nodes().
+
 update_nodes(Nodes, {NodeIdNew, _, _, _, _} = NodeNew) ->
     [case NodeIdCurr == NodeIdNew of
          true -> NodeNew;
          _ -> Node
      end || {NodeIdCurr, _, _, _, _} = Node <- Nodes].
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec update_nodes_children(pos_integer(), pos_integer(), pos_integer(), map()) -> {children(), map()}.
+
 update_nodes_children(ChildNext, ChildrenNo, NodeId, ChildrenMap) ->
     % ?debugFmt("wwe debugging update_nodes_children/4 ===> Start~n ChildNext: ~p~n ChildrenNo: ~p~n NodeId: ~p~n ChildrenMap: ~p~n", [ChildNext, ChildrenNo, NodeId, ChildrenMap]),
     Children = [Child || Child <- lists:seq(ChildNext, ChildNext + ChildrenNo)],
     {Children, update_nodes_children(Children, NodeId, ChildrenMap)}.
+
+-spec update_nodes_children(children(), pos_integer(), map()) -> map().
 
 update_nodes_children([], _, ChildrenMap) ->
     % ?debugFmt("wwe debugging update_nodes_children/3 ===> Start~n ChildrenMap: ~p~n", [ChildrenMap]),
@@ -386,10 +401,16 @@ update_nodes_children([Child | Tail], NodeId, ChildrenMap) ->
     % ?debugFmt("wwe debugging update_nodes_children/3 ===> Start~n Child: ~p~n NodeId: ~p~n ChildrenMap: ~p~n", [Child, NodeId, ChildrenMap]),
     update_nodes_children(Tail, NodeId, maps:put(Child, NodeId, ChildrenMap)).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec update_nodes_children_parents(b_tree_nodes()) -> b_tree_nodes().
+
 update_nodes_children_parents(Nodes) ->
     % ?debugFmt("wwe debugging update_nodes_children_parents/1 ===> Start~n Nodes: ~p~n", [Nodes]),
     {_, LevelLeaves, _, _, _} = lists:nth(length(Nodes), Nodes),
     update_nodes_children_parents(Nodes, 2, maps:new(), LevelLeaves, []).
+
+-spec update_nodes_children_parents(b_tree_nodes(), pos_integer(), map(), pos_integer(), b_tree_nodes()) -> b_tree_nodes().
 
 update_nodes_children_parents([], _, _, _, NodesNew) ->
     % ?debugFmt("wwe debugging update_nodes_children_parents/5 ===> Start~n NodesNew: ~p~n", [NodesNew]),
@@ -407,6 +428,10 @@ update_nodes_children_parents([{NodeId, Level, _, _, KeyValues} = _Node | Tail],
     ChildrenNo = length(KeyValues),
     {ChildrenNew, ChildrenMapNew} = update_nodes_children(ChildNext, ChildrenNo, NodeId, ChildrenMap),
     update_nodes_children_parents(Tail, ChildNext + ChildrenNo + 1, ChildrenMapNew, LevelLeaves, NodesNew ++ [{NodeId, Level, maps:get(NodeId, ChildrenMapNew), ChildrenNew, KeyValues}]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec update_nodes_split(b_tree_nodes(), b_tree_node(), b_tree_node(), b_tree_node(), b_tree_nodes(), pos_integer(), non_neg_integer(), b_tree_nodes()) -> b_tree_nodes().
 
 update_nodes_split([], _, {NodeIdSmaller, _, _, _, _} = NodeSmaller, {NodeIdBigger, _, _, _, _} = NodeBigger, NodesDelayed, _, _, NodesNew) ->
     % ?debugFmt("wwe debugging update_nodes_split/8 ===> Start ~n NodeSmaller: ~p~n NodeBigger: ~p~n NodesNew: ~p~n", [NodeSmaller, NodeBigger, NodesNew]),

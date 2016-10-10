@@ -21,7 +21,19 @@ suite() ->
     ].
 
 init_per_suite(Config) ->
-    Config.
+    [
+        {gbtree, test_generator:generate_gb_tree_from_number(2000, 4)},
+        {btree_3, test_generator:generate_b_tree_from_number(3, 2000, 4)},
+        {btree_5, test_generator:generate_b_tree_from_number(5, 2000, 4)},
+        {btree_9, test_generator:generate_b_tree_from_number(9, 2000, 4)},
+        {btree_17, test_generator:generate_b_tree_from_number(17, 2000, 4)},
+        {btree_33, test_generator:generate_b_tree_from_number(33, 2000, 4)},
+        {btree_65, test_generator:generate_b_tree_from_number(65, 2000, 4)},
+        {btree_129, test_generator:generate_b_tree_from_number(129, 2000, 4)},
+        {btree_257, test_generator:generate_b_tree_from_number(257, 2000, 4)},
+        {lookUps, test_generator:generate_keys_rand(2000, 10000, 4)}
+        | Config
+    ].
 
 end_per_suite(_Config) ->
     ok.
@@ -333,7 +345,7 @@ lookup_test(_Config) ->
         ], 3, 6
     },
     ?assertEqual(none, b_trees:lookup('k_1', _BTree_1)),
-    ?assertEqual('v_2', b_trees:lookup('k_2', _BTree_1)),
+    ?assertEqual({value, 'v_2'}, b_trees:lookup('k_2', _BTree_1)),
     ?assertEqual(none, b_trees:lookup('k_3', _BTree_1)),
 
     _BTree_3 = {
@@ -345,27 +357,27 @@ lookup_test(_Config) ->
         ], 3, 6
     },
     ?assertEqual(none, b_trees:lookup('k_00', _BTree_3)),
-    ?assertEqual('v_01', b_trees:lookup('k_01', _BTree_3)),
-    ?assertEqual('v_02', b_trees:lookup('k_02', _BTree_3)),
+    ?assertEqual({value, 'v_01'}, b_trees:lookup('k_01', _BTree_3)),
+    ?assertEqual({value, 'v_02'}, b_trees:lookup('k_02', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_03', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_04', _BTree_3)),
-    ?assertEqual('v_05', b_trees:lookup('k_05', _BTree_3)),
-    ?assertEqual('v_06', b_trees:lookup('k_06', _BTree_3)),
-    ?assertEqual('v_07', b_trees:lookup('k_07', _BTree_3)),
+    ?assertEqual({value, 'v_05'}, b_trees:lookup('k_05', _BTree_3)),
+    ?assertEqual({value, 'v_06'}, b_trees:lookup('k_06', _BTree_3)),
+    ?assertEqual({value, 'v_07'}, b_trees:lookup('k_07', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_08', _BTree_3)),
-    ?assertEqual('v_09', b_trees:lookup('k_09', _BTree_3)),
+    ?assertEqual({value, 'v_09'}, b_trees:lookup('k_09', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_10', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_11', _BTree_3)),
-    ?assertEqual('v_12', b_trees:lookup('k_12', _BTree_3)),
+    ?assertEqual({value, 'v_12'}, b_trees:lookup('k_12', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_13', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_14', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_15', _BTree_3)),
-    ?assertEqual('v_16', b_trees:lookup('k_16', _BTree_3)),
+    ?assertEqual({value, 'v_16'}, b_trees:lookup('k_16', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_17', _BTree_3)),
-    ?assertEqual('v_18', b_trees:lookup('k_18', _BTree_3)),
+    ?assertEqual({value, 'v_18'}, b_trees:lookup('k_18', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_19', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_20', _BTree_3)),
-    ?assertEqual('v_21', b_trees:lookup('k_21', _BTree_3)),
+    ?assertEqual({value, 'v_21'}, b_trees:lookup('k_21', _BTree_3)),
     ?assertEqual(none, b_trees:lookup('k_22', _BTree_3)).
 
 %%--------------------------------------------------------------------
@@ -379,7 +391,7 @@ lookup_nodes_test(_Config) ->
         ], 3, 6
     },
     ?assertEqual(none, b_trees:lookup_nodes(1, 'k_1', _BTree_1)),
-    ?assertEqual('v_2', b_trees:lookup_nodes(1, 'k_2', _BTree_1)),
+    ?assertEqual({value, 'v_2'}, b_trees:lookup_nodes(1, 'k_2', _BTree_1)),
     ?assertEqual(none, b_trees:lookup_nodes(1, 'k_3', _BTree_1)),
 
     _BTree_3 = {
@@ -391,27 +403,27 @@ lookup_nodes_test(_Config) ->
         ], 3, 6
     },
     ?assertEqual(none, b_trees:lookup_nodes(2, 'k_00', _BTree_3)),
-    ?assertEqual('v_01', b_trees:lookup_nodes(2, 'k_01', _BTree_3)),
-    ?assertEqual('v_02', b_trees:lookup_nodes(2, 'k_02', _BTree_3)),
+    ?assertEqual({value, 'v_01'}, b_trees:lookup_nodes(2, 'k_01', _BTree_3)),
+    ?assertEqual({value, 'v_02'}, b_trees:lookup_nodes(2, 'k_02', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(2, 'k_03', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(2, 'k_04', _BTree_3)),
-    ?assertEqual('v_05', b_trees:lookup_nodes(2, 'k_05', _BTree_3)),
-    ?assertEqual('v_06', b_trees:lookup_nodes(2, 'k_06', _BTree_3)),
-    ?assertEqual('v_07', b_trees:lookup_nodes(1, 'k_07', _BTree_3)),
+    ?assertEqual({value, 'v_05'}, b_trees:lookup_nodes(2, 'k_05', _BTree_3)),
+    ?assertEqual({value, 'v_06'}, b_trees:lookup_nodes(2, 'k_06', _BTree_3)),
+    ?assertEqual({value, 'v_07'}, b_trees:lookup_nodes(1, 'k_07', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(3, 'k_08', _BTree_3)),
-    ?assertEqual('v_09', b_trees:lookup_nodes(3, 'k_09', _BTree_3)),
+    ?assertEqual({value, 'v_09'}, b_trees:lookup_nodes(3, 'k_09', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(3, 'k_10', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(3, 'k_11', _BTree_3)),
-    ?assertEqual('v_12', b_trees:lookup_nodes(3, 'k_12', _BTree_3)),
+    ?assertEqual({value, 'v_12'}, b_trees:lookup_nodes(3, 'k_12', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(3, 'k_13', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(3, 'k_14', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(3, 'k_15', _BTree_3)),
-    ?assertEqual('v_16', b_trees:lookup_nodes(1, 'k_16', _BTree_3)),
+    ?assertEqual({value, 'v_16'}, b_trees:lookup_nodes(1, 'k_16', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(4, 'k_17', _BTree_3)),
-    ?assertEqual('v_18', b_trees:lookup_nodes(4, 'k_18', _BTree_3)),
+    ?assertEqual({value, 'v_18'}, b_trees:lookup_nodes(4, 'k_18', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(4, 'k_19', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(4, 'k_20', _BTree_3)),
-    ?assertEqual('v_21', b_trees:lookup_nodes(4, 'k_21', _BTree_3)),
+    ?assertEqual({value, 'v_21'}, b_trees:lookup_nodes(4, 'k_21', _BTree_3)),
     ?assertEqual(none, b_trees:lookup_nodes(4, 'k_22', _BTree_3)).
 
 %%--------------------------------------------------------------------
@@ -478,106 +490,106 @@ performance_insert_gb_tree_test(_Config) ->
     test_generator:generate_gb_tree_from_number(2000, 4).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup gb_tree
-%%--------------------------------------------------------------------
-
-performance_lookup_gb_tree_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    GBTree = test_generator:generate_gb_tree_from_number(2000, 4),
-    lookup_gb_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], GBTree, Format),
-    ok.
-
-lookup_gb_tree([], _, _) ->
-    none;
-lookup_gb_tree([Node | Tail], GBTree, Format) ->
-    gb_trees:lookup(lists:flatten(io_lib:format(Format, [Node])), GBTree),
-    lookup_gb_tree(Tail, GBTree, Format).
-
-%%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 129
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_129_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(129, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_129_test(Config) ->
+    BTree = ?config(btree_129, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
+
+lookup_b_tree([], _) ->
+    none;
+lookup_b_tree([Key | Tail], BTree) ->
+    b_trees:lookup(Key, BTree),
+    lookup_b_tree(Tail, BTree).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 17
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_17_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(17, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_17_test(Config) ->
+    BTree = ?config(btree_17, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 257
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_257_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(257, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_257_test(Config) ->
+    BTree = ?config(btree_257, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 3
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_3_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(3, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_3_test(Config) ->
+    BTree = ?config(btree_3, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 33
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_33_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(33, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_33_test(Config) ->
+    BTree = ?config(btree_33, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 5
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_5_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(5, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_5_test(Config) ->
+    BTree = ?config(btree_5, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 65
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_65_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(65, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_65_test(Config) ->
+    BTree = ?config(btree_65, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 9
 %%--------------------------------------------------------------------
 
-performance_lookup_b_tree_order_9_test(_Config) ->
-    Format = "~" ++ integer_to_list(4) ++ "..0B",
-    BTree = test_generator:generate_b_tree_from_number(9, 2000, 4),
-    lookup_b_tree([rand:uniform(2000) || _ <- lists:seq(1, 10000)], BTree, Format),
+performance_lookup_b_tree_order_9_test(Config) ->
+    BTree = ?config(btree_9, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
     ok.
 
-lookup_b_tree([], _, _) ->
+%%--------------------------------------------------------------------
+%% TEST CASES: performance lookup gb_tree
+%%--------------------------------------------------------------------
+
+performance_lookup_gb_tree_test(Config) ->
+    GBTree = ?config(gbtree, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_gb_tree(LookUps, GBTree),
+    ok.
+
+lookup_gb_tree([], _) ->
     none;
-lookup_b_tree([Node | Tail], BTree, Format) ->
-    b_trees:lookup(lists:flatten(io_lib:format(Format, [Node])), BTree),
-    lookup_b_tree(Tail, BTree, Format).
+lookup_gb_tree([Key | Tail], GBTree) ->
+    gb_trees:lookup(Key, GBTree),
+    lookup_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: size
