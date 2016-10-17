@@ -3,13 +3,22 @@
 %%% Description : Test Suite for module: b_trees.
 %%%
 %%% Created     : 09.09.2016
+%%%
+%%% Copyright (C) 2016 Walter Weinmann
 %%%-------------------------------------------------------------------
 -module(b_trees_SUITE).
 
 -compile(export_all).
 
+-define(NODEBUG, true).
+
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
+
+-include_lib("../include/b_trees_templates.hrl").
+
+-define(NUMBER_INSERTS, 2000).
+-define(NUMBER_LOOKUPS, 10000).
 
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE
@@ -22,16 +31,17 @@ suite() ->
 
 init_per_suite(Config) ->
     [
-        {gbtree, test_generator:generate_gb_tree_from_number(2000, 4)},
-        {btree_3, test_generator:generate_b_tree_from_number(3, 2000, 4)},
-        {btree_5, test_generator:generate_b_tree_from_number(5, 2000, 4)},
-        {btree_9, test_generator:generate_b_tree_from_number(9, 2000, 4)},
-        {btree_17, test_generator:generate_b_tree_from_number(17, 2000, 4)},
-        {btree_33, test_generator:generate_b_tree_from_number(33, 2000, 4)},
-        {btree_65, test_generator:generate_b_tree_from_number(65, 2000, 4)},
-        {btree_129, test_generator:generate_b_tree_from_number(129, 2000, 4)},
-        {btree_257, test_generator:generate_b_tree_from_number(257, 2000, 4)},
-        {lookUps, test_generator:generate_keys_rand(2000, 10000, 4)}
+        {gbtree, test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4)},
+        {btree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_INSERTS, 4)},
+        {btree_9, test_generator:generate_b_tree_till_number(9, ?NUMBER_INSERTS, 4)},
+        {btree_17, test_generator:generate_b_tree_from_number(17, ?NUMBER_INSERTS, 4)},
+        {btree_33, test_generator:generate_b_tree_till_number(33, ?NUMBER_INSERTS, 4)},
+        {btree_65, test_generator:generate_b_tree_from_number(65, ?NUMBER_INSERTS, 4)},
+        {btree_129, test_generator:generate_b_tree_till_number(129, ?NUMBER_INSERTS, 4)},
+        {btree_257, test_generator:generate_b_tree_from_number(257, ?NUMBER_INSERTS, 4)},
+        {btree_513, test_generator:generate_b_tree_from_number(513, ?NUMBER_INSERTS, 4)},
+        {btree_1025, test_generator:generate_b_tree_from_number(1025, ?NUMBER_INSERTS, 4)},
+        {lookUps, test_generator:generate_keys_rand(?NUMBER_INSERTS, ?NUMBER_LOOKUPS, 4)}
         | Config
     ].
 
@@ -44,15 +54,13 @@ end_per_suite(_Config) ->
 
 all() ->
     [
-        binary_search_test,
         empty_test,
-        insert_b_tree_order_3_test,
         insert_b_tree_order_5_test,
+        insert_b_tree_order_7_test,
+        insert_b_tree_order_8_test,
         insert_key_exists_test,
         is_empty_test,
         lookup_test,
-        lookup_nodes_test,
-        performance_insert_b_tree_order_3_test,
         performance_insert_b_tree_order_5_test,
         performance_insert_b_tree_order_9_test,
         performance_insert_b_tree_order_17_test,
@@ -60,8 +68,9 @@ all() ->
         performance_insert_b_tree_order_65_test,
         performance_insert_b_tree_order_129_test,
         performance_insert_b_tree_order_257_test,
+        performance_insert_b_tree_order_513_test,
+        performance_insert_b_tree_order_1025_test,
         performance_insert_gb_tree_test,
-        performance_lookup_b_tree_order_3_test,
         performance_lookup_b_tree_order_5_test,
         performance_lookup_b_tree_order_9_test,
         performance_lookup_b_tree_order_17_test,
@@ -69,425 +78,376 @@ all() ->
         performance_lookup_b_tree_order_65_test,
         performance_lookup_b_tree_order_129_test,
         performance_lookup_b_tree_order_257_test,
+        performance_lookup_b_tree_order_513_test,
+        performance_lookup_b_tree_order_1025_test,
         performance_lookup_gb_tree_test,
         size_test
     ].
-
-%%--------------------------------------------------------------------
-%% TEST CASES: binary_search
-%%--------------------------------------------------------------------
-
-binary_search_test(_Config) ->
-    _Node_1 = [{0, a}],
-    ?assertEqual({none, 1}, b_trees:binary_search(_Node_1, -1, 1, 1)),
-    ?assertEqual({a, 1}, b_trees:binary_search(_Node_1, 0, 1, 1)),
-    ?assertEqual({none, 2}, b_trees:binary_search(_Node_1, 1, 1, 1)),
-
-    _Node_2 = [{0, a}, {2, b}],
-    ?assertEqual({none, 1}, b_trees:binary_search(_Node_2, -1, 1, 2)),
-    ?assertEqual({a, 1}, b_trees:binary_search(_Node_2, 0, 1, 2)),
-    ?assertEqual({none, 2}, b_trees:binary_search(_Node_2, 1, 1, 2)),
-    ?assertEqual({b, 2}, b_trees:binary_search(_Node_2, 2, 1, 2)),
-    ?assertEqual({none, 3}, b_trees:binary_search(_Node_2, 3, 1, 2)),
-
-    _Node_3 = [{0, a}, {2, b}, {4, c}],
-    ?assertEqual({none, 1}, b_trees:binary_search(_Node_3, -1, 1, 3)),
-    ?assertEqual({a, 1}, b_trees:binary_search(_Node_3, 0, 1, 3)),
-    ?assertEqual({none, 2}, b_trees:binary_search(_Node_3, 1, 1, 3)),
-    ?assertEqual({b, 2}, b_trees:binary_search(_Node_3, 2, 1, 3)),
-    ?assertEqual({none, 3}, b_trees:binary_search(_Node_3, 3, 1, 3)),
-    ?assertEqual({c, 3}, b_trees:binary_search(_Node_3, 4, 1, 3)),
-    ?assertEqual({none, 4}, b_trees:binary_search(_Node_3, 5, 1, 3)),
-
-    _Node_4 = [{0, a}, {2, b}, {4, c}, {6, d}],
-    ?assertEqual({none, 1}, b_trees:binary_search(_Node_4, -1, 1, 4)),
-    ?assertEqual({a, 1}, b_trees:binary_search(_Node_4, 0, 1, 4)),
-    ?assertEqual({none, 2}, b_trees:binary_search(_Node_4, 1, 1, 4)),
-    ?assertEqual({b, 2}, b_trees:binary_search(_Node_4, 2, 1, 4)),
-    ?assertEqual({none, 3}, b_trees:binary_search(_Node_4, 3, 1, 4)),
-    ?assertEqual({c, 3}, b_trees:binary_search(_Node_4, 4, 1, 4)),
-    ?assertEqual({none, 4}, b_trees:binary_search(_Node_4, 5, 1, 4)),
-    ?assertEqual({d, 4}, b_trees:binary_search(_Node_4, 6, 1, 4)),
-    ?assertEqual({none, 5}, b_trees:binary_search(_Node_4, 7, 1, 4)),
-
-    _Node_5 = [{0, a}, {2, b}, {4, c}, {6, d}, {8, e}],
-    ?assertEqual({none, 1}, b_trees:binary_search(_Node_5, -1, 1, 5)),
-    ?assertEqual({a, 1}, b_trees:binary_search(_Node_5, 0, 1, 5)),
-    ?assertEqual({none, 2}, b_trees:binary_search(_Node_5, 1, 1, 5)),
-    ?assertEqual({b, 2}, b_trees:binary_search(_Node_5, 2, 1, 5)),
-    ?assertEqual({none, 3}, b_trees:binary_search(_Node_5, 3, 1, 5)),
-    ?assertEqual({c, 3}, b_trees:binary_search(_Node_5, 4, 1, 5)),
-    ?assertEqual({none, 4}, b_trees:binary_search(_Node_5, 5, 1, 5)),
-    ?assertEqual({d, 4}, b_trees:binary_search(_Node_5, 6, 1, 5)),
-    ?assertEqual({none, 5}, b_trees:binary_search(_Node_5, 7, 1, 5)),
-    ?assertEqual({e, 5}, b_trees:binary_search(_Node_5, 8, 1, 5)),
-    ?assertEqual({none, 6}, b_trees:binary_search(_Node_5, 9, 1, 5)).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: empty
 %%--------------------------------------------------------------------
 
 empty_test(_Config) ->
-    _BTree_7_0 = b_trees:empty(7),
-    ?assertEqual({[], 3, 6}, _BTree_7_0),
-    ?assert(b_trees:is_empty(_BTree_7_0)),
-    ?assertEqual(0, b_trees:size(_BTree_7_0)),
+    ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
+    ?assert(b_trees:is_empty(b_trees:empty(33))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(33))),
 
-    _BStarTree_7_0 = b_trees:empty(7, b_star),
-    ?assertEqual({[], 4, 6}, _BStarTree_7_0),
-    ?assert(b_trees:is_empty(_BStarTree_7_0)),
-    ?assertEqual(0, b_trees:size(_BStarTree_7_0)).
+    ?assertEqual(?B_STAR_TREE_33_00, b_trees:empty(33, b_star)),
+    ?assert(b_trees:is_empty(b_trees:empty(33, b_star))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(33, b_star))),
+
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert key exists
 %%--------------------------------------------------------------------
 
 insert_key_exists_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(5, 5, 2),
-    ?assertException(error, {key_exists, "k_02"}, b_trees:insert("k_02", "v_02", BTree)).
+    ?assertException(error, {key_exists, "k_01"}, b_trees:insert("k_01", "v_01", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_02"}, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_03"}, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_04"}, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_05"}, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(5, 5, 2))),
 
-%%--------------------------------------------------------------------
-%% TEST CASES: insert order 3
-%%--------------------------------------------------------------------
-
-insert_b_tree_order_3_test(_Config) ->
-    ?assertEqual(b_trees:empty(3), test_generator:generate_b_tree_from_number(3, 0, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [], [{"k_01", "v_01"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 1, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 2, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3], [{"k_02", "v_02"}]},
-        {2, 2, 1, [], [{"k_01", "v_01"}]},
-        {3, 2, 1, [], [{"k_03", "v_03"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 3, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3, 4], [{"k_02", "v_02"}, {"k_04", "v_04"}]},
-        {2, 2, 1, [], [{"k_01", "v_01"}]},
-        {3, 2, 1, [], [{"k_03", "v_03"}]},
-        {4, 2, 1, [], [{"k_05", "v_05"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 5, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3], [{"k_04", "v_04"}]},
-        {2, 2, 1, [4, 5], [{"k_02", "v_02"}]},
-        {3, 2, 1, [6, 7], [{"k_06", "v_06"}]},
-        {4, 3, 2, [], [{"k_01", "v_01"}]},
-        {5, 3, 2, [], [{"k_03", "v_03"}]},
-        {6, 3, 3, [], [{"k_05", "v_05"}]},
-        {7, 3, 3, [], [{"k_07", "v_07"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 7, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3], [{"k_04", "v_04"}]},
-        {2, 2, 1, [4, 5], [{"k_02", "v_02"}]},
-        {3, 2, 1, [6, 7, 8], [{"k_06", "v_06"}, {"k_08", "v_08"}]},
-        {4, 3, 2, [], [{"k_01", "v_01"}]},
-        {5, 3, 2, [], [{"k_03", "v_03"}]},
-        {6, 3, 3, [], [{"k_05", "v_05"}]},
-        {7, 3, 3, [], [{"k_07", "v_07"}]},
-        {8, 3, 3, [], [{"k_09", "v_09"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 9, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3, 4], [{"k_04", "v_04"}, {"k_08", "v_08"}]},
-        {2, 2, 1, [5, 6], [{"k_02", "v_02"}]},
-        {3, 2, 1, [7, 8], [{"k_06", "v_06"}]},
-        {4, 2, 1, [9, 10], [{"k_10", "v_10"}]},
-        {5, 3, 2, [], [{"k_01", "v_01"}]},
-        {6, 3, 2, [], [{"k_03", "v_03"}]},
-        {7, 3, 3, [], [{"k_05", "v_05"}]},
-        {8, 3, 3, [], [{"k_07", "v_07"}]},
-        {9, 3, 4, [], [{"k_09", "v_09"}]},
-        {10, 3, 4, [], [{"k_11", "v_11"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 11, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3, 4], [{"k_04", "v_04"}, {"k_08", "v_08"}]},
-        {2, 2, 1, [5, 6], [{"k_02", "v_02"}]},
-        {3, 2, 1, [7, 8], [{"k_06", "v_06"}]},
-        {4, 2, 1, [9, 10, 11], [{"k_10", "v_10"}, {"k_12", "v_12"}]},
-        {5, 3, 2, [], [{"k_01", "v_01"}]},
-        {6, 3, 2, [], [{"k_03", "v_03"}]},
-        {7, 3, 3, [], [{"k_05", "v_05"}]},
-        {8, 3, 3, [], [{"k_07", "v_07"}]},
-        {9, 3, 4, [], [{"k_09", "v_09"}]},
-        {10, 3, 4, [], [{"k_11", "v_11"}]},
-        {11, 3, 4, [], [{"k_13", "v_13"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 13, 2)),
-
-    ?assertEqual({[
-        {1, 1, 0, [2, 3], [{"k_08", "v_08"}]},
-        {2, 2, 1, [4, 5], [{"k_04", "v_04"}]},
-        {3, 2, 1, [6, 7], [{"k_12", "v_12"}]},
-        {4, 3, 2, [8, 9], [{"k_02", "v_02"}]},
-        {5, 3, 2, [10, 11], [{"k_06", "v_06"}]},
-        {6, 3, 3, [12, 13], [{"k_10", "v_10"}]},
-        {7, 3, 3, [14, 15], [{"k_14", "v_14"}]},
-        {8, 4, 4, [], [{"k_01", "v_01"}]},
-        {9, 4, 4, [], [{"k_03", "v_03"}]},
-        {10, 4, 5, [], [{"k_05", "v_05"}]},
-        {11, 4, 5, [], [{"k_07", "v_07"}]},
-        {12, 4, 6, [], [{"k_09", "v_09"}]},
-        {13, 4, 6, [], [{"k_11", "v_11"}]},
-        {14, 4, 7, [], [{"k_13", "v_13"}]},
-        {15, 4, 7, [], [{"k_15", "v_15"}]}
-    ], 1, 2}, test_generator:generate_b_tree_from_number(3, 15, 2)).
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert order 5
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_5_test(_Config) ->
-    ?assertEqual(b_trees:empty(5), test_generator:generate_b_tree_from_number(5, 0, 2)),
+    ?assertEqual(?B_TREE_05_00, b_trees:empty(5)),
+    ?assertEqual(0, b_trees:number_key_values(?B_TREE_05_00)),
+    ?assertEqual(0, b_trees:height(?B_TREE_05_00)),
+    ?assertEqual(0, b_trees:size(?B_TREE_05_00)),
 
-    ?assertEqual({[
-        {1, 1, 0, [], [{"k_01", "v_01"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 1, 2)),
+    ?assertEqual(?B_TREE_05_01, b_trees:insert("k_01", "v_01", ?B_TREE_05_00)),
+    ?assertEqual(1, b_trees:number_key_values(?B_TREE_05_01)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_01)),
+    ?assertEqual(1, b_trees:size(?B_TREE_05_01)),
 
-    ?assertEqual({[
-        {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 2, 2)),
+    ?assertEqual(?B_TREE_05_02, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(5, 1, 2))),
+    ?assertEqual(2, b_trees:number_key_values(?B_TREE_05_02)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_02)),
+    ?assertEqual(1, b_trees:size(?B_TREE_05_02)),
 
-    ?assertEqual({[
-        {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}, {"k_03", "v_03"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 3, 2)),
+    ?assertEqual(?B_TREE_05_03, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(5, 2, 2))),
+    ?assertEqual(3, b_trees:number_key_values(?B_TREE_05_03)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_03)),
+    ?assertEqual(1, b_trees:size(?B_TREE_05_03)),
 
-    ?assertEqual({[
-        {1, 1, 0, [], [{"k_01", "v_01"}, {"k_02", "v_02"}, {"k_03", "v_03"}, {"k_04", "v_04"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 4, 2)),
+    ?assertEqual(?B_TREE_05_04, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(5, 3, 2))),
+    ?assertEqual(4, b_trees:number_key_values(?B_TREE_05_04)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_04)),
+    ?assertEqual(1, b_trees:size(?B_TREE_05_04)),
 
-    ?assertEqual({[
-        {1, 1, 0, [2, 3], [{"k_03", "v_03"}]},
-        {2, 2, 1, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
-        {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 5, 2)),
+    ?assertEqual(?B_TREE_05_05, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(5, 4, 2))),
+    ?assertEqual(5, b_trees:number_key_values(?B_TREE_05_05)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_05)),
+    ?assertEqual(3, b_trees:size(?B_TREE_05_05)),
 
-    ?assertEqual({[
-        {1, 1, 0, [2, 3, 4], [{"k_03", "v_03"}, {"k_06", "v_06"}]},
-        {2, 2, 1, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
-        {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]},
-        {4, 2, 1, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 8, 2)),
+    ?assertEqual(?B_TREE_05_09, b_trees:insert("k_09", "v_09", test_generator:generate_b_tree_from_number(5, 8, 2))),
+    ?assertEqual(9, b_trees:number_key_values(?B_TREE_05_09)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_09)),
+    ?assertEqual(4, b_trees:size(?B_TREE_05_09)),
 
-    ?assertEqual({[
-        {1, 1, 0, [2, 3, 4, 5], [{"k_03", "v_03"}, {"k_06", "v_06"}, {"k_09", "v_09"}]},
-        {2, 2, 1, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
-        {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]},
-        {4, 2, 1, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]},
-        {5, 2, 1, [], [{"k_10", "v_10"}, {"k_11", "v_11"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 11, 2)),
+    ?assertEqual(?B_TREE_05_13, b_trees:insert("k_13", "v_13", test_generator:generate_b_tree_from_number(5, 12, 2))),
+    ?assertEqual(13, b_trees:number_key_values(?B_TREE_05_13)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_13)),
+    ?assertEqual(5, b_trees:size(?B_TREE_05_13)),
 
-    ?assertEqual({[
-        {1, 1, 0, [2, 3, 4, 5, 6], [{"k_03", "v_03"}, {"k_06", "v_06"}, {"k_09", "v_09"}, {"k_12", "v_12"}]},
-        {2, 2, 1, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
-        {3, 2, 1, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]},
-        {4, 2, 1, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]},
-        {5, 2, 1, [], [{"k_10", "v_10"}, {"k_11", "v_11"}]},
-        {6, 2, 1, [], [{"k_13", "v_13"}, {"k_14", "v_14"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 14, 2)),
+    ?assertEqual(?B_TREE_05_17, b_trees:insert("k_17", "v_17", test_generator:generate_b_tree_from_number(5, 16, 2))),
+    ?assertEqual(17, b_trees:number_key_values(?B_TREE_05_17)),
+    ?assertEqual(3, b_trees:height(?B_TREE_05_17)),
+    ?assertEqual(9, b_trees:size(?B_TREE_05_17)),
 
-    ?assertEqual({[
-        {1, 1, 0, [2, 3], [{"k_09", "v_09"}]},
-        {2, 2, 1, [4, 5, 6], [{"k_03", "v_03"}, {"k_06", "v_06"}]},
-        {3, 2, 1, [7, 8, 9], [{"k_12", "v_12"}, {"k_15", "v_15"}]},
-        {4, 3, 2, [], [{"k_01", "v_01"}, {"k_02", "v_02"}]},
-        {5, 3, 2, [], [{"k_04", "v_04"}, {"k_05", "v_05"}]},
-        {6, 3, 2, [], [{"k_07", "v_07"}, {"k_08", "v_08"}]},
-        {7, 3, 3, [], [{"k_10", "v_10"}, {"k_11", "v_11"}]},
-        {8, 3, 3, [], [{"k_13", "v_13"}, {"k_14", "v_14"}]},
-        {9, 3, 3, [], [{"k_16", "v_16"}, {"k_17", "v_17"}]}
-    ], 2, 4}, test_generator:generate_b_tree_from_number(5, 17, 2)),
+    ?assertEqual(?B_TREE_05_21, b_trees:insert("k_21", "v_21", test_generator:generate_b_tree_from_number(5, 20, 2))),
+    ?assertEqual(21, b_trees:number_key_values(?B_TREE_05_21)),
+    ?assertEqual(3, b_trees:height(?B_TREE_05_21)),
+    ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
 
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 5, 2), test_generator:generate_b_tree_till_number(5, 5, 2)),
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 8, 2), test_generator:generate_b_tree_till_number(5, 8, 2)),
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 11, 2), test_generator:generate_b_tree_till_number(5, 11, 2)),
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 17, 2), test_generator:generate_b_tree_till_number(5, 17, 2)),
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 26, 2), test_generator:generate_b_tree_till_number(5, 26, 2)),
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 35, 2), test_generator:generate_b_tree_till_number(5, 35, 2)),
-    ?assertEqual(test_generator:generate_b_tree_from_number(5, 44, 2), test_generator:generate_b_tree_till_number(5, 44, 2)).
+    ?assertEqual(?B_TREE_05_25, b_trees:insert("k_25", "v_25", test_generator:generate_b_tree_from_number(5, 24, 2))),
+    ?assertEqual(25, b_trees:number_key_values(?B_TREE_05_25)),
+    ?assertEqual(3, b_trees:height(?B_TREE_05_25)),
+    ?assertEqual(12, b_trees:size(?B_TREE_05_25)),
+
+    ?assertEqual(?B_TREE_05_29, b_trees:insert("k_29", "v_29", test_generator:generate_b_tree_from_number(5, 28, 2))),
+    ?assertEqual(29, b_trees:number_key_values(?B_TREE_05_29)),
+    ?assertEqual(3, b_trees:height(?B_TREE_05_29)),
+    ?assertEqual(14, b_trees:size(?B_TREE_05_29)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert order 7
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_7_test(_Config) ->
+    ?assertEqual(?B_TREE_07_00, b_trees:empty(7)),
+    ?assertEqual(0, b_trees:number_key_values(?B_TREE_07_00)),
+    ?assertEqual(0, b_trees:height(?B_TREE_07_00)),
+    ?assertEqual(0, b_trees:size(?B_TREE_07_00)),
+
+    ?assertEqual(?B_TREE_07_07, b_trees:insert("k_07", "v_07", test_generator:generate_b_tree_from_number(7, 6, 2))),
+    ?assertEqual(7, b_trees:number_key_values(?B_TREE_07_07)),
+    ?assertEqual(2, b_trees:height(?B_TREE_07_07)),
+    ?assertEqual(3, b_trees:size(?B_TREE_07_07)),
+
+    ?assertEqual(?B_TREE_07_80, test_generator:generate_b_tree_from_list(7,
+        [
+            11, 17, 23, 31, 41, 47, 59, 67, 73, 83, 97,
+            103, 109, 127, 137, 149, 157, 167, 179, 191, 197,
+            211, 227, 233, 241, 257, 269, 277, 283,
+            307, 313, 331, 347, 353, 367, 379, 389,
+            401, 419, 431, 439, 449, 461, 467, 487, 499,
+            509, 523, 547, 563, 571, 587, 599,
+            607, 617, 631, 643, 653, 661, 677, 691,
+            709, 727, 739, 751, 761, 773, 797,
+            811, 823, 829, 853, 859, 877, 883,
+            907, 919, 937, 947, 967
+        ],
+        3)),
+    ?assertEqual(80, b_trees:number_key_values(?B_TREE_07_80)),
+    ?assertEqual(3, b_trees:height(?B_TREE_07_80)),
+    ?assertEqual(26, b_trees:size(?B_TREE_07_80)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert order 8
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_8_test(_Config) ->
+    ?assertEqual(?B_TREE_08_16, b_trees:insert("k_16", "v_16", test_generator:generate_b_tree_from_number(8, 15, 2))),
+    ?assertEqual(16, b_trees:number_key_values(?B_TREE_08_16)),
+    ?assertEqual(2, b_trees:height(?B_TREE_08_16)),
+    ?assertEqual(4, b_trees:size(?B_TREE_08_16)),
+
+    ?assertEqual(?B_TREE_08_32, b_trees:insert("k_32", "v_32", test_generator:generate_b_tree_from_number(8, 31, 2))),
+    ?assertEqual(32, b_trees:number_key_values(?B_TREE_08_32)),
+    ?assertEqual(2, b_trees:height(?B_TREE_08_32)),
+    ?assertEqual(7, b_trees:size(?B_TREE_08_32)),
+
+    ?assertEqual(?B_TREE_08_64, b_trees:insert("k_64", "v_64", test_generator:generate_b_tree_from_number(8, 63, 2))),
+    ?assertEqual(64, b_trees:number_key_values(?B_TREE_08_64)),
+    ?assertEqual(3, b_trees:height(?B_TREE_08_64)),
+    ?assertEqual(17, b_trees:size(?B_TREE_08_64)),
+
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: is_empty
 %%--------------------------------------------------------------------
 
 is_empty_test(_Config) ->
-    _BTree_1 = {
-        [
-            {1, 1, 0, [], [{k_2, v_2}]}
-        ], 3, 6
-    },
-    ?assertEqual(false, b_trees:is_empty(_BTree_1)),
+    ?assertEqual(false, b_trees:is_empty(?B_TREE_33_01)),
 
-    _BTree_7_0 = b_trees:empty(7),
-    ?assertEqual(true, b_trees:is_empty(_BTree_7_0)),
+    ?assertEqual(true, b_trees:is_empty(?B_TREE_33_00)),
 
-    _BStarTree_7_0 = b_trees:empty(6, b_star),
-    ?assertEqual(true, b_trees:is_empty(_BStarTree_7_0)).
+    ?assertEqual(true, b_trees:is_empty(?B_STAR_TREE_07_00)),
+
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: lookup
 %%--------------------------------------------------------------------
 
 lookup_test(_Config) ->
-    _BTree_6_0 = b_trees:empty(7),
-    ?assertEqual(none, b_trees:lookup('k_1', _BTree_6_0)),
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_04_00)),
 
-    _BTree_1 = {
-        [
-            {1, 1, 0, [], [{k_2, v_2}]}
-        ], 3, 6
-    },
-    ?assertEqual(none, b_trees:lookup('k_1', _BTree_1)),
-    ?assertEqual({value, 'v_2'}, b_trees:lookup('k_2', _BTree_1)),
-    ?assertEqual(none, b_trees:lookup('k_3', _BTree_1)),
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_04_04)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", ?B_TREE_04_04)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", ?B_TREE_04_04)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", ?B_TREE_04_04)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", ?B_TREE_04_04)),
+    ?assertEqual(none, b_trees:lookup("k_05", ?B_TREE_04_04)),
 
-    _BTree_3 = {
-        [
-            {1, 1, 0, [2, 3, 4], [{k_07, v_07}, {k_16, v_16}]},
-            {2, 1, 1, [], [{k_01, v_01}, {k_02, v_02}, {k_05, v_05}, {k_06, v_06}]},
-            {2, 2, 1, [], [{k_09, v_09}, {k_12, v_12}]},
-            {2, 3, 1, [], [{k_18, v_18}, {k_21, v_21}]}
-        ], 3, 6
-    },
-    ?assertEqual(none, b_trees:lookup('k_00', _BTree_3)),
-    ?assertEqual({value, 'v_01'}, b_trees:lookup('k_01', _BTree_3)),
-    ?assertEqual({value, 'v_02'}, b_trees:lookup('k_02', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_03', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_04', _BTree_3)),
-    ?assertEqual({value, 'v_05'}, b_trees:lookup('k_05', _BTree_3)),
-    ?assertEqual({value, 'v_06'}, b_trees:lookup('k_06', _BTree_3)),
-    ?assertEqual({value, 'v_07'}, b_trees:lookup('k_07', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_08', _BTree_3)),
-    ?assertEqual({value, 'v_09'}, b_trees:lookup('k_09', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_10', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_11', _BTree_3)),
-    ?assertEqual({value, 'v_12'}, b_trees:lookup('k_12', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_13', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_14', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_15', _BTree_3)),
-    ?assertEqual({value, 'v_16'}, b_trees:lookup('k_16', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_17', _BTree_3)),
-    ?assertEqual({value, 'v_18'}, b_trees:lookup('k_18', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_19', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_20', _BTree_3)),
-    ?assertEqual({value, 'v_21'}, b_trees:lookup('k_21', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup('k_22', _BTree_3)).
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_05"}, b_trees:lookup("k_05", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_06"}, b_trees:lookup("k_06", ?B_TREE_07_07)),
+    ?assertEqual({value, "v_07"}, b_trees:lookup("k_07", ?B_TREE_07_07)),
+    ?assertEqual(none, b_trees:lookup("k_08", ?B_TREE_07_07)),
+
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_05"}, b_trees:lookup("k_05", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_06"}, b_trees:lookup("k_06", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_07"}, b_trees:lookup("k_07", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_08"}, b_trees:lookup("k_08", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_09"}, b_trees:lookup("k_09", ?B_TREE_10_10)),
+    ?assertEqual({value, "v_10"}, b_trees:lookup("k_10", ?B_TREE_10_10)),
+    ?assertEqual(none, b_trees:lookup("k_11", ?B_TREE_10_10)),
+
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_05"}, b_trees:lookup("k_05", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_06"}, b_trees:lookup("k_06", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_07"}, b_trees:lookup("k_07", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_08"}, b_trees:lookup("k_08", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_09"}, b_trees:lookup("k_09", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_10"}, b_trees:lookup("k_10", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_11"}, b_trees:lookup("k_11", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_12"}, b_trees:lookup("k_12", ?B_TREE_13_13)),
+    ?assertEqual({value, "v_13"}, b_trees:lookup("k_13", ?B_TREE_13_13)),
+    ?assertEqual(none, b_trees:lookup("k_14", ?B_TREE_13_13)),
+
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_05"}, b_trees:lookup("k_05", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_06"}, b_trees:lookup("k_06", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_07"}, b_trees:lookup("k_07", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_08"}, b_trees:lookup("k_08", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_09"}, b_trees:lookup("k_09", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_10"}, b_trees:lookup("k_10", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_11"}, b_trees:lookup("k_11", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_12"}, b_trees:lookup("k_12", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_13"}, b_trees:lookup("k_13", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_14"}, b_trees:lookup("k_14", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_15"}, b_trees:lookup("k_15", ?B_TREE_16_16)),
+    ?assertEqual({value, "v_16"}, b_trees:lookup("k_16", ?B_TREE_16_16)),
+    ?assertEqual(none, b_trees:lookup("k_17", ?B_TREE_16_16)),
+
+    ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_05"}, b_trees:lookup("k_05", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_06"}, b_trees:lookup("k_06", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_07"}, b_trees:lookup("k_07", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_08"}, b_trees:lookup("k_08", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_09"}, b_trees:lookup("k_09", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_10"}, b_trees:lookup("k_10", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_11"}, b_trees:lookup("k_11", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_12"}, b_trees:lookup("k_12", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_13"}, b_trees:lookup("k_13", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_14"}, b_trees:lookup("k_14", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_15"}, b_trees:lookup("k_15", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_16"}, b_trees:lookup("k_16", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_17"}, b_trees:lookup("k_17", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_18"}, b_trees:lookup("k_18", ?B_TREE_19_19)),
+    ?assertEqual({value, "v_19"}, b_trees:lookup("k_19", ?B_TREE_19_19)),
+    ?assertEqual(none, b_trees:lookup("k_20", ?B_TREE_19_19)),
+
+    ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: lookup_nodes
+%% TEST CASES: performance insert b_tree order 1025
 %%--------------------------------------------------------------------
 
-lookup_nodes_test(_Config) ->
-    _BTree_1 = {
-        [
-            {1, 1, 0, [], [{k_2, v_2}]}
-        ], 3, 6
-    },
-    ?assertEqual(none, b_trees:lookup_nodes(1, 'k_1', _BTree_1)),
-    ?assertEqual({value, 'v_2'}, b_trees:lookup_nodes(1, 'k_2', _BTree_1)),
-    ?assertEqual(none, b_trees:lookup_nodes(1, 'k_3', _BTree_1)),
-
-    _BTree_3 = {
-        [
-            {1, 1, 0, [2, 3, 4], [{k_07, v_07}, {k_16, v_16}]},
-            {2, 1, 1, [], [{k_01, v_01}, {k_02, v_02}, {k_05, v_05}, {k_06, v_06}]},
-            {2, 2, 1, [], [{k_09, v_09}, {k_12, v_12}]},
-            {2, 3, 1, [], [{k_18, v_18}, {k_21, v_21}]}
-        ], 3, 6
-    },
-    ?assertEqual(none, b_trees:lookup_nodes(2, 'k_00', _BTree_3)),
-    ?assertEqual({value, 'v_01'}, b_trees:lookup_nodes(2, 'k_01', _BTree_3)),
-    ?assertEqual({value, 'v_02'}, b_trees:lookup_nodes(2, 'k_02', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(2, 'k_03', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(2, 'k_04', _BTree_3)),
-    ?assertEqual({value, 'v_05'}, b_trees:lookup_nodes(2, 'k_05', _BTree_3)),
-    ?assertEqual({value, 'v_06'}, b_trees:lookup_nodes(2, 'k_06', _BTree_3)),
-    ?assertEqual({value, 'v_07'}, b_trees:lookup_nodes(1, 'k_07', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(3, 'k_08', _BTree_3)),
-    ?assertEqual({value, 'v_09'}, b_trees:lookup_nodes(3, 'k_09', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(3, 'k_10', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(3, 'k_11', _BTree_3)),
-    ?assertEqual({value, 'v_12'}, b_trees:lookup_nodes(3, 'k_12', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(3, 'k_13', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(3, 'k_14', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(3, 'k_15', _BTree_3)),
-    ?assertEqual({value, 'v_16'}, b_trees:lookup_nodes(1, 'k_16', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(4, 'k_17', _BTree_3)),
-    ?assertEqual({value, 'v_18'}, b_trees:lookup_nodes(4, 'k_18', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(4, 'k_19', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(4, 'k_20', _BTree_3)),
-    ?assertEqual({value, 'v_21'}, b_trees:lookup_nodes(4, 'k_21', _BTree_3)),
-    ?assertEqual(none, b_trees:lookup_nodes(4, 'k_22', _BTree_3)).
+performance_insert_b_tree_order_1025_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number(1025, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_1025_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(1025 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(1025 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 129
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_129_test(_Config) ->
-    test_generator:generate_b_tree_from_number(129, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(129, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_129_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(129 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(129 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 17
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_17_test(_Config) ->
-    test_generator:generate_b_tree_from_number(17, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(17, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_17_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(17 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(17 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 257
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_257_test(_Config) ->
-    test_generator:generate_b_tree_from_number(257, 2000, 4).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 3
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_3_test(_Config) ->
-    test_generator:generate_b_tree_from_number(3, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(257, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_257_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(257 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(257 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 33
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_33_test(_Config) ->
-    test_generator:generate_b_tree_from_number(33, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(33, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_33_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(33 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(33 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 5
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_5_test(_Config) ->
-    test_generator:generate_b_tree_from_number(5, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_5_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(5 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance insert b_tree order 513
+%%--------------------------------------------------------------------
+
+performance_insert_b_tree_order_513_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number(513, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_513_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(513 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(513 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 65
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_65_test(_Config) ->
-    test_generator:generate_b_tree_from_number(65, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(65, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_65_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(65 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(65 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 9
 %%--------------------------------------------------------------------
 
 performance_insert_b_tree_order_9_test(_Config) ->
-    test_generator:generate_b_tree_from_number(9, 2000, 4).
+    BTree = test_generator:generate_b_tree_from_number(9, ?NUMBER_INSERTS, 4),
+    ?debugFmt("wwe debugging performance_insert_b_tree_order_9_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(9 div 2)]),
+    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert gb_tree
 %%--------------------------------------------------------------------
 
 performance_insert_gb_tree_test(_Config) ->
-    test_generator:generate_gb_tree_from_number(2000, 4).
+    test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance lookup b_tree order 1025
+%%--------------------------------------------------------------------
+
+performance_lookup_b_tree_order_1025_test(Config) ->
+    BTree = ?config(btree_1025, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
+    ok.
+
+lookup_b_tree([], _) ->
+    none;
+lookup_b_tree([Key | Tail], BTree) ->
+    b_trees:lookup(Key, BTree),
+    lookup_b_tree(Tail, BTree).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 129
@@ -498,12 +458,6 @@ performance_lookup_b_tree_order_129_test(Config) ->
     LookUps = ?config(lookUps, Config),
     lookup_b_tree(LookUps, BTree),
     ok.
-
-lookup_b_tree([], _) ->
-    none;
-lookup_b_tree([Key | Tail], BTree) ->
-    b_trees:lookup(Key, BTree),
-    lookup_b_tree(Tail, BTree).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 17
@@ -526,16 +480,6 @@ performance_lookup_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 3
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_3_test(Config) ->
-    BTree = ?config(btree_3, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 33
 %%--------------------------------------------------------------------
 
@@ -551,6 +495,16 @@ performance_lookup_b_tree_order_33_test(Config) ->
 
 performance_lookup_b_tree_order_5_test(Config) ->
     BTree = ?config(btree_5, Config),
+    LookUps = ?config(lookUps, Config),
+    lookup_b_tree(LookUps, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance lookup b_tree order 513
+%%--------------------------------------------------------------------
+
+performance_lookup_b_tree_order_513_test(Config) ->
+    BTree = ?config(btree_513, Config),
     LookUps = ?config(lookUps, Config),
     lookup_b_tree(LookUps, BTree),
     ok.
@@ -596,25 +550,30 @@ lookup_gb_tree([Key | Tail], GBTree) ->
 %%--------------------------------------------------------------------
 
 size_test(_Config) ->
-    _BStarTree_7_0 = b_trees:empty(6, b_star),
-    ?assertEqual(0, b_trees:size(_BStarTree_7_0)),
 
-    _BTree_1 = {
-        [
-            {1, 1, 0, [], [{k_2, v_2}]}
-        ], 3, 6
-    },
-    ?assertEqual(1, b_trees:size(_BTree_1)),
+    ?assertEqual(0, b_trees:size(b_trees:empty(5))),
 
-    _BTree_3 = {
-        [
-            {1, 1, 0, [2, 3, 4], [{k_07, v_07}, {k_16, v_16}]},
-            {2, 1, 1, [], [{k_01, v_01}, {k_02, v_02}, {k_05, v_05}, {k_06, v_06}]},
-            {2, 2, 1, [], [{k_09, v_09}, {k_12, v_12}]},
-            {2, 3, 1, [], [{k_18, v_18}, {k_21, v_21}]}
-        ], 3, 6
-    },
-    ?assertEqual(4, b_trees:size(_BTree_3)),
+    ?assertEqual(1, b_trees:size(?B_TREE_05_01)),
 
-    _BTree_7_0 = b_trees:empty(7),
-    ?assertEqual(0, b_trees:size(_BTree_7_0)).
+    ?assertEqual(3, b_trees:size(?B_TREE_05_05)),
+
+    ?assertEqual(5, b_trees:size(?B_TREE_05_11)),
+
+    ?assertEqual(8, b_trees:size(?B_TREE_05_16)),
+
+    ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
+
+    ?assertEqual(0, b_trees:size(b_trees:empty(5, b_star))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% Helper functions.
+%%--------------------------------------------------------------------
+
+int_ceil(X) ->
+    T = trunc(X),
+    if
+        X > T -> T + 1;
+        true -> T
+    end.
