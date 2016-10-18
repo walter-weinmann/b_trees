@@ -47,7 +47,8 @@ all() ->
         is_empty_test,
         keys_test,
         lookup_test,
-        size_test
+        size_test,
+        values_test
     ].
 
 %%--------------------------------------------------------------------
@@ -432,5 +433,20 @@ size_test(_Config) ->
     ?assertEqual(8, b_trees:size(?B_TREE_05_16)),
     ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
     ?assertEqual(0, b_trees:size(b_trees:empty(5, b_star))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: values
+%%--------------------------------------------------------------------
+
+values_test(_Config) ->
+    ?assertEqual([], b_trees:values(?B_TREE_05_00)),
+    ?assertEqual(["v_01"], b_trees:values(?B_TREE_05_01)),
+    ?assertEqual(2, length(b_trees:values(?B_TREE_05_02))),
+    ?assertEqual(5, length(b_trees:values(?B_TREE_05_05))),
+    ?assertEqual(9, length(b_trees:values(?B_TREE_05_09))),
+    ?assertEqual(16, length(b_trees:values(?B_TREE_05_16))),
+    ?assertEqual(80, length(b_trees:values(?B_TREE_07_80))),
 
     ok.

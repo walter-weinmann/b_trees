@@ -68,6 +68,9 @@
 %% - size(T): returns the number of nodes in the B-tree / B*-tree T 
 %%   as an integer. Returns 0 (zero) if the B-tree / B*-tree T is empty.
 %%
+%% - values(T): returns the list of values for all keys in 
+%%   B-tree / B*-tree T. Duplicates are not removed.
+%%
 
 
 %% - enter(X, V, T): inserts key X with value V into tree T if the key
@@ -108,9 +111,6 @@
 %% - to_list(T): returns an ordered list of {Key, Value} pairs for all
 %%   keys in tree T.
 %%
-%% - values(T): returns the list of values for all keys in tree T,
-%%   sorted by their corresponding keys. Duplicates are not removed.
-%%
 %% - update(X, V, T): updates key X to value V in tree T; returns the
 %%   new tree. Assumes that the key is present in the tree.
 %%
@@ -148,17 +148,20 @@
     empty/2,
     height/1,
     insert/3,
+    is_defined/2,
     is_empty/1,
+    keys/1,
     lookup/2,
     number_key_values/1,
-    size/1
+    size/1,
+    values/1
 ]).
 
 -define(BINARY_SEARCH_INSERT, 4).
 
--ifdef(EUNIT).
--compile([export_all]).
--endif.
+%%-ifdef(EUNIT).
+%%-compile([export_all]).
+%%-endif.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
@@ -284,6 +287,15 @@ size({_, _, _, 0, nil}) ->
     0;
 size({_, _, _, _, Tree}) ->
     size_tree(Tree, 0).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec values(b_tree()) -> [value()].
+
+values({_, _, _, 0, nil}) ->
+    [];
+values({_, _, _, _, Tree}) ->
+    values_tree(Tree, []).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Helper functions.
@@ -511,6 +523,29 @@ split_tree_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit) ->
             }
         ]
     }.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec values([key_value(), ...], [value()]) -> [value()].
+
+values([], Values) ->
+    Values;
+values([{_, Value} | Tail], Values) ->
+    values(Tail, Values ++ [Value]).
+
+-spec values_tree(tree(), [value()]) -> [value()].
+
+values_tree({_, true, KeyValues, _}, Values) ->
+    values(KeyValues, Values);
+values_tree({_, _, KeyValues, Trees}, Values) ->
+    values_trees(Trees, values(KeyValues, Values)).
+
+-spec values_trees([tree(), ...], [value()]) -> [value()].
+
+values_trees([], Values) ->
+    Values;
+values_trees([Tree | Tail], Values) ->
+    values_trees(Tail, values_tree(Tree, Values)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Test functions.

@@ -15,8 +15,6 @@
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
--include_lib("../include/b_trees_templates.hrl").
-
 -define(NUMBER_INSERTS, 2000).
 -define(NUMBER_LOOKUPS, 10000).
 
@@ -96,7 +94,18 @@ all() ->
         performance_lookup_b_tree_order_257_test,
         performance_lookup_b_tree_order_513_test,
         performance_lookup_b_tree_order_1025_test,
-        performance_lookup_gb_tree_test
+        performance_lookup_gb_tree_test,
+
+        performance_values_b_tree_order_5_test,
+        performance_values_b_tree_order_9_test,
+        performance_values_b_tree_order_17_test,
+        performance_values_b_tree_order_33_test,
+        performance_values_b_tree_order_65_test,
+        performance_values_b_tree_order_129_test,
+        performance_values_b_tree_order_257_test,
+        performance_values_b_tree_order_513_test,
+        performance_values_b_tree_order_1025_test,
+        performance_values_gb_tree_test
     ].
 
 %%--------------------------------------------------------------------
@@ -501,6 +510,106 @@ lookup_gb_tree([], _) ->
 lookup_gb_tree([Key | Tail], GBTree) ->
     gb_trees:lookup(Key, GBTree),
     lookup_gb_tree(Tail, GBTree).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 1025
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_1025_test(Config) ->
+    BTree = ?config(btree_1025, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 129
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_129_test(Config) ->
+    BTree = ?config(btree_129, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 17
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_17_test(Config) ->
+    BTree = ?config(btree_17, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 257
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_257_test(Config) ->
+    BTree = ?config(btree_257, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 33
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_33_test(Config) ->
+    BTree = ?config(btree_33, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 5
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_5_test(Config) ->
+    BTree = ?config(btree_5, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 513
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_513_test(Config) ->
+    BTree = ?config(btree_513, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 65
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_65_test(Config) ->
+    BTree = ?config(btree_65, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values b_tree order 9
+%%--------------------------------------------------------------------
+
+performance_values_b_tree_order_9_test(Config) ->
+    BTree = ?config(btree_9, Config),
+    Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance values gb_tree
+%%--------------------------------------------------------------------
+
+performance_values_gb_tree_test(Config) ->
+    GBTree = ?config(gbtree, Config),
+    Keys = gb_trees:values(GBTree),
+    ?assertEqual(?NUMBER_INSERTS, length(Keys)),
+    ok.
 
 %%--------------------------------------------------------------------
 %% Helper functions.
