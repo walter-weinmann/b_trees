@@ -93,4 +93,4 @@ generate_keys_2([], _, Keys) ->
     Keys;
 generate_keys_2([Key | Tail], Format, Keys) ->
     LastString = lists:flatten(io_lib:format(Format, [Key])),
-    generate_keys_2(Tail, Format, Keys ++ "k_" ++ LastString).
+    generate_keys_2(Tail, Format, Keys ++ ["k_" ++ LastString]).

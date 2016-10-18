@@ -22,6 +22,114 @@ empty_test() ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: get
+%%--------------------------------------------------------------------
+
+get_test() ->
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_04_00)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_04_04)),
+    ?assertEqual("v_01", b_trees:get("k_01", ?B_TREE_04_04)),
+    ?assertEqual("v_02", b_trees:get("k_02", ?B_TREE_04_04)),
+    ?assertEqual("v_03", b_trees:get("k_03", ?B_TREE_04_04)),
+    ?assertEqual("v_04", b_trees:get("k_04", ?B_TREE_04_04)),
+    ?assertException(error, {key_not_found, "k_05"}, b_trees:get("k_05", ?B_TREE_04_04)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_07_07)),
+    ?assertEqual("v_01", b_trees:get("k_01", ?B_TREE_07_07)),
+    ?assertEqual("v_02", b_trees:get("k_02", ?B_TREE_07_07)),
+    ?assertEqual("v_03", b_trees:get("k_03", ?B_TREE_07_07)),
+    ?assertEqual("v_04", b_trees:get("k_04", ?B_TREE_07_07)),
+    ?assertEqual("v_05", b_trees:get("k_05", ?B_TREE_07_07)),
+    ?assertEqual("v_06", b_trees:get("k_06", ?B_TREE_07_07)),
+    ?assertEqual("v_07", b_trees:get("k_07", ?B_TREE_07_07)),
+    ?assertException(error, {key_not_found, "k_08"}, b_trees:get("k_08", ?B_TREE_07_07)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_10_10)),
+    ?assertEqual("v_01", b_trees:get("k_01", ?B_TREE_10_10)),
+    ?assertEqual("v_02", b_trees:get("k_02", ?B_TREE_10_10)),
+    ?assertEqual("v_03", b_trees:get("k_03", ?B_TREE_10_10)),
+    ?assertEqual("v_04", b_trees:get("k_04", ?B_TREE_10_10)),
+    ?assertEqual("v_05", b_trees:get("k_05", ?B_TREE_10_10)),
+    ?assertEqual("v_06", b_trees:get("k_06", ?B_TREE_10_10)),
+    ?assertEqual("v_07", b_trees:get("k_07", ?B_TREE_10_10)),
+    ?assertEqual("v_08", b_trees:get("k_08", ?B_TREE_10_10)),
+    ?assertEqual("v_09", b_trees:get("k_09", ?B_TREE_10_10)),
+    ?assertEqual("v_10", b_trees:get("k_10", ?B_TREE_10_10)),
+    ?assertException(error, {key_not_found, "k_11"}, b_trees:get("k_11", ?B_TREE_10_10)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_13_13)),
+    ?assertEqual("v_01", b_trees:get("k_01", ?B_TREE_13_13)),
+    ?assertEqual("v_02", b_trees:get("k_02", ?B_TREE_13_13)),
+    ?assertEqual("v_03", b_trees:get("k_03", ?B_TREE_13_13)),
+    ?assertEqual("v_04", b_trees:get("k_04", ?B_TREE_13_13)),
+    ?assertEqual("v_05", b_trees:get("k_05", ?B_TREE_13_13)),
+    ?assertEqual("v_06", b_trees:get("k_06", ?B_TREE_13_13)),
+    ?assertEqual("v_07", b_trees:get("k_07", ?B_TREE_13_13)),
+    ?assertEqual("v_08", b_trees:get("k_08", ?B_TREE_13_13)),
+    ?assertEqual("v_09", b_trees:get("k_09", ?B_TREE_13_13)),
+    ?assertEqual("v_10", b_trees:get("k_10", ?B_TREE_13_13)),
+    ?assertEqual("v_11", b_trees:get("k_11", ?B_TREE_13_13)),
+    ?assertEqual("v_12", b_trees:get("k_12", ?B_TREE_13_13)),
+    ?assertEqual("v_13", b_trees:get("k_13", ?B_TREE_13_13)),
+    ?assertException(error, {key_not_found, "k_14"}, b_trees:get("k_14", ?B_TREE_13_13)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_16_16)),
+    ?assertEqual("v_01", b_trees:get("k_01", ?B_TREE_16_16)),
+    ?assertEqual("v_02", b_trees:get("k_02", ?B_TREE_16_16)),
+    ?assertEqual("v_03", b_trees:get("k_03", ?B_TREE_16_16)),
+    ?assertEqual("v_04", b_trees:get("k_04", ?B_TREE_16_16)),
+    ?assertEqual("v_05", b_trees:get("k_05", ?B_TREE_16_16)),
+    ?assertEqual("v_06", b_trees:get("k_06", ?B_TREE_16_16)),
+    ?assertEqual("v_07", b_trees:get("k_07", ?B_TREE_16_16)),
+    ?assertEqual("v_08", b_trees:get("k_08", ?B_TREE_16_16)),
+    ?assertEqual("v_09", b_trees:get("k_09", ?B_TREE_16_16)),
+    ?assertEqual("v_10", b_trees:get("k_10", ?B_TREE_16_16)),
+    ?assertEqual("v_11", b_trees:get("k_11", ?B_TREE_16_16)),
+    ?assertEqual("v_12", b_trees:get("k_12", ?B_TREE_16_16)),
+    ?assertEqual("v_13", b_trees:get("k_13", ?B_TREE_16_16)),
+    ?assertEqual("v_14", b_trees:get("k_14", ?B_TREE_16_16)),
+    ?assertEqual("v_15", b_trees:get("k_15", ?B_TREE_16_16)),
+    ?assertEqual("v_16", b_trees:get("k_16", ?B_TREE_16_16)),
+    ?assertException(error, {key_not_found, "k_17"}, b_trees:get("k_17", ?B_TREE_16_16)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", ?B_TREE_19_19)),
+    ?assertEqual("v_01", b_trees:get("k_01", ?B_TREE_19_19)),
+    ?assertEqual("v_02", b_trees:get("k_02", ?B_TREE_19_19)),
+    ?assertEqual("v_03", b_trees:get("k_03", ?B_TREE_19_19)),
+    ?assertEqual("v_04", b_trees:get("k_04", ?B_TREE_19_19)),
+    ?assertEqual("v_05", b_trees:get("k_05", ?B_TREE_19_19)),
+    ?assertEqual("v_06", b_trees:get("k_06", ?B_TREE_19_19)),
+    ?assertEqual("v_07", b_trees:get("k_07", ?B_TREE_19_19)),
+    ?assertEqual("v_08", b_trees:get("k_08", ?B_TREE_19_19)),
+    ?assertEqual("v_09", b_trees:get("k_09", ?B_TREE_19_19)),
+    ?assertEqual("v_10", b_trees:get("k_10", ?B_TREE_19_19)),
+    ?assertEqual("v_11", b_trees:get("k_11", ?B_TREE_19_19)),
+    ?assertEqual("v_12", b_trees:get("k_12", ?B_TREE_19_19)),
+    ?assertEqual("v_13", b_trees:get("k_13", ?B_TREE_19_19)),
+    ?assertEqual("v_14", b_trees:get("k_14", ?B_TREE_19_19)),
+    ?assertEqual("v_15", b_trees:get("k_15", ?B_TREE_19_19)),
+    ?assertEqual("v_16", b_trees:get("k_16", ?B_TREE_19_19)),
+    ?assertEqual("v_17", b_trees:get("k_17", ?B_TREE_19_19)),
+    ?assertEqual("v_18", b_trees:get("k_18", ?B_TREE_19_19)),
+    ?assertEqual("v_19", b_trees:get("k_19", ?B_TREE_19_19)),
+    ?assertException(error, {key_not_found, "k_20"}, b_trees:get("k_20", ?B_TREE_19_19)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: height
+%%--------------------------------------------------------------------
+
+height_test() ->
+    ?assertEqual(0, b_trees:height(?B_TREE_05_00)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_02)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_05)),
+    ?assertEqual(3, b_trees:height(?B_TREE_05_16)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: insert - key exists
 %%--------------------------------------------------------------------
 
@@ -373,6 +481,21 @@ lookup_test() ->
     ?assertEqual({value, "v_18"}, b_trees:lookup("k_18", ?B_TREE_19_19)),
     ?assertEqual({value, "v_19"}, b_trees:lookup("k_19", ?B_TREE_19_19)),
     ?assertEqual(none, b_trees:lookup("k_20", ?B_TREE_19_19)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: number_key_values
+%%--------------------------------------------------------------------
+
+number_key_values_test() ->
+    ?assertEqual(0, b_trees:number_key_values(?B_TREE_05_00)),
+    ?assertEqual(2, b_trees:number_key_values(?B_TREE_05_02)),
+    ?assertEqual(5, b_trees:number_key_values(?B_TREE_05_05)),
+    ?assertEqual(16, b_trees:number_key_values(?B_TREE_05_16)),
+    ?assertEqual(29, b_trees:number_key_values(?B_TREE_05_29)),
+    ?assertEqual(19, b_trees:number_key_values(?B_TREE_19_19)),
+    ?assertEqual(80, b_trees:number_key_values(?B_TREE_07_80)),
 
     ok.
 

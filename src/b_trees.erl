@@ -1,4 +1,4 @@
-% -define(NODEBUG, true).
+-define(NODEBUG, true).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -43,33 +43,36 @@
 %%   defined as the maximum number of children nodes a non-leaf node 
 %%   may hold. The minimum value is 4.
 %%
-%% - height(T): returns the height of the B-tree / B*-tree T as an integer.
-%%   Returns 0 (zero) if the B-tree / B*-tree T is empty.
+%% - get(K, B): retreives the value stored with key K in 
+%%   B-tree / B*-tree T. Assumes that the key is present in the tree.
 %%
-%% - insert(X, V, T): inserts key X with value V into B-tree / B*-tree T; 
-%%   returns the new B-tree / B*-tree. Assumes that the key is *not* 
-%%   present in the B-tree / B*-tree T.
+%% - height(B): returns the height of the B-tree / B*-tree B as an integer.
+%%   Returns 0 (zero) if the B-tree / B*-tree B is empty.
 %%
-%% - is_defined(X, T): returns `true' if key X is present in 
-%%   B-tree / B*-tree T, and `false' otherwise.
+%% - insert(K, V, B): inserts key K with value V into B-tree / B*-tree B; 
+%%   returns the new B-tree / B*-tree. Assumes that the key K is *not* 
+%%   present in the B-tree / B*-tree B.
 %%
-%% - is_empty(T): returns 'true' if T is an empty B-tree / B*-tree, 
+%% - is_defined(K, B): returns `true' if key K is present in 
+%%   B-tree / B*-tree B, and `false' otherwise.
+%%
+%% - is_empty(B): returns 'true' if B is an empty B-tree / B*-tree, 
 %%   and 'false' otherwise.
 %%
-%% - keys(T): returns a list of all keys in B-tree / B*-tree T.
+%% - keys(B): returns a list of all keys in B-tree / B*-tree B.
 %%
-%% - lookup(X, T): looks up key X in B-tree / B*-tree T; returns {value, V}, 
-%%   or `none' if the key is not present.
+%% - lookup(K, B): looks up key K in B-tree / B*-tree B; returns {value, V}, 
+%%   or `none' if the key K is not present.
 %%
-%% - number_key_values(T): returns the number of key / value pairs in the 
-%%   B-tree / B*-tree T as an integer. Returns 0 (zero) if the 
-%%   B-tree / B*-tree T is empty.
+%% - number_key_values(B): returns the number of key / value pairs in the 
+%%   B-tree / B*-tree B as an integer. Returns 0 (zero) if the 
+%%   B-tree / B*-tree B is empty.
 %%
-%% - size(T): returns the number of nodes in the B-tree / B*-tree T 
-%%   as an integer. Returns 0 (zero) if the B-tree / B*-tree T is empty.
+%% - size(B): returns the number of nodes in the B-tree / B*-tree B 
+%%   as an integer. Returns 0 (zero) if the B-tree / B*-tree B is empty.
 %%
-%% - values(T): returns the list of values for all keys in 
-%%   B-tree / B*-tree T. Duplicates are not removed.
+%% - values(B): returns the list of values for all keys in 
+%%   B-tree / B*-tree B. Duplicates are not removed.
 %%
 
 
@@ -79,9 +82,6 @@
 %%
 %% - from_orddict(L): turns an ordered list L of {Key, Value} pairs into
 %%   a tree. The list must not contain duplicate keys.
-%%
-%% - get(X, T): retreives the value stored with key X in tree T. Assumes
-%%   that the key is present in the tree.
 %%
 %% - iterator(T): returns an iterator that can be used for traversing
 %%   the entries of tree T; see `next'. The implementation of this is
@@ -146,6 +146,7 @@
 -export([
     empty/1,
     empty/2,
+    get/2,
     height/1,
     insert/3,
     is_defined/2,
@@ -157,11 +158,7 @@
     values/1
 ]).
 
--define(BINARY_SEARCH_INSERT, 4).
-
-%%-ifdef(EUNIT).
-%%-compile([export_all]).
-%%-endif.
+-define(BINARY_SEARCH_FROM_LENGTH, 4).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
@@ -192,6 +189,22 @@ empty(Order) when Order > 3 ->
     {b, Order div 2, Order - 1, 0, nil}.
 empty(Order, b_star) when Order > 3 ->
     {b_star, Order * 2 div 3, Order - 1, 0, nil}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% This is a specialized version of `lookup'.
+
+-spec get(key(), b_tree()) -> value().
+
+get(Key, {_, _, _, 0, nil}) ->
+    erlang:error({key_not_found, Key});
+get(Key, {_, _, _, _, Tree} = _X) ->
+    case lookup_1(Key, Tree) of
+        {value, Value} ->
+            Value;
+        _ ->
+            erlang:error({key_not_found, Key})
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -356,7 +369,7 @@ insert_into_tree(KeyValue, {KeyNo, true = IsLeaf, KeyValues, Trees} = _Tree, _Ke
     TreeOut = {KeyNo + 1, IsLeaf, insert_into_key_values(KeyValue, KeyValues, []), Trees ++ [nil]},
     TreeOut;
 insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} = _Tree, KeyNoMin, KeyNoMax) ->
-    {ValueFound, TreeUpperPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_INSERT),
+    {ValueFound, TreeUpperPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_FROM_LENGTH),
     case ValueFound of
         none ->
             TreeUpper = lists:nth(TreeUpperPos, Trees),
@@ -376,7 +389,7 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} 
                                                                                                        end
                                                                                                end,
                                                                                   {KeyValuesSplit, TreesSplit} = split_tree_non_root(TreeUpper, KeyNoSplit, KeyValues, Trees, TreeUpperPos),
-                                                                                  {none, TreeUpperPosSplit} = search(Key, KeyValuesSplit, length(KeyValuesSplit), ?BINARY_SEARCH_INSERT),
+                                                                                  {none, TreeUpperPosSplit} = search(Key, KeyValuesSplit, length(KeyValuesSplit), ?BINARY_SEARCH_FROM_LENGTH),
                                                                                   {lists:nth(TreeUpperPosSplit, TreesSplit), KeyValuesSplit, TreesSplit, TreeUpperPosSplit};
                                                                               _ ->
                                                                                   {TreeUpper, KeyValues, Trees, TreeUpperPos}
