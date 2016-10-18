@@ -48,9 +48,12 @@ all() ->
         is_defined_test,
         is_empty_test,
         keys_test,
+        largest_test,
         lookup_test,
         number_key_values_test,
         size_test,
+        smallest_test,
+        to_list_test,
         values_test
     ].
 
@@ -437,6 +440,22 @@ keys_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: largest
+%%--------------------------------------------------------------------
+
+largest_test(_Config) ->
+    ?assertException(error, {empty_tree, _}, b_trees:largest(?B_TREE_05_00)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:largest(?B_TREE_05_01)),
+    ?assertEqual({"k_02", "v_02"}, b_trees:largest(?B_TREE_05_02)),
+    ?assertEqual({"k_05", "v_05"}, b_trees:largest(?B_TREE_05_05)),
+    ?assertEqual({"k_09", "v_09"}, b_trees:largest(?B_TREE_05_09)),
+    ?assertEqual({"k_16", "v_16"}, b_trees:largest(?B_TREE_05_16)),
+    ?assertEqual({"k_19", "v_19"}, b_trees:largest(?B_TREE_19_19)),
+    ?assertEqual({"k_967", "v_967"}, b_trees:largest(?B_TREE_07_80)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: lookup
 %%--------------------------------------------------------------------
 
@@ -559,6 +578,37 @@ size_test(_Config) ->
     ?assertEqual(8, b_trees:size(?B_TREE_05_16)),
     ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
     ?assertEqual(0, b_trees:size(b_trees:empty(5, b_star))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: smallest
+%%--------------------------------------------------------------------
+
+smallest_test(_Config) ->
+    ?assertException(error, {empty_tree, _}, b_trees:smallest(?B_TREE_05_00)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_05_01)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_05_02)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_05_05)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_05_09)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_05_16)),
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_19_19)),
+    ?assertEqual({"k_011", "v_011"}, b_trees:smallest(?B_TREE_07_80)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: to_list
+%%--------------------------------------------------------------------
+
+to_list_test(_Config) ->
+    ?assertException(error, {empty_tree, _}, b_trees:to_list(?B_TREE_05_00)),
+    ?assertEqual([{"k_01", "v_01"}], b_trees:to_list(?B_TREE_05_01)),
+    ?assertEqual(2, length(b_trees:to_list(?B_TREE_05_02))),
+    ?assertEqual(5, length(b_trees:to_list(?B_TREE_05_05))),
+    ?assertEqual(9, length(b_trees:to_list(?B_TREE_05_09))),
+    ?assertEqual(16, length(b_trees:to_list(?B_TREE_05_16))),
+    ?assertEqual(80, length(b_trees:to_list(?B_TREE_07_80))),
 
     ok.
 

@@ -61,6 +61,10 @@
 %%
 %% - keys(B): returns a list of all keys in B-tree / B*-tree B.
 %%
+%% - largest(B): returns {K, V}, where K is the largest key in 
+%%   B-tree / B*-tree B, and V is the value associated with K in B. 
+%%   Assumes that the B-tree / B*-tree B is nonempty.
+%%
 %% - lookup(K, B): looks up key K in B-tree / B*-tree B; returns {value, V}, 
 %%   or `none' if the key K is not present.
 %%
@@ -71,11 +75,30 @@
 %% - size(B): returns the number of nodes in the B-tree / B*-tree B 
 %%   as an integer. Returns 0 (zero) if the B-tree / B*-tree B is empty.
 %%
+%% - smallest(B): returns {K, V}, where K is the smallest key in 
+%%   B-tree / B*-tree B, and V is the value associated with K in B. 
+%%   Assumes that the B-tree / B*-tree B is nonempty.
+%%
+%% - to_list(B): returns a list of {Key, Value} pairs for all keys
+%%   in B-tree / B*-tree B.
+%%
 %% - values(B): returns the list of values for all keys in 
 %%   B-tree / B*-tree B. Duplicates are not removed.
 %%
 
 
+%% - balance(T): rebalances tree T. Note that this is rarely necessary,
+%%   but may be motivated when a large number of entries have been
+%%   deleted from the tree without further insertions. Rebalancing could
+%%   then be forced in order to minimise lookup times, since deletion
+%%   only does not rebalance the tree.
+%%
+%% - delete(X, T): removes key X from tree T; returns new tree. Assumes
+%%   that the key is present in the tree.
+%%
+%% - delete_any(X, T): removes key X from tree T if the key is present
+%%   in the tree, otherwise does nothing; returns new tree.
+%%
 %% - enter(X, V, T): inserts key X with value V into tree T if the key
 %%   is not present in the tree, otherwise updates key X to value V in
 %%   T. Returns the new tree.
@@ -95,42 +118,14 @@
 %%   traversing the entries of tree T with key greater than or
 %%   equal to K; see `next'.
 %%
-%% - largest(T): returns {X, V}, where X is the largest key in tree T,
-%%   and V is the value associated with X in T. Assumes that the tree T
-%%   is nonempty.
+%% - map(F, T): maps the function F(K, V) -> V' to all key-value pairs
+%%   of the tree T and returns a new tree T' with the same set of keys
+%%   as T and the new set of values V'.
 %%
 %% - next(S): returns {X, V, S1} where X is the smallest key referred to
 %%   by the iterator S, and S1 is the new iterator to be used for
 %%   traversing the remaining entries, or the atom `none' if no entries
 %%   remain.
-%%
-%% - smallest(T): returns {X, V}, where X is the smallest key in tree T,
-%%   and V is the value associated with X in T. Assumes that the tree T
-%%   is nonempty.
-%%
-%% - to_list(T): returns an ordered list of {Key, Value} pairs for all
-%%   keys in tree T.
-%%
-%% - update(X, V, T): updates key X to value V in tree T; returns the
-%%   new tree. Assumes that the key is present in the tree.
-%%
-
-
-%% - balance(T): rebalances tree T. Note that this is rarely necessary,
-%%   but may be motivated when a large number of entries have been
-%%   deleted from the tree without further insertions. Rebalancing could
-%%   then be forced in order to minimise lookup times, since deletion
-%%   only does not rebalance the tree.
-%%
-%% - delete(X, T): removes key X from tree T; returns new tree. Assumes
-%%   that the key is present in the tree.
-%%
-%% - delete_any(X, T): removes key X from tree T if the key is present
-%%   in the tree, otherwise does nothing; returns new tree.
-%%
-%% - map(F, T): maps the function F(K, V) -> V' to all key-value pairs
-%%   of the tree T and returns a new tree T' with the same set of keys
-%%   as T and the new set of values V'.
 %%
 %% - take_largest(T): returns {X, V, T1}, where X is the largest key
 %%   in tree T, V is the value associated with X in T, and T1 is the
@@ -139,6 +134,9 @@
 %% - take_smallest(T): returns {X, V, T1}, where X is the smallest key
 %%   in tree T, V is the value associated with X in T, and T1 is the
 %%   tree T with key X deleted. Assumes that the tree T is nonempty.
+%%
+%% - update(X, V, T): updates key X to value V in tree T; returns the
+%%   new tree. Assumes that the key is present in the tree.
 %%
 
 -module(b_trees).
@@ -152,9 +150,12 @@
     is_defined/2,
     is_empty/1,
     keys/1,
+    largest/1,
     lookup/2,
     number_key_values/1,
     size/1,
+    smallest/1,
+    to_list/1,
     values/1
 ]).
 
@@ -278,6 +279,15 @@ keys({_, _, _, _, Tree}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec largest(b_tree()) -> key_value().
+
+largest({_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+largest({_, _, _, _, Tree}) ->
+    largest_tree(Tree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
 
 lookup(_Key, {_, _, _, 0, nil}) ->
@@ -300,6 +310,25 @@ size({_, _, _, 0, nil}) ->
     0;
 size({_, _, _, _, Tree}) ->
     size_tree(Tree, 0).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec smallest(b_tree()) -> key_value().
+
+smallest({_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+smallest({_, _, _, _, Tree}) ->
+    smallest_tree(Tree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec to_list(b_tree()) -> [key_value()].
+
+to_list({_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+to_list({_, _, _, _, Tree}) ->
+    to_list_tree(Tree, []).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -431,6 +460,15 @@ keys_trees([Tree | Tail], Keys) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec largest_tree(tree()) -> key_value().
+
+largest_tree({_, true, KeyValues, _}) ->
+    lists:nth(length(KeyValues), KeyValues);
+largest_tree({_, _, _, Trees}) ->
+    largest_tree(lists:nth(length(Trees), Trees)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% The term order is an arithmetic total order, so we should not
 %% test exact equality for the keys. (If we do, then it becomes
 %% possible that neither `>', `<', nor `=:=' matches.) Testing '<'
@@ -500,6 +538,15 @@ size_trees([Tree | Tail], Number) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec smallest_tree(tree()) -> key_value().
+
+smallest_tree({_, true, KeyValues, _}) ->
+    lists:nth(1, KeyValues);
+smallest_tree({_, _, _, Trees}) ->
+    smallest_tree(lists:nth(1, Trees)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec split_tree_non_root(tree(), pos_integer(), key_values(), trees(), pos_integer()) -> {key_values(), trees()}.
 
 split_tree_non_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
@@ -536,6 +583,29 @@ split_tree_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit) ->
             }
         ]
     }.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec to_list([key_value(), ...], [value()]) -> [key_value()].
+
+to_list([], KeyValueList) ->
+    KeyValueList;
+to_list([{Key, Value} | Tail], KeyValueList) ->
+    to_list(Tail, KeyValueList ++ [{Key, Value}]).
+
+-spec to_list_tree(tree(), [key_value()]) -> [key_value()].
+
+to_list_tree({_, true, KeyValues, _}, KeyValueList) ->
+    to_list(KeyValues, KeyValueList);
+to_list_tree({_, _, KeyValues, Trees}, KeyValueList) ->
+    to_list_trees(Trees, to_list(KeyValues, KeyValueList)).
+
+-spec to_list_trees([tree(), ...], [key_value()]) -> [key_value()].
+
+to_list_trees([], KeyValueList) ->
+    KeyValueList;
+to_list_trees([Tree | Tail], KeyValueList) ->
+    to_list_trees(Tail, to_list_tree(Tree, KeyValueList)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

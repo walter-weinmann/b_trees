@@ -15,8 +15,10 @@
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
+-define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
 -define(NUMBER_INSERTS, 2000).
 -define(NUMBER_KEYS, 10000).
+-define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
 
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE
@@ -96,6 +98,17 @@ all() ->
         performance_keys_b_tree_order_1025_test,
         performance_keys_gb_tree_test,
 
+        performance_largest_b_tree_order_5_test,
+        performance_largest_b_tree_order_9_test,
+        performance_largest_b_tree_order_17_test,
+        performance_largest_b_tree_order_33_test,
+        performance_largest_b_tree_order_65_test,
+        performance_largest_b_tree_order_129_test,
+        performance_largest_b_tree_order_257_test,
+        performance_largest_b_tree_order_513_test,
+        performance_largest_b_tree_order_1025_test,
+        performance_largest_gb_tree_test,
+
         performance_lookup_b_tree_order_5_test,
         performance_lookup_b_tree_order_9_test,
         performance_lookup_b_tree_order_17_test,
@@ -106,6 +119,28 @@ all() ->
         performance_lookup_b_tree_order_513_test,
         performance_lookup_b_tree_order_1025_test,
         performance_lookup_gb_tree_test,
+
+        performance_smallest_b_tree_order_5_test,
+        performance_smallest_b_tree_order_9_test,
+        performance_smallest_b_tree_order_17_test,
+        performance_smallest_b_tree_order_33_test,
+        performance_smallest_b_tree_order_65_test,
+        performance_smallest_b_tree_order_129_test,
+        performance_smallest_b_tree_order_257_test,
+        performance_smallest_b_tree_order_513_test,
+        performance_smallest_b_tree_order_1025_test,
+        performance_smallest_gb_tree_test,
+
+        performance_to_list_b_tree_order_5_test,
+        performance_to_list_b_tree_order_9_test,
+        performance_to_list_b_tree_order_17_test,
+        performance_to_list_b_tree_order_33_test,
+        performance_to_list_b_tree_order_65_test,
+        performance_to_list_b_tree_order_129_test,
+        performance_to_list_b_tree_order_257_test,
+        performance_to_list_b_tree_order_513_test,
+        performance_to_list_b_tree_order_1025_test,
+        performance_to_list_gb_tree_test,
 
         performance_values_b_tree_order_5_test,
         performance_values_b_tree_order_9_test,
@@ -523,6 +558,96 @@ performance_keys_gb_tree_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 1025
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_1025_test(Config) ->
+    BTree = ?config(btree_1025, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 129
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_129_test(Config) ->
+    BTree = ?config(btree_129, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 17
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_17_test(Config) ->
+    BTree = ?config(btree_17, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 257
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_257_test(Config) ->
+    BTree = ?config(btree_257, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 33
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_33_test(Config) ->
+    BTree = ?config(btree_33, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 5
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_5_test(Config) ->
+    BTree = ?config(btree_5, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 513
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_513_test(Config) ->
+    BTree = ?config(btree_513, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 65
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_65_test(Config) ->
+    BTree = ?config(btree_65, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest b_tree order 9
+%%--------------------------------------------------------------------
+
+performance_largest_b_tree_order_9_test(Config) ->
+    BTree = ?config(btree_9, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance largest gb_tree
+%%--------------------------------------------------------------------
+
+performance_largest_gb_tree_test(Config) ->
+    GBTree = ?config(gbtree, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, gb_trees:largest(GBTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: performance lookup b_tree order 1025
 %%--------------------------------------------------------------------
 
@@ -633,6 +758,196 @@ lookup_gb_tree([], _) ->
 lookup_gb_tree([Key | Tail], GBTree) ->
     gb_trees:lookup(Key, GBTree),
     lookup_gb_tree(Tail, GBTree).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 1025
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_1025_test(Config) ->
+    BTree = ?config(btree_1025, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 129
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_129_test(Config) ->
+    BTree = ?config(btree_129, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 17
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_17_test(Config) ->
+    BTree = ?config(btree_17, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 257
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_257_test(Config) ->
+    BTree = ?config(btree_257, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 33
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_33_test(Config) ->
+    BTree = ?config(btree_33, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 5
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_5_test(Config) ->
+    BTree = ?config(btree_5, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 513
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_513_test(Config) ->
+    BTree = ?config(btree_513, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 65
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_65_test(Config) ->
+    BTree = ?config(btree_65, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest b_tree order 9
+%%--------------------------------------------------------------------
+
+performance_smallest_b_tree_order_9_test(Config) ->
+    BTree = ?config(btree_9, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance smallest gb_tree
+%%--------------------------------------------------------------------
+
+performance_smallest_gb_tree_test(Config) ->
+    GBTree = ?config(gbtree, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, gb_trees:smallest(GBTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 1025
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_1025_test(Config) ->
+    BTree = ?config(btree_1025, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 129
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_129_test(Config) ->
+    BTree = ?config(btree_129, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 17
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_17_test(Config) ->
+    BTree = ?config(btree_17, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 257
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_257_test(Config) ->
+    BTree = ?config(btree_257, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 33
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_33_test(Config) ->
+    BTree = ?config(btree_33, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 5
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_5_test(Config) ->
+    BTree = ?config(btree_5, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 513
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_513_test(Config) ->
+    BTree = ?config(btree_513, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 65
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_65_test(Config) ->
+    BTree = ?config(btree_65, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list b_tree order 9
+%%--------------------------------------------------------------------
+
+performance_to_list_b_tree_order_9_test(Config) ->
+    BTree = ?config(btree_9, Config),
+    KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance to_list gb_tree
+%%--------------------------------------------------------------------
+
+performance_to_list_gb_tree_test(Config) ->
+    GBTree = ?config(gbtree, Config),
+    KeyValues = gb_trees:to_list(GBTree),
+    ?assertEqual(?NUMBER_INSERTS, length(KeyValues)),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance values b_tree order 1025
