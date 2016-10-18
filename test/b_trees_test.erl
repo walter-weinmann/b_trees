@@ -6,7 +6,9 @@
 
 -define(TIMEOUT, 60).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: empty
+%%--------------------------------------------------------------------
 
 empty_test() ->
     ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
@@ -19,7 +21,9 @@ empty_test() ->
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: insert - key exists
+%%--------------------------------------------------------------------
 
 insert_key_exists_test() ->
     ?assertException(error, {key_exists, "k_01"}, b_trees:insert("k_01", "v_01", test_generator:generate_b_tree_from_number(5, 5, 2))),
@@ -30,7 +34,9 @@ insert_key_exists_test() ->
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: insert - order 5
+%%--------------------------------------------------------------------
 
 insert_b_tree_order_5_test() ->
     ?assertEqual(?B_TREE_05_00, b_trees:empty(5)),
@@ -95,7 +101,9 @@ insert_b_tree_order_5_test() ->
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: insert - order 7
+%%--------------------------------------------------------------------
 
 insert_b_tree_order_7_test() ->
     ?assertEqual(?B_TREE_07_00, b_trees:empty(7)),
@@ -128,7 +136,9 @@ insert_b_tree_order_7_test() ->
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: insert - order 8
+%%--------------------------------------------------------------------
 
 insert_b_tree_order_8_test() ->
     ?assertEqual(?B_TREE_08_16, b_trees:insert("k_16", "v_16", test_generator:generate_b_tree_from_number(8, 15, 2))),
@@ -148,18 +158,131 @@ insert_b_tree_order_8_test() ->
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: is_defined
+%%--------------------------------------------------------------------
+
+is_defined_test() ->
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_04_00)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_04_04)),
+    ?assertNot(b_trees:is_defined("k_05", ?B_TREE_04_04)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_07_07)),
+    ?assertNot(b_trees:is_defined("k_08", ?B_TREE_07_07)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_10_10)),
+    ?assertNot(b_trees:is_defined("k_11", ?B_TREE_10_10)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_11", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_12", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_13", ?B_TREE_13_13)),
+    ?assertNot(b_trees:is_defined("k_14", ?B_TREE_13_13)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_11", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_12", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_13", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_14", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_15", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_16", ?B_TREE_16_16)),
+    ?assertNot(b_trees:is_defined("k_17", ?B_TREE_16_16)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_11", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_12", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_13", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_14", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_15", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_16", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_17", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_18", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_19", ?B_TREE_19_19)),
+    ?assertNot(b_trees:is_defined("k_20", ?B_TREE_19_19)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_empty
+%%--------------------------------------------------------------------
 
 is_empty_test() ->
     ?assertEqual(false, b_trees:is_empty(?B_TREE_33_01)),
-
     ?assertEqual(true, b_trees:is_empty(?B_TREE_33_00)),
-
     ?assertEqual(true, b_trees:is_empty(?B_STAR_TREE_07_00)),
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: keys
+%%--------------------------------------------------------------------
+
+keys_test() ->
+    ?assertEqual([], b_trees:keys(?B_TREE_05_00)),
+    ?assertEqual(["k_01"], b_trees:keys(?B_TREE_05_01)),
+    ?assertEqual(2, length(b_trees:keys(?B_TREE_05_02))),
+    ?assertEqual(5, length(b_trees:keys(?B_TREE_05_05))),
+    ?assertEqual(9, length(b_trees:keys(?B_TREE_05_09))),
+    ?assertEqual(16, length(b_trees:keys(?B_TREE_05_16))),
+    ?assertEqual(80, length(b_trees:keys(?B_TREE_07_80))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: lookup
+%%--------------------------------------------------------------------
 
 lookup_test() ->
     ?assertEqual(none, b_trees:lookup("k_00", ?B_TREE_04_00)),
@@ -253,21 +376,17 @@ lookup_test() ->
 
     ok.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%--------------------------------------------------------------------
+%% TEST CASES: size
+%%--------------------------------------------------------------------
 
 size_test() ->
     ?assertEqual(0, b_trees:size(b_trees:empty(5))),
-
     ?assertEqual(1, b_trees:size(?B_TREE_05_01)),
-
     ?assertEqual(3, b_trees:size(?B_TREE_05_05)),
-
     ?assertEqual(5, b_trees:size(?B_TREE_05_11)),
-
     ?assertEqual(8, b_trees:size(?B_TREE_05_16)),
-
     ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
-
     ?assertEqual(0, b_trees:size(b_trees:empty(5, b_star))),
 
     ok.

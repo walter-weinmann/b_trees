@@ -17,9 +17,6 @@
 
 -include_lib("../include/b_trees_templates.hrl").
 
--define(NUMBER_INSERTS, 2000).
--define(NUMBER_LOOKUPS, 10000).
-
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE
 %%--------------------------------------------------------------------
@@ -30,20 +27,7 @@ suite() ->
     ].
 
 init_per_suite(Config) ->
-    [
-        {gbtree, test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4)},
-        {btree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_INSERTS, 4)},
-        {btree_9, test_generator:generate_b_tree_till_number(9, ?NUMBER_INSERTS, 4)},
-        {btree_17, test_generator:generate_b_tree_from_number(17, ?NUMBER_INSERTS, 4)},
-        {btree_33, test_generator:generate_b_tree_till_number(33, ?NUMBER_INSERTS, 4)},
-        {btree_65, test_generator:generate_b_tree_from_number(65, ?NUMBER_INSERTS, 4)},
-        {btree_129, test_generator:generate_b_tree_till_number(129, ?NUMBER_INSERTS, 4)},
-        {btree_257, test_generator:generate_b_tree_from_number(257, ?NUMBER_INSERTS, 4)},
-        {btree_513, test_generator:generate_b_tree_from_number(513, ?NUMBER_INSERTS, 4)},
-        {btree_1025, test_generator:generate_b_tree_from_number(1025, ?NUMBER_INSERTS, 4)},
-        {lookUps, test_generator:generate_keys_rand(?NUMBER_INSERTS, ?NUMBER_LOOKUPS, 4)}
-        | Config
-    ].
+    Config.
 
 end_per_suite(_Config) ->
     ok.
@@ -59,28 +43,10 @@ all() ->
         insert_b_tree_order_7_test,
         insert_b_tree_order_8_test,
         insert_key_exists_test,
+        is_defined_test,
         is_empty_test,
+        keys_test,
         lookup_test,
-        performance_insert_b_tree_order_5_test,
-        performance_insert_b_tree_order_9_test,
-        performance_insert_b_tree_order_17_test,
-        performance_insert_b_tree_order_33_test,
-        performance_insert_b_tree_order_65_test,
-        performance_insert_b_tree_order_129_test,
-        performance_insert_b_tree_order_257_test,
-        performance_insert_b_tree_order_513_test,
-        performance_insert_b_tree_order_1025_test,
-        performance_insert_gb_tree_test,
-        performance_lookup_b_tree_order_5_test,
-        performance_lookup_b_tree_order_9_test,
-        performance_lookup_b_tree_order_17_test,
-        performance_lookup_b_tree_order_33_test,
-        performance_lookup_b_tree_order_65_test,
-        performance_lookup_b_tree_order_129_test,
-        performance_lookup_b_tree_order_257_test,
-        performance_lookup_b_tree_order_513_test,
-        performance_lookup_b_tree_order_1025_test,
-        performance_lookup_gb_tree_test,
         size_test
     ].
 
@@ -237,15 +203,124 @@ insert_b_tree_order_8_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: is_defined
+%%--------------------------------------------------------------------
+
+is_defined_test(_Config) ->
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_04_00)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_04_04)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_04_04)),
+    ?assertNot(b_trees:is_defined("k_05", ?B_TREE_04_04)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_07_07)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_07_07)),
+    ?assertNot(b_trees:is_defined("k_08", ?B_TREE_07_07)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_10_10)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_10_10)),
+    ?assertNot(b_trees:is_defined("k_11", ?B_TREE_10_10)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_11", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_12", ?B_TREE_13_13)),
+    ?assert(b_trees:is_defined("k_13", ?B_TREE_13_13)),
+    ?assertNot(b_trees:is_defined("k_14", ?B_TREE_13_13)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_11", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_12", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_13", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_14", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_15", ?B_TREE_16_16)),
+    ?assert(b_trees:is_defined("k_16", ?B_TREE_16_16)),
+    ?assertNot(b_trees:is_defined("k_17", ?B_TREE_16_16)),
+
+    ?assertNot(b_trees:is_defined("k_00", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_01", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_02", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_03", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_04", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_05", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_06", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_07", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_08", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_09", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_10", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_11", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_12", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_13", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_14", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_15", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_16", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_17", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_18", ?B_TREE_19_19)),
+    ?assert(b_trees:is_defined("k_19", ?B_TREE_19_19)),
+    ?assertNot(b_trees:is_defined("k_20", ?B_TREE_19_19)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: is_empty
 %%--------------------------------------------------------------------
 
 is_empty_test(_Config) ->
     ?assertEqual(false, b_trees:is_empty(?B_TREE_33_01)),
-
     ?assertEqual(true, b_trees:is_empty(?B_TREE_33_00)),
-
     ?assertEqual(true, b_trees:is_empty(?B_STAR_TREE_07_00)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: keys
+%%--------------------------------------------------------------------
+
+keys_test(_Config) ->
+    ?assertEqual([], b_trees:keys(?B_TREE_05_00)),
+    ?assertEqual(["k_01"], b_trees:keys(?B_TREE_05_01)),
+    ?assertEqual(2, length(b_trees:keys(?B_TREE_05_02))),
+    ?assertEqual(5, length(b_trees:keys(?B_TREE_05_05))),
+    ?assertEqual(9, length(b_trees:keys(?B_TREE_05_09))),
+    ?assertEqual(16, length(b_trees:keys(?B_TREE_05_16))),
+    ?assertEqual(80, length(b_trees:keys(?B_TREE_07_80))),
 
     ok.
 
@@ -346,234 +421,16 @@ lookup_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 1025
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_1025_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(1025, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_1025_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(1025 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(1025 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 129
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_129_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(129, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_129_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(129 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(129 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 17
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_17_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(17, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_17_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(17 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(17 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 257
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_257_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(257, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_257_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(257 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(257 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 33
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_33_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(33, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_33_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(33 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(33 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 5
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_5_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_5_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(5 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 513
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_513_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(513, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_513_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(513 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(513 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 65
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_65_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(65, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_65_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(65 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(65 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 9
-%%--------------------------------------------------------------------
-
-performance_insert_b_tree_order_9_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number(9, ?NUMBER_INSERTS, 4),
-    ?debugFmt("wwe debugging performance_insert_b_tree_order_9_test/1 ===> Start ~n Height: ~p~n Number Key Values: ~p~n Size: ~p~n Log: ~p~n", [b_trees:height(BTree), b_trees:number_key_values(BTree), b_trees:size(BTree), math:log(((?NUMBER_INSERTS + 1) / 2)) / math:log(9 div 2)]),
-    ?assert(b_trees:height(BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance insert gb_tree
-%%--------------------------------------------------------------------
-
-performance_insert_gb_tree_test(_Config) ->
-    test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 1025
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_1025_test(Config) ->
-    BTree = ?config(btree_1025, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-lookup_b_tree([], _) ->
-    none;
-lookup_b_tree([Key | Tail], BTree) ->
-    b_trees:lookup(Key, BTree),
-    lookup_b_tree(Tail, BTree).
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 129
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_129_test(Config) ->
-    BTree = ?config(btree_129, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 17
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_17_test(Config) ->
-    BTree = ?config(btree_17, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 257
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_257_test(Config) ->
-    BTree = ?config(btree_257, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 33
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_33_test(Config) ->
-    BTree = ?config(btree_33, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 5
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_5_test(Config) ->
-    BTree = ?config(btree_5, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 513
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_513_test(Config) ->
-    BTree = ?config(btree_513, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 65
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_65_test(Config) ->
-    BTree = ?config(btree_65, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 9
-%%--------------------------------------------------------------------
-
-performance_lookup_b_tree_order_9_test(Config) ->
-    BTree = ?config(btree_9, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_b_tree(LookUps, BTree),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: performance lookup gb_tree
-%%--------------------------------------------------------------------
-
-performance_lookup_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
-    LookUps = ?config(lookUps, Config),
-    lookup_gb_tree(LookUps, GBTree),
-    ok.
-
-lookup_gb_tree([], _) ->
-    none;
-lookup_gb_tree([Key | Tail], GBTree) ->
-    gb_trees:lookup(Key, GBTree),
-    lookup_gb_tree(Tail, GBTree).
-
-%%--------------------------------------------------------------------
 %% TEST CASES: size
 %%--------------------------------------------------------------------
 
 size_test(_Config) ->
-
     ?assertEqual(0, b_trees:size(b_trees:empty(5))),
-
     ?assertEqual(1, b_trees:size(?B_TREE_05_01)),
-
     ?assertEqual(3, b_trees:size(?B_TREE_05_05)),
-
     ?assertEqual(5, b_trees:size(?B_TREE_05_11)),
-
     ?assertEqual(8, b_trees:size(?B_TREE_05_16)),
-
     ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
-
     ?assertEqual(0, b_trees:size(b_trees:empty(5, b_star))),
 
     ok.
-
-%%--------------------------------------------------------------------
-%% Helper functions.
-%%--------------------------------------------------------------------
-
-int_ceil(X) ->
-    T = trunc(X),
-    if
-        X > T -> T + 1;
-        true -> T
-    end.

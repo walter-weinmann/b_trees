@@ -24,7 +24,7 @@
 %% %CopyrightEnd%
 %%
 %% =============================================================================
-%% B Trees - balanced n-ary trees (B tree & B* tree).
+%% B-trees - balanced n-ary trees (B-tree & B*-tree).
 %%
 %% Copyright (C) 2016 Walter Weinmann
 %%
@@ -35,40 +35,38 @@
 %% -----------------------------------------------------------------------------
 %% Operations:
 %%
-%% - empty(O): returns empty B tree of order O. Order is defined as 
+%% - empty(O): returns empty B-tree of order O. Order is defined as 
 %%   the maximum number of children nodes a non-leaf node may hold.
 %%   The minimum value is 4.
 %%
-%% - empty(O, b_star): returns empty B* tree of order O. Order is 
+%% - empty(O, b_star): returns empty B*-tree of order O. Order is 
 %%   defined as the maximum number of children nodes a non-leaf node 
 %%   may hold. The minimum value is 4.
 %%
-%% - height(T): returns the height of the B tree / B* tree T as an integer.
-%%   Returns 0 (zero) if the B tree / B* tree T is empty.
+%% - height(T): returns the height of the B-tree / B*-tree T as an integer.
+%%   Returns 0 (zero) if the B-tree / B*-tree T is empty.
 %%
-%% - insert(X, V, T): inserts key X with value V into B tree / B* tree T; 
-%%   returns the new B tree / B* tree. Assumes that the key is *not* 
-%%   present in the B tree / B* tree T.
+%% - insert(X, V, T): inserts key X with value V into B-tree / B*-tree T; 
+%%   returns the new B-tree / B*-tree. Assumes that the key is *not* 
+%%   present in the B-tree / B*-tree T.
 %%
-%% - is_empty(T): returns 'true' if T is an empty B tree / B* tree, 
+%% - is_defined(X, T): returns `true' if key X is present in 
+%%   B-tree / B*-tree T, and `false' otherwise.
+%%
+%% - is_empty(T): returns 'true' if T is an empty B-tree / B*-tree, 
 %%   and 'false' otherwise.
 %%
-%% - lookup(X, T): looks up key X in B tree / B* tree T; returns {value, V}, 
+%% - keys(T): returns a list of all keys in B-tree / B*-tree T.
+%%
+%% - lookup(X, T): looks up key X in B-tree / B*-tree T; returns {value, V}, 
 %%   or `none' if the key is not present.
 %%
 %% - number_key_values(T): returns the number of key / value pairs in the 
-%%   B tree / B* tree T as an integer. Returns 0 (zero) if the 
-%%   B tree / B* tree T is empty.
+%%   B-tree / B*-tree T as an integer. Returns 0 (zero) if the 
+%%   B-tree / B*-tree T is empty.
 %%
-%% - size(T): returns the number of nodes in the B tree / B* tree T 
-%%   as an integer. Returns 0 (zero) if the B tree / B* tree T is empty.
-%%
-
-
-%% - is_defined(X, T): returns `true' if key X is present in tree T, and
-%%   `false' otherwise.
-%%
-%% - keys(T): returns an ordered list of all keys in tree T.
+%% - size(T): returns the number of nodes in the B-tree / B*-tree T 
+%%   as an integer. Returns 0 (zero) if the B-tree / B*-tree T is empty.
 %%
 
 
@@ -164,7 +162,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {Minimum, Maximum, NumberKeyValues, Tree}, where `Tree' is composed of :
+%% - {BTreeType, Minimum, Maximum, NumberKeyValues, Tree}, 
+%%   where `Tree' is composed of :
 %%   - {KeyNo, IsLeaf, [{Key, Value}], [Tree]}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,7 +178,7 @@
 -type tree() :: 'nil' | {pos_integer(), boolean(), key_values(), trees()}.
 -type trees() :: [tree()].
 
--type b_tree() :: {pos_integer(), pos_integer(), non_neg_integer(), tree()}.
+-type b_tree() :: {atom(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -187,26 +186,26 @@
 -spec empty(pos_integer(), atom()) -> b_tree().
 
 empty(Order) when Order > 3 ->
-    {Order div 2, Order - 1, 0, nil}.
+    {b, Order div 2, Order - 1, 0, nil}.
 empty(Order, b_star) when Order > 3 ->
-    {Order * 2 div 3, Order - 1, 0, nil}.
+    {b_star, Order * 2 div 3, Order - 1, 0, nil}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec height(b_tree()) -> non_neg_integer().
 
-height({_, _, 0, nil}) ->
+height({_, _, _, 0, nil}) ->
     0;
-height({_, _, _, Tree}) ->
+height({_, _, _, _, Tree}) ->
     height_1(Tree, 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec insert(key(), value(), b_tree()) -> b_tree().
 
-insert(Key, Value, {KeyNoMin, KeyNoMax, 0, nil}) ->
-    {KeyNoMin, KeyNoMax, 1, {1, true, [{Key, Value}], [nil, nil]}};
-insert(Key, Value, {KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, _, KeyValues, _} = BTree}) ->
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, 0, nil}) ->
+    {BTreeType, KeyNoMin, KeyNoMax, 1, {1, true, [{Key, Value}], [nil, nil]}};
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, _, KeyValues, _} = BTree}) ->
     TreeRepl = case KeyNo == KeyNoMax of
                    true ->
                        KeyNoSplit = case KeyNoMax rem 2 of
@@ -225,40 +224,65 @@ insert(Key, Value, {KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, _, KeyValues, _
                    _ ->
                        BTree
                end,
-    {KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, TreeRepl, KeyNoMin, KeyNoMax)}.
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, TreeRepl, KeyNoMin, KeyNoMax)}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% This is a specialized version of `lookup'.
+
+-spec is_defined(key(), b_tree()) -> boolean().
+
+is_defined(_Key, {_, _, _, 0, nil}) ->
+    false;
+is_defined(Key, {_, _, _, _, Tree}) ->
+    case lookup_1(Key, Tree) == none of
+        true ->
+            false;
+        _ ->
+            true
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec is_empty(b_tree()) -> boolean().
 
-is_empty({_, _, 0, nil}) ->
+is_empty({_, _, _, 0, nil}) ->
     true;
 is_empty(_) ->
     false.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec keys(b_tree()) -> [key()].
+
+keys({_, _, _, 0, nil}) ->
+    [];
+keys({_, _, _, _, Tree}) ->
+    keys_tree(Tree, []).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
 
-lookup(_Key, {_, _, 0, nil}) ->
+lookup(_Key, {_, _, _, 0, nil}) ->
     none;
-lookup(Key, {_, _, _, Tree}) ->
+lookup(Key, {_, _, _, _, Tree}) ->
     lookup_1(Key, Tree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec number_key_values(b_tree()) -> non_neg_integer().
 
-number_key_values({_, _, NumberKeyValues, _}) ->
+number_key_values({_, _, _, NumberKeyValues, _}) ->
     NumberKeyValues.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec size(b_tree()) -> non_neg_integer().
 
-size({_, _, 0, nil}) ->
+size({_, _, _, 0, nil}) ->
     0;
-size({_, _, _, Tree} = _X) ->
+size({_, _, _, _, Tree}) ->
     size_tree(Tree, 0).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -268,7 +292,6 @@ size({_, _, _, Tree} = _X) ->
 -spec binary_search(key(), key_values(), pos_integer(), pos_integer()) -> {none, pos_integer()} | {any(), pos_integer()}.
 
 binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
-    % ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
     TreeNo = case Lower > length(KeyValues) of
                  true -> Upper;
                  _ -> Lower
@@ -279,7 +302,6 @@ binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
         _ -> {none, TreeNo + 1}
     end;
 binary_search(Key, KeyValues, Lower, Upper) ->
-    % ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
     Mid = (Upper + Lower) div 2,
     {MidKey, MidValue} = lists:nth(Mid, KeyValues),
     if
@@ -319,11 +341,9 @@ insert_into_key_values({Key, _Value} = _KeyValue, _KeyValues, _KeyValuesAcc) ->
 -spec insert_into_tree(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
 
 insert_into_tree(KeyValue, {KeyNo, true = IsLeaf, KeyValues, Trees} = _Tree, _KeyNoMin, _KeyNoMax) ->
-    % ?debugFmt("wwe debugging insert_into_tree/4 ===> Start ~n KeyValue: ~p~n Tree: ~p~n KeyNoMin: ~p~n KeyNoMax: ~p~n", [KeyValue, _Tree, _KeyNoMin, _KeyNoMax]),
     TreeOut = {KeyNo + 1, IsLeaf, insert_into_key_values(KeyValue, KeyValues, []), Trees ++ [nil]},
     TreeOut;
 insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} = _Tree, KeyNoMin, KeyNoMax) ->
-    % ?debugFmt("wwe debugging insert_into_tree/4 ===> Start ~n KeyValue: ~p~n Tree: ~p~n KeyNoMin: ~p~n KeyNoMax: ~p~n", [KeyValue, _Tree, KeyNoMin, KeyNoMax]),
     {ValueFound, TreeUpperPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_INSERT),
     case ValueFound of
         none ->
@@ -363,6 +383,29 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec keys([key_value(), ...], [key()]) -> [key()].
+
+keys([], Keys) ->
+    Keys;
+keys([{Key, _} | Tail], Keys) ->
+    keys(Tail, Keys ++ [Key]).
+
+-spec keys_tree(tree(), [key()]) -> [key()].
+
+keys_tree({_, true, KeyValues, _}, Keys) ->
+    keys(KeyValues, Keys);
+keys_tree({_, _, KeyValues, Trees}, Keys) ->
+    keys_trees(Trees, keys(KeyValues, Keys)).
+
+-spec keys_trees([tree(), ...], [key()]) -> [key()].
+
+keys_trees([], Keys) ->
+    Keys;
+keys_trees([Tree | Tail], Keys) ->
+    keys_trees(Tail, keys_tree(Tree, Keys)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% The term order is an arithmetic total order, so we should not
 %% test exact equality for the keys. (If we do, then it becomes
 %% possible that neither `>', `<', nor `=:=' matches.) Testing '<'
@@ -370,14 +413,16 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} 
 %% equality, and also allows us to skip the test completely in the
 %% remaining case.
 
--spec lookup_1(key(), b_tree()) -> 'none' | {'value', value()}.
+-spec lookup_1(key(), tree()) -> 'none' | {'value', value()}.
 
 lookup_1(Key, {_, IsLeaf, KeyValues, ChildTrees}) ->
     {Value, Pos} = sequential_search(Key, KeyValues, 0),
     case Value == none of
         true -> case IsLeaf of
-                    true -> none;
-                    _ -> ChildTree = lists:nth(Pos, ChildTrees),
+                    true ->
+                        none;
+                    _ ->
+                        ChildTree = lists:nth(Pos, ChildTrees),
                         lookup_1(Key, ChildTree)
                 end;
         _ -> {value, Value}
@@ -401,34 +446,31 @@ sequential_search(_, [], Pos) ->
 sequential_search(Key, [{KeyLast, ValueLast} | Tail], Pos) ->
     PosNew = Pos + 1,
     case Key < KeyLast of
-        true -> {none, PosNew};
-        _ -> case Key > KeyLast of
-                 true -> sequential_search(Key, Tail, PosNew);
-                 _ -> {ValueLast, PosNew}
-             end
+        true ->
+            {none, PosNew};
+        _ ->
+            case Key > KeyLast of
+                true ->
+                    sequential_search(Key, Tail, PosNew);
+                _ ->
+                    {ValueLast, PosNew}
+            end
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec size_tree(tree(), pos_integer()) -> pos_integer().
 
-size_tree({_, true, _, _} = _X, Number) ->
-    % ?debugFmt("wwe debugging size_tree/2 ===> Start ~n Tree: ~p~n Number: ~p~n", [_X, Number]),
+size_tree({_, true, _, _}, Number) ->
     Number + 1;
-size_tree({_, _, _, Trees} = _X, Number) ->
-    % ?debugFmt("wwe debugging size_tree/2 ===> Start ~n Tree: ~p~n Number: ~p~n", [_X, Number]),
+size_tree({_, _, _, Trees}, Number) ->
     size_trees(Trees, Number + 1).
 
 -spec size_trees([tree(), ...], pos_integer()) -> pos_integer().
 
-%%size_trees([] = _X, Number) ->
-%%    ?debugFmt("wwe debugging size_trees/2 ===> Start ~n Trees: ~p~n Number: ~p~n", [_X, Number]),
-%%    Number;
-size_trees([] = _X, Number) ->
-    % ?debugFmt("wwe debugging size_trees/2 ===> Start ~n Trees: ~p~n Number: ~p~n", [_X, Number]),
+size_trees([], Number) ->
     Number;
-size_trees([Tree | Tail] = _X, Number) ->
-    % ?debugFmt("wwe debugging size_trees/2 ===> Start ~n Trees: ~p~n Number: ~p~n", [_X, Number]),
+size_trees([Tree | Tail], Number) ->
     size_trees(Tail, size_tree(Tree, Number)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -436,7 +478,6 @@ size_trees([Tree | Tail] = _X, Number) ->
 -spec split_tree_non_root(tree(), pos_integer(), key_values(), trees(), pos_integer()) -> {key_values(), trees()}.
 
 split_tree_non_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
-    % ?debugFmt("wwe debugging split_tree_non_root/5 ===> Start ~n Tree: ~p~n KeyNoSplit: ~p~n KeyValuesLower: ~p~n TreesLower: ~p~n TreeNo: ~p~n", [_Tree, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo]),
     {insert_into_key_values(lists:nth(KeyNoSplit, KeyValues), KeyValuesLower, []),
             lists:sublist(TreesLower, 1, TreeNo - 1) ++
             [
@@ -454,7 +495,6 @@ split_tree_non_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit, KeyVa
 -spec split_tree_root(tree(), pos_integer()) -> tree().
 
 split_tree_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit) ->
-    % ?debugFmt("wwe debugging split_tree_root/2 ===> Start ~n Tree: ~p~n KeyNoSplit: ~p~n", [_Tree, KeyNoSplit]),
     {
         1, false,
         [lists:nth(KeyNoSplit, KeyValues)],
@@ -477,8 +517,11 @@ split_tree_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%direct_test() ->
-%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_04_00~n ~p~n", [b_trees:empty(4)]),
 %%
-%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_05_01~n ~p~n", [test_generator:generate_b_tree_from_number(5, 01, 2)]),
+%%%%    ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
+%%%%
+%%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_04_00~n ~p~n", [b_trees:empty(4)]),
+%%%%
+%%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_05_01~n ~p~n", [test_generator:generate_b_tree_from_number(5, 01, 2)]),
 %%
 %%    ok.
