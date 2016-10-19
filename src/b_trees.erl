@@ -43,6 +43,16 @@
 %%   defined as the maximum number of children nodes a non-leaf node 
 %%   may hold. The minimum value is 4.
 %%
+%% - enter(K, V, B): inserts key K with value V into B-tree / B*-tree B 
+%%   if the key is not present in the tree, otherwise updates key K to 
+%%   value V in B. Returns the new tree.
+%%
+%% - from_dict(O, L): turns a list L of {Key, Value} pairs into
+%%   a B-tree of order O. The list must not contain duplicate keys.
+%%
+%% - from_dict(O, b_star, L): turns a list L of {Key, Value} pairs into
+%%   a B*-tree of order O. The list must not contain duplicate keys.
+%%
 %% - get(K, B): retreives the value stored with key K in 
 %%   B-tree / B*-tree T. Assumes that the key is present in the tree.
 %%
@@ -68,6 +78,10 @@
 %% - lookup(K, B): looks up key K in B-tree / B*-tree B; returns {value, V}, 
 %%   or `none' if the key K is not present.
 %%
+%% - map(F, B): maps the function F(K, V) -> V' to all key-value pairs
+%%   of the B-tree / B*-tree B and returns a new B-tree / B*-tree B' 
+%%   with the same set of keys as B and the new set of values V'.
+%%
 %% - number_key_values(B): returns the number of key / value pairs in the 
 %%   B-tree / B*-tree B as an integer. Returns 0 (zero) if the 
 %%   B-tree / B*-tree B is empty.
@@ -82,8 +96,30 @@
 %% - to_list(B): returns a list of {Key, Value} pairs for all keys
 %%   in B-tree / B*-tree B.
 %%
+%% - update(K, V, B): updates key K to value V in B-tree / B*-tree B; 
+%%   returns the new tree. Assumes that the key is present in the tree.
+%%
 %% - values(B): returns the list of values for all keys in 
 %%   B-tree / B*-tree B. Duplicates are not removed.
+%%
+
+
+%% - iterator(T): returns an iterator that can be used for traversing
+%%   the entries of tree T; see `next'. The implementation of this is
+%%   very efficient; traversing the whole tree using `next' is only
+%%   slightly slower than getting the list of all elements using
+%%   `to_list' and traversing that. The main advantage of the iterator
+%%   approach is that it does not require the complete list of all
+%%   elements to be built in memory at one time.
+%%
+%% - iterator_from(K, T): returns an iterator that can be used for
+%%   traversing the entries of tree T with key greater than or
+%%   equal to K; see `next'.
+%%
+%% - next(S): returns {X, V, S1} where X is the smallest key referred to
+%%   by the iterator S, and S1 is the new iterator to be used for
+%%   traversing the remaining entries, or the atom `none' if no entries
+%%   remain.
 %%
 
 
@@ -99,34 +135,6 @@
 %% - delete_any(X, T): removes key X from tree T if the key is present
 %%   in the tree, otherwise does nothing; returns new tree.
 %%
-%% - enter(X, V, T): inserts key X with value V into tree T if the key
-%%   is not present in the tree, otherwise updates key X to value V in
-%%   T. Returns the new tree.
-%%
-%% - from_orddict(L): turns an ordered list L of {Key, Value} pairs into
-%%   a tree. The list must not contain duplicate keys.
-%%
-%% - iterator(T): returns an iterator that can be used for traversing
-%%   the entries of tree T; see `next'. The implementation of this is
-%%   very efficient; traversing the whole tree using `next' is only
-%%   slightly slower than getting the list of all elements using
-%%   `to_list' and traversing that. The main advantage of the iterator
-%%   approach is that it does not require the complete list of all
-%%   elements to be built in memory at one time.
-%%
-%% - iterator_from(K, T): returns an iterator that can be used for
-%%   traversing the entries of tree T with key greater than or
-%%   equal to K; see `next'.
-%%
-%% - map(F, T): maps the function F(K, V) -> V' to all key-value pairs
-%%   of the tree T and returns a new tree T' with the same set of keys
-%%   as T and the new set of values V'.
-%%
-%% - next(S): returns {X, V, S1} where X is the smallest key referred to
-%%   by the iterator S, and S1 is the new iterator to be used for
-%%   traversing the remaining entries, or the atom `none' if no entries
-%%   remain.
-%%
 %% - take_largest(T): returns {X, V, T1}, where X is the largest key
 %%   in tree T, V is the value associated with X in T, and T1 is the
 %%   tree T with key X deleted. Assumes that the tree T is nonempty.
@@ -135,27 +143,32 @@
 %%   in tree T, V is the value associated with X in T, and T1 is the
 %%   tree T with key X deleted. Assumes that the tree T is nonempty.
 %%
-%% - update(X, V, T): updates key X to value V in tree T; returns the
-%%   new tree. Assumes that the key is present in the tree.
-%%
 
 -module(b_trees).
 
 -export([
     empty/1,
     empty/2,
+    enter/3,
+    from_dict/2,
+    from_dict/3,
     get/2,
     height/1,
     insert/3,
     is_defined/2,
     is_empty/1,
+%%    iterator/1,
+%%    iterator_from/2,
     keys/1,
     largest/1,
     lookup/2,
+%%    map/1,
+%%    next/1,
     number_key_values/1,
     size/1,
     smallest/1,
     to_list/1,
+    update/3,
     values/1
 ]).
 
@@ -190,6 +203,30 @@ empty(Order) when Order > 3 ->
     {b, Order div 2, Order - 1, 0, nil}.
 empty(Order, b_star) when Order > 3 ->
     {b_star, Order * 2 div 3, Order - 1, 0, nil}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec enter(key(), value(), b_tree()) -> b_tree().
+
+enter(Key, Value, BTree) ->
+    case is_defined(Key, BTree) of
+        true ->
+            update(Key, Value, BTree);
+        false ->
+            insert(Key, Value, BTree)
+    end.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec from_dict(pos_integer(), [key_value()]) -> b_tree().
+-spec from_dict(pos_integer(), atom(), [key_value()]) -> b_tree().
+
+from_dict(Order, KeyValues) when Order > 3, length(KeyValues) > 0 ->
+    BTree = {b, Order div 2, Order - 1, 0, nil},
+    from_dict_insert(KeyValues, BTree).
+from_dict(Order, b_star, KeyValues) when Order > 3, length(KeyValues) > 0 ->
+    BTree = {b_star, Order * 2 div 3, Order - 1, 0, nil},
+    from_dict_insert(KeyValues, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -329,6 +366,14 @@ to_list({_, _, _, 0, nil} = BTree) ->
 to_list({_, _, _, _, Tree}) ->
     to_list_tree(Tree, []).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec update(key(), value(), b_tree()) -> b_tree().
+
+update(_, _, {_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_into_tree({Key, Value}, Tree)}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -367,6 +412,14 @@ binary_search(Key, KeyValues, Lower, Upper) ->
             {MidValue, Mid}
     end.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec from_dict_insert([key_value(), ...], b_tree()) -> b_tree().
+
+from_dict_insert([], BTree) ->
+    BTree;
+from_dict_insert([{Key, Value} | Tail], BTree) ->
+    from_dict_insert(Tail, insert(Key, Value, BTree)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -606,6 +659,38 @@ to_list_trees([], KeyValueList) ->
     KeyValueList;
 to_list_trees([Tree | Tail], KeyValueList) ->
     to_list_trees(Tail, to_list_tree(Tree, KeyValueList)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec update_into_tree(key_value(), tree()) -> {tree(), boolean()}.
+
+update_into_tree({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
+    {ValueFound, KeyPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_FROM_LENGTH),
+    case ValueFound of
+        none ->
+            case IsLeaf of
+                true ->
+                    erlang:error({key_not_found, Key});
+                _ ->
+                    {
+                        KeyNo,
+                        IsLeaf,
+                        KeyValues,
+                            lists:sublist(Trees, 1, KeyPos - 1) ++
+                            [update_into_tree(KeyValue, lists:nth(KeyPos, Trees))] ++
+                            lists:sublist(Trees, KeyPos + 1, length(Trees))
+                    }
+            end;
+        _ ->
+            {
+                KeyNo,
+                IsLeaf,
+                    lists:sublist(KeyValues, 1, KeyPos - 1) ++
+                    [KeyValue] ++
+                    lists:sublist(KeyValues, KeyPos + 1, length(Trees)),
+                Trees
+            }
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

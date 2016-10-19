@@ -7,17 +7,85 @@
 -define(TIMEOUT, 60).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: empty
+%% TEST CASES: empty - b-tree
 %%--------------------------------------------------------------------
 
-empty_test() ->
+empty_b_tree_test() ->
     ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
     ?assert(b_trees:is_empty(b_trees:empty(33))),
     ?assertEqual(0, b_trees:size(b_trees:empty(33))),
 
-    ?assertEqual(?B_STAR_TREE_33_00, b_trees:empty(33, b_star)),
-    ?assert(b_trees:is_empty(b_trees:empty(33, b_star))),
-    ?assertEqual(0, b_trees:size(b_trees:empty(33, b_star))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: empty - b*-tree
+%%--------------------------------------------------------------------
+
+empty_b_star_tree_test() ->
+    ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
+    ?assert(b_trees:is_empty(b_trees:empty(33))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(33))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: enter - order 4
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_4_test() ->
+    BTree_04_15_01 = b_trees:enter("k_01", "v_01", ?B_TREE_04_15),
+    BTree_04_15_02 = b_trees:enter("k_02", "v_02", BTree_04_15_01),
+    BTree_04_15_03 = b_trees:enter("k_03", "v_03", BTree_04_15_02),
+    BTree_04_15_04 = b_trees:enter("k_04", "v_04", BTree_04_15_03),
+    BTree_04_15_05 = b_trees:enter("k_05", "v_05", BTree_04_15_04),
+    BTree_04_15_06 = b_trees:enter("k_06", "v_06", BTree_04_15_05),
+    BTree_04_15_07 = b_trees:enter("k_07", "v_07", BTree_04_15_06),
+    BTree_04_15_08 = b_trees:enter("k_08", "v_08", BTree_04_15_07),
+    BTree_04_15_09 = b_trees:enter("k_09", "v_09", BTree_04_15_08),
+    BTree_04_15_10 = b_trees:enter("k_10", "v_10", BTree_04_15_09),
+    BTree_04_15_11 = b_trees:enter("k_11", "v_11", BTree_04_15_10),
+    BTree_04_15_12 = b_trees:enter("k_12", "v_12", BTree_04_15_11),
+    BTree_04_15_13 = b_trees:enter("k_13", "v_13", BTree_04_15_12),
+    BTree_04_15_14 = b_trees:enter("k_14", "v_14", BTree_04_15_13),
+    BTree_04_15_15 = b_trees:enter("k_15", "v_15", BTree_04_15_14),
+    ?assertEqual(?B_TREE_04_15, BTree_04_15_15),
+
+    BTree_04_15_K_01 = b_trees:enter("k_01", "v_01_new", BTree_04_15_15),
+    BTree_04_15_K_02 = b_trees:enter("k_02", "v_02_new", BTree_04_15_K_01),
+    BTree_04_15_K_03 = b_trees:enter("k_03", "v_03_new", BTree_04_15_K_02),
+    BTree_04_15_K_04 = b_trees:enter("k_04", "v_04_new", BTree_04_15_K_03),
+    BTree_04_15_K_05 = b_trees:enter("k_05", "v_05_new", BTree_04_15_K_04),
+    BTree_04_15_K_06 = b_trees:enter("k_06", "v_06_new", BTree_04_15_K_05),
+    BTree_04_15_K_07 = b_trees:enter("k_07", "v_07_new", BTree_04_15_K_06),
+    BTree_04_15_K_08 = b_trees:enter("k_08", "v_08_new", BTree_04_15_K_07),
+    BTree_04_15_K_09 = b_trees:enter("k_09", "v_09_new", BTree_04_15_K_08),
+    BTree_04_15_K_10 = b_trees:enter("k_10", "v_10_new", BTree_04_15_K_09),
+    BTree_04_15_K_11 = b_trees:enter("k_11", "v_11_new", BTree_04_15_K_10),
+    BTree_04_15_K_12 = b_trees:enter("k_12", "v_12_new", BTree_04_15_K_11),
+    BTree_04_15_K_13 = b_trees:enter("k_13", "v_13_new", BTree_04_15_K_12),
+    BTree_04_15_K_14 = b_trees:enter("k_14", "v_14_new", BTree_04_15_K_13),
+    ?assertEqual(?B_TREE_04_15_UPDATE, b_trees:enter("k_15", "v_15_new", BTree_04_15_K_14)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict - b-tree
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_test() ->
+    ?assertEqual(?B_TREE_04_04, b_trees:from_dict(4, test_generator:generate_key_values_from(4, 2))),
+    ?assertEqual(?B_TREE_05_01, b_trees:from_dict(5, test_generator:generate_key_values_from(1, 2))),
+    ?assertEqual(?B_TREE_05_29, b_trees:from_dict(5, test_generator:generate_key_values_from(29, 2))),
+    ?assertEqual(?B_TREE_19_19, b_trees:from_dict(19, test_generator:generate_key_values_from(19, 2))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict - b*-tree
+%%--------------------------------------------------------------------
+
+from_dict_b_star_tree_test() ->
+    ?assertEqual(?B_STAR_TREE_33_01, b_trees:from_dict(33, b_star, test_generator:generate_key_values_from(1, 2))),
 
     ok.
 
@@ -558,6 +626,45 @@ to_list_test() ->
     ?assertEqual(9, length(b_trees:to_list(?B_TREE_05_09))),
     ?assertEqual(16, length(b_trees:to_list(?B_TREE_05_16))),
     ?assertEqual(80, length(b_trees:to_list(?B_TREE_07_80))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update - order 4
+%%--------------------------------------------------------------------
+
+update_b_tree_order_4_test() ->
+    BTree_04_15_K_01 = b_trees:update("k_01", "v_01_new", ?B_TREE_04_15),
+    BTree_04_15_K_02 = b_trees:update("k_02", "v_02_new", BTree_04_15_K_01),
+    BTree_04_15_K_03 = b_trees:update("k_03", "v_03_new", BTree_04_15_K_02),
+    BTree_04_15_K_04 = b_trees:update("k_04", "v_04_new", BTree_04_15_K_03),
+    BTree_04_15_K_05 = b_trees:update("k_05", "v_05_new", BTree_04_15_K_04),
+    BTree_04_15_K_06 = b_trees:update("k_06", "v_06_new", BTree_04_15_K_05),
+    BTree_04_15_K_07 = b_trees:update("k_07", "v_07_new", BTree_04_15_K_06),
+    BTree_04_15_K_08 = b_trees:update("k_08", "v_08_new", BTree_04_15_K_07),
+    BTree_04_15_K_09 = b_trees:update("k_09", "v_09_new", BTree_04_15_K_08),
+    BTree_04_15_K_10 = b_trees:update("k_10", "v_10_new", BTree_04_15_K_09),
+    BTree_04_15_K_11 = b_trees:update("k_11", "v_11_new", BTree_04_15_K_10),
+    BTree_04_15_K_12 = b_trees:update("k_12", "v_12_new", BTree_04_15_K_11),
+    BTree_04_15_K_13 = b_trees:update("k_13", "v_13_new", BTree_04_15_K_12),
+    BTree_04_15_K_14 = b_trees:update("k_14", "v_14_new", BTree_04_15_K_13),
+    ?assertEqual(?B_TREE_04_15_UPDATE, b_trees:update("k_15", "v_15_new", BTree_04_15_K_14)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update - key not exists
+%%--------------------------------------------------------------------
+
+update_key_not_exists_test() ->
+    ?assertException(error, {empty_tree, ?B_TREE_05_00}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_00)),
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_02)),
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_29)),
+    ?assertException(error, {key_not_found, "k_30"}, b_trees:update("k_30", "v_30_new", ?B_TREE_05_29)),
+    ?assertException(error, {key_not_found, "k_000"}, b_trees:update("k_000", "v_000_new", ?B_TREE_07_80)),
+    ?assertException(error, {key_not_found, "k_999"}, b_trees:update("k_999", "v_999_new", ?B_TREE_07_80)),
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_08_64)),
+    ?assertException(error, {key_not_found, "k_65"}, b_trees:update("k_65", "v_65_new", ?B_TREE_08_64)),
 
     ok.
 
