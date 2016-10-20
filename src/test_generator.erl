@@ -24,6 +24,7 @@
     generate_key_values_from_update/2,
     generate_key_values_rand/3,
     generate_key_values_rand_update/3,
+    generate_keys_from/2,
     generate_keys_rand/3]).
 
 generate_b_tree_from_list(Order, Keys, Width) when Order > 3 ->
@@ -68,6 +69,10 @@ generate_key_values_rand(Range, Number, Width) when Number >= 0 ->
 generate_key_values_rand_update(Range, Number, Width) when Number >= 0 ->
     Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],
     generate_key_values_1(Keys, "_new", Width).
+
+generate_keys_from(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(1, Number),
+    generate_keys_1(Keys, Width).
 
 generate_keys_rand(Range, Number, Width) when Number >= 0 ->
     Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],

@@ -456,11 +456,25 @@ is_empty_test() ->
 
 keys_test() ->
     ?assertEqual([], b_trees:keys(?B_TREE_05_00)),
+
     ?assertEqual(["k_01"], b_trees:keys(?B_TREE_05_01)),
-    ?assertEqual(2, length(b_trees:keys(?B_TREE_05_02))),
-    ?assertEqual(5, length(b_trees:keys(?B_TREE_05_05))),
-    ?assertEqual(9, length(b_trees:keys(?B_TREE_05_09))),
-    ?assertEqual(16, length(b_trees:keys(?B_TREE_05_16))),
+
+    Keys_05_02 = b_trees:keys(?B_TREE_05_02),
+    ?assertEqual(test_generator:generate_keys_from(2, 2), Keys_05_02),
+    ?assertEqual(2, length(Keys_05_02)),
+
+    Keys_05_05 = b_trees:keys(?B_TREE_05_05),
+    ?assertEqual(test_generator:generate_keys_from(5, 2), Keys_05_05),
+    ?assertEqual(5, length(Keys_05_05)),
+
+    Keys_05_09 = b_trees:keys(?B_TREE_05_09),
+    ?assertEqual(test_generator:generate_keys_from(9, 2), Keys_05_09),
+    ?assertEqual(9, length(Keys_05_09)),
+
+    Keys_05_16 = b_trees:keys(?B_TREE_05_16),
+    ?assertEqual(test_generator:generate_keys_from(16, 2), Keys_05_16),
+    ?assertEqual(16, length(Keys_05_16)),
+
     ?assertEqual(80, length(b_trees:keys(?B_TREE_07_80))),
 
     ok.
@@ -650,11 +664,25 @@ smallest_test() ->
 
 to_list_test() ->
     ?assertException(error, {empty_tree, _}, b_trees:to_list(?B_TREE_05_00)),
+
     ?assertEqual([{"k_01", "v_01"}], b_trees:to_list(?B_TREE_05_01)),
-    ?assertEqual(2, length(b_trees:to_list(?B_TREE_05_02))),
-    ?assertEqual(5, length(b_trees:to_list(?B_TREE_05_05))),
-    ?assertEqual(9, length(b_trees:to_list(?B_TREE_05_09))),
-    ?assertEqual(16, length(b_trees:to_list(?B_TREE_05_16))),
+
+    KeyValues_05_02 = b_trees:to_list(?B_TREE_05_02),
+    ?assertEqual(test_generator:generate_key_values_from(2, 2), KeyValues_05_02),
+    ?assertEqual(2, length(KeyValues_05_02)),
+
+    KeyValues_05_05 = b_trees:to_list(?B_TREE_05_05),
+    ?assertEqual(test_generator:generate_key_values_from(5, 2), KeyValues_05_05),
+    ?assertEqual(5, length(KeyValues_05_05)),
+
+    KeyValues_05_09 = b_trees:to_list(?B_TREE_05_09),
+    ?assertEqual(test_generator:generate_key_values_from(9, 2), KeyValues_05_09),
+    ?assertEqual(9, length(KeyValues_05_09)),
+
+    KeyValues_05_16 = b_trees:to_list(?B_TREE_05_16),
+    ?assertEqual(test_generator:generate_key_values_from(16, 2), KeyValues_05_16),
+    ?assertEqual(16, length(KeyValues_05_16)),
+
     ?assertEqual(80, length(b_trees:to_list(?B_TREE_07_80))),
 
     ok.
@@ -704,7 +732,9 @@ update_error_test() ->
 
 values_test() ->
     ?assertEqual([], b_trees:values(?B_TREE_05_00)),
+    
     ?assertEqual(["v_01"], b_trees:values(?B_TREE_05_01)),
+    
     ?assertEqual(2, length(b_trees:values(?B_TREE_05_02))),
     ?assertEqual(5, length(b_trees:values(?B_TREE_05_05))),
     ?assertEqual(9, length(b_trees:values(?B_TREE_05_09))),

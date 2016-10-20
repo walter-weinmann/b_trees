@@ -69,7 +69,19 @@
 %% - is_empty(B): returns 'true' if B is an empty B-tree / B*-tree, 
 %%   and 'false' otherwise.
 %%
-%% - keys(B): returns a list of all keys in B-tree / B*-tree B.
+%% - iterator(B): returns an iterator that can be used for traversing
+%%   the entries of B-tree / B*-tree B; see `next'. The implementation 
+%%   of this is very efficient; traversing the whole tree using `next'
+%%   is only slightly slower than getting the list of all elements using
+%%   `to_list' and traversing that. The main advantage of the iterator
+%%   approach is that it does not require the complete list of all
+%%   elements to be built in memory at one time.
+%%
+%% - iterator_from(K, B): returns an iterator that can be used for
+%%   traversing the entries of B-tree / B*-tree B with key greater 
+%%   than or equal to K; see `next'.
+%%
+%% - keys(B): returns an ordered list of all keys in B-tree / B*-tree B.
 %%
 %% - largest(B): returns {K, V}, where K is the largest key in 
 %%   B-tree / B*-tree B, and V is the value associated with K in B. 
@@ -82,6 +94,11 @@
 %%   of the B-tree / B*-tree B and returns a new B-tree / B*-tree B' 
 %%   with the same set of keys as B and the new set of values V'.
 %%
+%% - next(I): returns {K, V, I1} where K is the smallest key referred to
+%%   by the iterator I, and I1 is the new iterator to be used for
+%%   traversing the remaining entries, or the atom `none' if no entries
+%%   remain.
+%%
 %% - number_key_values(B): returns the number of key / value pairs in the 
 %%   B-tree / B*-tree B as an integer. Returns 0 (zero) if the 
 %%   B-tree / B*-tree B is empty.
@@ -93,33 +110,15 @@
 %%   B-tree / B*-tree B, and V is the value associated with K in B. 
 %%   Assumes that the B-tree / B*-tree B is nonempty.
 %%
-%% - to_list(B): returns a list of {Key, Value} pairs for all keys
-%%   in B-tree / B*-tree B.
-%%
+%% - to_list(B): returns an ordered list of {Key, Value} pairs 
+%%   for all keys in B-tree / B*-tree B.
+
 %% - update(K, V, B): updates key K to value V in B-tree / B*-tree B; 
 %%   returns the new tree. Assumes that the key is present in the tree.
 %%
 %% - values(B): returns the list of values for all keys in 
-%%   B-tree / B*-tree B. Duplicates are not removed.
-%%
-
-
-%% - iterator(T): returns an iterator that can be used for traversing
-%%   the entries of tree T; see `next'. The implementation of this is
-%%   very efficient; traversing the whole tree using `next' is only
-%%   slightly slower than getting the list of all elements using
-%%   `to_list' and traversing that. The main advantage of the iterator
-%%   approach is that it does not require the complete list of all
-%%   elements to be built in memory at one time.
-%%
-%% - iterator_from(K, T): returns an iterator that can be used for
-%%   traversing the entries of tree T with key greater than or
-%%   equal to K; see `next'.
-%%
-%% - next(S): returns {X, V, S1} where X is the smallest key referred to
-%%   by the iterator S, and S1 is the new iterator to be used for
-%%   traversing the remaining entries, or the atom `none' if no entries
-%%   remain.
+%%   B-tree / B*-tree B, sorted by their corresponding keys. 
+%%   Duplicates are not removed.
 %%
 
 
@@ -184,15 +183,17 @@
 %% Some types.
 
 -type key() :: any().
+-type keys() :: [any(), ...].
 -type value() :: any().
+-type values() :: [any(), ...].
 
 -type key_value() :: {key(), value()}.
--type key_values() :: [key_value()].
+-type key_values() :: [key_value(), ...].
 
 -type map_function() :: fun((key(), value()) -> value()).
 
 -type tree() :: 'nil' | {pos_integer(), boolean(), key_values(), trees()}.
--type trees() :: [tree()].
+-type trees() :: [tree(), ...].
 
 -type b_tree() :: {atom(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 
@@ -220,15 +221,22 @@ enter(Key, Value, BTree) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec from_dict(pos_integer(), [key_value()]) -> b_tree().
--spec from_dict(pos_integer(), atom(), [key_value()]) -> b_tree().
+-spec from_dict(pos_integer(), key_values()) -> b_tree().
+-spec from_dict(pos_integer(), atom(), key_values()) -> b_tree().
 
 from_dict(Order, KeyValues) when Order > 3, length(KeyValues) > 0 ->
     BTree = {b, Order div 2, Order - 1, 0, nil},
-    from_dict_insert(KeyValues, BTree).
+    from_dict_1(KeyValues, BTree).
 from_dict(Order, b_star, KeyValues) when Order > 3, length(KeyValues) > 0 ->
     BTree = {b_star, Order * 2 div 3, Order - 1, 0, nil},
-    from_dict_insert(KeyValues, BTree).
+    from_dict_1(KeyValues, BTree).
+
+-spec from_dict_1(key_values(), b_tree()) -> b_tree().
+
+from_dict_1([], BTree) ->
+    BTree;
+from_dict_1([{Key, Value} | Tail], BTree) ->
+    from_dict_1(Tail, insert(Key, Value, BTree)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -253,7 +261,14 @@ get(Key, {_, _, _, _, Tree} = _X) ->
 height({_, _, _, 0, nil}) ->
     0;
 height({_, _, _, _, Tree}) ->
-    height_1(Tree, 1).
+    height(Tree, 1).
+
+-spec height(tree(), pos_integer()) -> pos_integer().
+
+height({_, true, _, _}, Number) ->
+    Number;
+height({_, _, _, [Tree | _]}, Number) ->
+    height(Tree, Number + 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -282,171 +297,6 @@ insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, _, K
                end,
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, TreeRepl, KeyNoMin, KeyNoMax)}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% This is a specialized version of `lookup'.
-
--spec is_defined(key(), b_tree()) -> boolean().
-
-is_defined(_, {_, _, _, 0, nil}) ->
-    false;
-is_defined(Key, {_, _, _, _, Tree}) ->
-    case lookup_1(Key, Tree) == none of
-        true ->
-            false;
-        _ ->
-            true
-    end.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec is_empty(b_tree()) -> boolean().
-
-is_empty({_, _, _, 0, nil}) ->
-    true;
-is_empty(_) ->
-    false.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec keys(b_tree()) -> [key()].
-
-keys({_, _, _, 0, nil}) ->
-    [];
-keys({_, _, _, _, Tree}) ->
-    keys_tree(Tree, []).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec largest(b_tree()) -> key_value().
-
-largest({_, _, _, 0, nil} = BTree) ->
-    erlang:error({empty_tree, BTree});
-largest({_, _, _, _, Tree}) ->
-    largest_tree(Tree).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
-
-lookup(_Key, {_, _, _, 0, nil}) ->
-    none;
-lookup(Key, {_, _, _, _, Tree}) ->
-    lookup_1(Key, Tree).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec map(map_function(), b_tree()) -> b_tree().
-
-map(_, {_, _, _, 0, nil} = BTree) ->
-    erlang:error({empty_tree, BTree});
-map(Function, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec number_key_values(b_tree()) -> non_neg_integer().
-
-number_key_values({_, _, _, NumberKeyValues, _}) ->
-    NumberKeyValues.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec size(b_tree()) -> non_neg_integer().
-
-size({_, _, _, 0, nil}) ->
-    0;
-size({_, _, _, _, Tree}) ->
-    size_tree(Tree, 0).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec smallest(b_tree()) -> key_value().
-
-smallest({_, _, _, 0, nil} = BTree) ->
-    erlang:error({empty_tree, BTree});
-smallest({_, _, _, _, Tree}) ->
-    smallest_tree(Tree).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec to_list(b_tree()) -> [key_value()].
-
-to_list({_, _, _, 0, nil} = BTree) ->
-    erlang:error({empty_tree, BTree});
-to_list({_, _, _, _, Tree}) ->
-    to_list_tree(Tree, []).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec update(key(), value(), b_tree()) -> b_tree().
-
-update(_, _, {_, _, _, 0, nil} = BTree) ->
-    erlang:error({empty_tree, BTree});
-update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_into_tree({Key, Value}, Tree)}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec values(b_tree()) -> [value()].
-
-values({_, _, _, 0, nil}) ->
-    [];
-values({_, _, _, _, Tree}) ->
-    values_tree(Tree, []).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Helper functions.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec binary_search(key(), key_values(), pos_integer(), pos_integer()) -> {none, pos_integer()} | {any(), pos_integer()}.
-
-binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
-    TreeNo = case Lower > length(KeyValues) of
-                 true ->
-                     Upper;
-                 _ ->
-                     Lower
-             end,
-    {KeyLast, _} = lists:nth(TreeNo, KeyValues),
-    case Key < KeyLast of
-        true ->
-            {none, TreeNo};
-        _ ->
-            {none, TreeNo + 1}
-    end;
-binary_search(Key, KeyValues, Lower, Upper) ->
-    Mid = (Upper + Lower) div 2,
-    {MidKey, MidValue} = lists:nth(Mid, KeyValues),
-    if
-        Key > MidKey ->
-            binary_search(Key, KeyValues, Mid + 1, Upper);
-        Key < MidKey ->
-            binary_search(Key, KeyValues, Lower, Mid - 1);
-        true ->
-            {MidValue, Mid}
-    end.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec from_dict_insert([key_value(), ...], b_tree()) -> b_tree().
-
-from_dict_insert([], BTree) ->
-    BTree;
-from_dict_insert([{Key, Value} | Tail], BTree) ->
-    from_dict_insert(Tail, insert(Key, Value, BTree)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec height_1(tree(), pos_integer()) -> pos_integer().
-
-height_1({_, true, _, _}, Number) ->
-    Number;
-height_1({_, _, _, [Tree | _]}, Number) ->
-    height_1(Tree, Number + 1).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 -spec insert_into_key_values(key_value(), key_values(), key_values()) -> key_values().
 
 insert_into_key_values(KeyValue, [] = _KeyValues, KeyValuesAcc) ->
@@ -457,8 +307,6 @@ insert_into_key_values({Key, _} = KeyValue, [{KeyCurr, _} | _] = KeyValues, KeyV
     KeyValuesAcc ++ [KeyValue] ++ KeyValues;
 insert_into_key_values({Key, _Value} = _KeyValue, _KeyValues, _KeyValuesAcc) ->
     erlang:error({key_exists, Key}).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec insert_into_tree(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
 
@@ -503,143 +351,6 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} 
             erlang:error({key_exists, Key})
     end.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec keys([key_value(), ...], [key()]) -> [key()].
-
-keys([], Keys) ->
-    Keys;
-keys([{Key, _} | Tail], Keys) ->
-    keys(Tail, Keys ++ [Key]).
-
--spec keys_tree(tree(), [key()]) -> [key()].
-
-keys_tree({_, true, KeyValues, _}, Keys) ->
-    keys(KeyValues, Keys);
-keys_tree({_, _, KeyValues, Trees}, Keys) ->
-    keys_trees(Trees, keys(KeyValues, Keys)).
-
--spec keys_trees([tree(), ...], [key()]) -> [key()].
-
-keys_trees([], Keys) ->
-    Keys;
-keys_trees([Tree | Tail], Keys) ->
-    keys_trees(Tail, keys_tree(Tree, Keys)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec largest_tree(tree()) -> key_value().
-
-largest_tree({_, true, KeyValues, _}) ->
-    lists:nth(length(KeyValues), KeyValues);
-largest_tree({_, _, _, Trees}) ->
-    largest_tree(lists:nth(length(Trees), Trees)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% The term order is an arithmetic total order, so we should not
-%% test exact equality for the keys. (If we do, then it becomes
-%% possible that neither `>', `<', nor `=:=' matches.) Testing '<'
-%% and '>' first is statistically better than testing for
-%% equality, and also allows us to skip the test completely in the
-%% remaining case.
-
--spec lookup_1(key(), tree()) -> 'none' | {'value', value()}.
-
-lookup_1(Key, {_, IsLeaf, KeyValues, ChildTrees}) ->
-    {Value, Pos} = sequential_search(Key, KeyValues, 0),
-    case Value == none of
-        true ->
-            case IsLeaf of
-                true ->
-                    none;
-                _ ->
-                    ChildTree = lists:nth(Pos, ChildTrees),
-                    lookup_1(Key, ChildTree)
-            end;
-        _ ->
-            {value, Value}
-    end.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec map_key_values(map_function(), [key_values(), ...], [key_values(), ...]) -> [key_values(), ...].
-
-map_key_values(_, [], KeyValuesMapped) ->
-    KeyValuesMapped;
-map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
-    map_key_values(Function, Tail, KeyValuesMapped ++ [{Key, Function(Key, Value)}]).
-
--spec map_tree(map_function(), tree()) -> tree().
-
-map_tree(Function, {KeyNo, true = IsLeaf, KeyValues, Trees}) ->
-    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), Trees};
-map_tree(Function, {KeyNo, IsLeaf, KeyValues, Trees}) ->
-    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), map_trees(Function, Trees, [])}.
-
--spec map_trees(map_function(), [tree(), ...], [tree(), ...]) -> [tree(), ...].
-
-map_trees(_, [], TreesMapped) ->
-    TreesMapped;
-map_trees(Function, [Tree | Tail], TreesMapped) ->
-    map_trees(Function, Tail, TreesMapped ++ [map_tree(Function, Tree)]).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec search(key(), key_values(), pos_integer(), pos_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
-
-search(Key, KeyValues, Upper, Limit) when Upper =< Limit ->
-    sequential_search(Key, KeyValues, 0);
-search(Key, KeyValues, Upper, _Limit) ->
-    binary_search(Key, KeyValues, 1, Upper).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec sequential_search(key(), key_values(), non_neg_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
-
-sequential_search(_, [], Pos) ->
-    {none, Pos + 1};
-sequential_search(Key, [{KeyLast, ValueLast} | Tail], Pos) ->
-    PosNew = Pos + 1,
-    case Key < KeyLast of
-        true ->
-            {none, PosNew};
-        _ ->
-            case Key > KeyLast of
-                true ->
-                    sequential_search(Key, Tail, PosNew);
-                _ ->
-                    {ValueLast, PosNew}
-            end
-    end.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec size_tree(tree(), pos_integer()) -> pos_integer().
-
-size_tree({_, true, _, _}, Number) ->
-    Number + 1;
-size_tree({_, _, _, Trees}, Number) ->
-    size_trees(Trees, Number + 1).
-
--spec size_trees([tree(), ...], pos_integer()) -> pos_integer().
-
-size_trees([], Number) ->
-    Number;
-size_trees([Tree | Tail], Number) ->
-    size_trees(Tail, size_tree(Tree, Number)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec smallest_tree(tree()) -> key_value().
-
-smallest_tree({_, true, KeyValues, _}) ->
-    lists:nth(1, KeyValues);
-smallest_tree({_, _, _, Trees}) ->
-    smallest_tree(lists:nth(1, Trees)).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 -spec split_tree_non_root(tree(), pos_integer(), key_values(), trees(), pos_integer()) -> {key_values(), trees()}.
 
 split_tree_non_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
@@ -679,32 +390,201 @@ split_tree_root({KeyNo, IsLeaf, KeyValues, Trees} = _Tree, KeyNoSplit) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec to_list([key_value(), ...], [value()]) -> [key_value()].
+%% This is a specialized version of `lookup'.
 
-to_list([], KeyValueList) ->
-    KeyValueList;
-to_list([{Key, Value} | Tail], KeyValueList) ->
-    to_list(Tail, KeyValueList ++ [{Key, Value}]).
+-spec is_defined(key(), b_tree()) -> boolean().
 
--spec to_list_tree(tree(), [key_value()]) -> [key_value()].
-
-to_list_tree({_, true, KeyValues, _}, KeyValueList) ->
-    to_list(KeyValues, KeyValueList);
-to_list_tree({_, _, KeyValues, Trees}, KeyValueList) ->
-    to_list_trees(Trees, to_list(KeyValues, KeyValueList)).
-
--spec to_list_trees([tree(), ...], [key_value()]) -> [key_value()].
-
-to_list_trees([], KeyValueList) ->
-    KeyValueList;
-to_list_trees([Tree | Tail], KeyValueList) ->
-    to_list_trees(Tail, to_list_tree(Tree, KeyValueList)).
+is_defined(_, {_, _, _, 0, nil}) ->
+    false;
+is_defined(Key, {_, _, _, _, Tree}) ->
+    case lookup_1(Key, Tree) == none of
+        true ->
+            false;
+        _ ->
+            true
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec update_into_tree(key_value(), tree()) -> {tree(), boolean()}.
+-spec is_empty(b_tree()) -> boolean().
 
-update_into_tree({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
+is_empty({_, _, _, 0, nil}) ->
+    true;
+is_empty(_) ->
+    false.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%-spec iterator(b_tree()) -> [key_value(),...].
+%%
+%%iterator({_, _, _, 0, nil}) ->
+%%    [].
+%%iterator({_, _, _, _, Tree}) ->
+%%    iterator_1(Tree,[]).
+%%
+%%%% The iterator structure is really just a list corresponding to
+%%%% the call stack of an in-order traversal. This is quite fast.
+%%
+%%iterator({_, _, nil, _} = T, As) ->
+%%    [T | As];
+%%iterator({_, _, L, _} = T, As) ->
+%%    iterator(L, [T | As]);
+%%iterator(nil, As) ->
+%%    As.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec keys(b_tree()) -> keys().
+
+keys({_, _, _, 0, nil}) ->
+    [];
+keys({_, _, _, _, {_, _, KeyValues, Trees}}) ->
+    keys(KeyValues, Trees, []).
+
+-spec keys(key_values(), trees(), keys()) -> keys().
+
+keys([], [nil], Keys) ->
+    Keys;
+keys([], [{_, _, KeyValues, Trees}], Keys) ->
+    Keys ++ keys(KeyValues, Trees, []);
+keys([{Key, _} | TailKeyValues], [nil | TailTrees], Keys) ->
+    keys(TailKeyValues, TailTrees, Keys ++ [Key]);
+keys([{Key, _} | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], Keys) ->
+    keys(TailKeyValues, TailTrees, Keys ++ keys(KeyValues, Trees, []) ++ [Key]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec largest(b_tree()) -> key_value().
+
+largest({_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+largest({_, _, _, _, Tree}) ->
+    largest_1(Tree).
+
+-spec largest_1(tree()) -> key_value().
+
+largest_1({_, true, KeyValues, _}) ->
+    lists:nth(length(KeyValues), KeyValues);
+largest_1({_, _, _, Trees}) ->
+    largest_1(lists:nth(length(Trees), Trees)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
+
+lookup(_Key, {_, _, _, 0, nil}) ->
+    none;
+lookup(Key, {_, _, _, _, Tree}) ->
+    lookup_1(Key, Tree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec map(map_function(), b_tree()) -> b_tree().
+
+map(_, {_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+map(Function, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
+
+-spec map_key_values(map_function(), [key_values(), ...], [key_values(), ...]) -> [key_values(), ...].
+
+map_key_values(_, [], KeyValuesMapped) ->
+    KeyValuesMapped;
+map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
+    map_key_values(Function, Tail, KeyValuesMapped ++ [{Key, Function(Key, Value)}]).
+
+-spec map_tree(map_function(), tree()) -> tree().
+
+map_tree(Function, {KeyNo, true = IsLeaf, KeyValues, Trees}) ->
+    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), Trees};
+map_tree(Function, {KeyNo, IsLeaf, KeyValues, Trees}) ->
+    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), map_trees(Function, Trees, [])}.
+
+-spec map_trees(map_function(), [tree(), ...], [tree(), ...]) -> [tree(), ...].
+
+map_trees(_, [], TreesMapped) ->
+    TreesMapped;
+map_trees(Function, [Tree | Tail], TreesMapped) ->
+    map_trees(Function, Tail, TreesMapped ++ [map_tree(Function, Tree)]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec number_key_values(b_tree()) -> non_neg_integer().
+
+number_key_values({_, _, _, NumberKeyValues, _}) ->
+    NumberKeyValues.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec size(b_tree()) -> non_neg_integer().
+
+size({_, _, _, 0, nil}) ->
+    0;
+size({_, _, _, _, Tree}) ->
+    size_tree(Tree, 0).
+
+-spec size_tree(tree(), pos_integer()) -> pos_integer().
+
+size_tree({_, true, _, _}, Number) ->
+    Number + 1;
+size_tree({_, _, _, Trees}, Number) ->
+    size_trees(Trees, Number + 1).
+
+-spec size_trees([tree(), ...], pos_integer()) -> pos_integer().
+
+size_trees([], Number) ->
+    Number;
+size_trees([Tree | Tail], Number) ->
+    size_trees(Tail, size_tree(Tree, Number)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec smallest(b_tree()) -> key_value().
+
+smallest({_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+smallest({_, _, _, _, Tree}) ->
+    smallest_1(Tree).
+
+-spec smallest_1(tree()) -> key_value().
+
+smallest_1({_, true, KeyValues, _}) ->
+    lists:nth(1, KeyValues);
+smallest_1({_, _, _, Trees}) ->
+    smallest_1(lists:nth(1, Trees)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec to_list(b_tree()) -> key_values().
+
+to_list({_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+to_list({_, _, _, _, {_, _, KeyValues, Trees}}) ->
+    to_list(KeyValues, Trees, []).
+
+-spec to_list(key_values(), trees(), key_values()) -> key_values().
+
+to_list([], [nil], KeyValueList) ->
+    KeyValueList;
+to_list([], [{_, _, KeyValues, Trees}], KeyValueList) ->
+    KeyValueList ++ to_list(KeyValues, Trees, []);
+to_list([KeyValue | TailKeyValues], [nil | TailTrees], KeyValueList) ->
+    to_list(TailKeyValues, TailTrees, KeyValueList ++ [KeyValue]);
+to_list([KeyValue | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], KeyValueList) ->
+    to_list(TailKeyValues, TailTrees, KeyValueList ++ to_list(KeyValues, Trees, []) ++ [KeyValue]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec update(key(), value(), b_tree()) -> b_tree().
+
+update(_, _, {_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_1({Key, Value}, Tree)}.
+
+-spec update_1(key_value(), tree()) -> {tree(), boolean()}.
+
+update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
     {ValueFound, KeyPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_FROM_LENGTH),
     case ValueFound of
         none ->
@@ -717,7 +597,7 @@ update_into_tree({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
                         IsLeaf,
                         KeyValues,
                             lists:sublist(Trees, 1, KeyPos - 1) ++
-                            [update_into_tree(KeyValue, lists:nth(KeyPos, Trees))] ++
+                            [update_1(KeyValue, lists:nth(KeyPos, Trees))] ++
                             lists:sublist(Trees, KeyPos + 1, length(Trees))
                     }
             end;
@@ -734,26 +614,110 @@ update_into_tree({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec values([key_value(), ...], [value()]) -> [value()].
+-spec values(b_tree()) -> values().
 
-values([], Values) ->
+values({_, _, _, 0, nil}) ->
+    [];
+values({_, _, _, _, {_, _, KeyValues, Trees}}) ->
+    values(KeyValues, Trees, []).
+
+-spec values(key_values(), trees(), values()) -> values().
+
+values([], [nil], Values) ->
     Values;
-values([{_, Value} | Tail], Values) ->
-    values(Tail, Values ++ [Value]).
+values([], [{_, _, KeyValues, Trees}], Values) ->
+    Values ++ values(KeyValues, Trees, []);
+values([{_, Value} | TailKeyValues], [nil | TailTrees], Values) ->
+    values(TailKeyValues, TailTrees, Values ++ [Value]);
+values([{_, Value} | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], Values) ->
+    values(TailKeyValues, TailTrees, Values ++ values(KeyValues, Trees, []) ++ [Value]).
 
--spec values_tree(tree(), [value()]) -> [value()].
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Helper functions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-values_tree({_, true, KeyValues, _}, Values) ->
-    values(KeyValues, Values);
-values_tree({_, _, KeyValues, Trees}, Values) ->
-    values_trees(Trees, values(KeyValues, Values)).
+-spec binary_search(key(), key_values(), pos_integer(), pos_integer()) -> {none, pos_integer()} | {any(), pos_integer()}.
 
--spec values_trees([tree(), ...], [value()]) -> [value()].
+binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
+    TreeNo = case Lower > length(KeyValues) of
+                 true ->
+                     Upper;
+                 _ ->
+                     Lower
+             end,
+    {KeyLast, _} = lists:nth(TreeNo, KeyValues),
+    case Key < KeyLast of
+        true ->
+            {none, TreeNo};
+        _ ->
+            {none, TreeNo + 1}
+    end;
+binary_search(Key, KeyValues, Lower, Upper) ->
+    Mid = (Upper + Lower) div 2,
+    {MidKey, MidValue} = lists:nth(Mid, KeyValues),
+    if
+        Key > MidKey ->
+            binary_search(Key, KeyValues, Mid + 1, Upper);
+        Key < MidKey ->
+            binary_search(Key, KeyValues, Lower, Mid - 1);
+        true ->
+            {MidValue, Mid}
+    end.
 
-values_trees([], Values) ->
-    Values;
-values_trees([Tree | Tail], Values) ->
-    values_trees(Tail, values_tree(Tree, Values)).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% The term order is an arithmetic total order, so we should not
+%% test exact equality for the keys. (If we do, then it becomes
+%% possible that neither `>', `<', nor `=:=' matches.) Testing '<'
+%% and '>' first is statistically better than testing for
+%% equality, and also allows us to skip the test completely in the
+%% remaining case.
+
+-spec lookup_1(key(), tree()) -> 'none' | {'value', value()}.
+
+lookup_1(Key, {_, IsLeaf, KeyValues, ChildTrees}) ->
+    {Value, Pos} = sequential_search(Key, KeyValues, 0),
+    case Value == none of
+        true ->
+            case IsLeaf of
+                true ->
+                    none;
+                _ ->
+                    ChildTree = lists:nth(Pos, ChildTrees),
+                    lookup_1(Key, ChildTree)
+            end;
+        _ ->
+            {value, Value}
+    end.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec search(key(), key_values(), pos_integer(), pos_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
+
+search(Key, KeyValues, Upper, Limit) when Upper =< Limit ->
+    sequential_search(Key, KeyValues, 0);
+search(Key, KeyValues, Upper, _Limit) ->
+    binary_search(Key, KeyValues, 1, Upper).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec sequential_search(key(), key_values(), non_neg_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
+
+sequential_search(_, [], Pos) ->
+    {none, Pos + 1};
+sequential_search(Key, [{KeyLast, ValueLast} | Tail], Pos) ->
+    PosNew = Pos + 1,
+    case Key < KeyLast of
+        true ->
+            {none, PosNew};
+        _ ->
+            case Key > KeyLast of
+                true ->
+                    sequential_search(Key, Tail, PosNew);
+                _ ->
+                    {ValueLast, PosNew}
+            end
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Test functions.
@@ -761,11 +725,25 @@ values_trees([Tree | Tail], Values) ->
 
 %%direct_test() ->
 %%
-%%%%    ?debugFmt("wwe debugging binary_search/4 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
+%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n b_trees:keys(?B_TREE_05_16): ~p~n", [b_trees:keys(?B_TREE_05_16)]),
+%%
+%%%%    GBTree = test_generator:generate_gb_tree_from_number(10, 2),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n GBTree: ~p~n", [GBTree]),
+%%%%    Iterator_01 = gb_trees:iterator(GBTree),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Iterator_01: ~p~n", [Iterator_01]),
+%%%%    {Key_01, Value_01, Iterator_02} = gb_trees:next(Iterator_01),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_02: ~p~n", [Key_01, Value_01, Iterator_02]),
+%%%%    {Key_02, Value_02, Iterator_03} = gb_trees:next(Iterator_02),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_03: ~p~n", [Key_02, Value_02, Iterator_03]),
+%%%%    {Key_03, Value_03, Iterator_04} = gb_trees:next(Iterator_03),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_04: ~p~n", [Key_03, Value_03, Iterator_04]),
+%%%%    {_Key_04, _Value_04, _Iterator_05} = gb_trees:next(Iterator_04),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_05: ~p~n", [_Key_04, _Value_04, _Iterator_05]),
+%%
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
 %%%%
 %%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_04_00~n ~p~n", [b_trees:empty(4)]),
 %%%%
 %%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_05_01~n ~p~n", [test_generator:generate_b_tree_from_number(5, 01, 2)]),
 %%
 %%    ok.
-
