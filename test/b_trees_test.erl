@@ -1,3 +1,12 @@
+%%%-------------------------------------------------------------------
+%%% File        : b_trees_test.erl
+%%% Description : Eunit tests for module: b_trees.
+%%%
+%%% Created     : 09.09.2016
+%%%
+%%% Copyright (C) 2016 Walter Weinmann
+%%%-------------------------------------------------------------------
+
 -module(b_trees_test).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -50,21 +59,21 @@ enter_b_tree_order_4_test() ->
     BTree_04_15_15 = b_trees:enter("k_15", "v_15", BTree_04_15_14),
     ?assertEqual(?B_TREE_04_15, BTree_04_15_15),
 
-    BTree_04_15_K_01 = b_trees:enter("k_01", "v_01_new", BTree_04_15_15),
-    BTree_04_15_K_02 = b_trees:enter("k_02", "v_02_new", BTree_04_15_K_01),
-    BTree_04_15_K_03 = b_trees:enter("k_03", "v_03_new", BTree_04_15_K_02),
-    BTree_04_15_K_04 = b_trees:enter("k_04", "v_04_new", BTree_04_15_K_03),
-    BTree_04_15_K_05 = b_trees:enter("k_05", "v_05_new", BTree_04_15_K_04),
-    BTree_04_15_K_06 = b_trees:enter("k_06", "v_06_new", BTree_04_15_K_05),
-    BTree_04_15_K_07 = b_trees:enter("k_07", "v_07_new", BTree_04_15_K_06),
-    BTree_04_15_K_08 = b_trees:enter("k_08", "v_08_new", BTree_04_15_K_07),
-    BTree_04_15_K_09 = b_trees:enter("k_09", "v_09_new", BTree_04_15_K_08),
-    BTree_04_15_K_10 = b_trees:enter("k_10", "v_10_new", BTree_04_15_K_09),
-    BTree_04_15_K_11 = b_trees:enter("k_11", "v_11_new", BTree_04_15_K_10),
-    BTree_04_15_K_12 = b_trees:enter("k_12", "v_12_new", BTree_04_15_K_11),
-    BTree_04_15_K_13 = b_trees:enter("k_13", "v_13_new", BTree_04_15_K_12),
-    BTree_04_15_K_14 = b_trees:enter("k_14", "v_14_new", BTree_04_15_K_13),
-    ?assertEqual(?B_TREE_04_15_UPDATE, b_trees:enter("k_15", "v_15_new", BTree_04_15_K_14)),
+    BTree_04_15_01_NEW = b_trees:enter("k_01", "v_01_new", BTree_04_15_15),
+    BTree_04_15_02_NEW = b_trees:enter("k_02", "v_02_new", BTree_04_15_01_NEW),
+    BTree_04_15_03_NEW = b_trees:enter("k_03", "v_03_new", BTree_04_15_02_NEW),
+    BTree_04_15_04_NEW = b_trees:enter("k_04", "v_04_new", BTree_04_15_03_NEW),
+    BTree_04_15_05_NEW = b_trees:enter("k_05", "v_05_new", BTree_04_15_04_NEW),
+    BTree_04_15_06_NEW = b_trees:enter("k_06", "v_06_new", BTree_04_15_05_NEW),
+    BTree_04_15_07_NEW = b_trees:enter("k_07", "v_07_new", BTree_04_15_06_NEW),
+    BTree_04_15_08_NEW = b_trees:enter("k_08", "v_08_new", BTree_04_15_07_NEW),
+    BTree_04_15_09_NEW = b_trees:enter("k_09", "v_09_new", BTree_04_15_08_NEW),
+    BTree_04_15_10_NEW = b_trees:enter("k_10", "v_10_new", BTree_04_15_09_NEW),
+    BTree_04_15_11_NEW = b_trees:enter("k_11", "v_11_new", BTree_04_15_10_NEW),
+    BTree_04_15_12_NEW = b_trees:enter("k_12", "v_12_new", BTree_04_15_11_NEW),
+    BTree_04_15_13_NEW = b_trees:enter("k_13", "v_13_new", BTree_04_15_12_NEW),
+    BTree_04_15_14_NEW = b_trees:enter("k_14", "v_14_new", BTree_04_15_13_NEW),
+    ?assertEqual(?B_TREE_04_15_UPDATE, b_trees:enter("k_15", "v_15_new", BTree_04_15_14_NEW)),
 
     ok.
 
@@ -198,10 +207,10 @@ height_test() ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: insert - key exists
+%% TEST CASES: insert - error
 %%--------------------------------------------------------------------
 
-insert_key_exists_test() ->
+insert_error_test() ->
     ?assertException(error, {key_exists, "k_01"}, b_trees:insert("k_01", "v_01", test_generator:generate_b_tree_from_number(5, 5, 2))),
     ?assertException(error, {key_exists, "k_02"}, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(5, 5, 2))),
     ?assertException(error, {key_exists, "k_03"}, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(5, 5, 2))),
@@ -569,6 +578,27 @@ lookup_test() ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: map - order 4
+%%--------------------------------------------------------------------
+
+map_b_tree_order_4_test() ->
+    ?assertEqual(?B_TREE_04_15_UPDATE, b_trees:map(fun map_value_to_new/2, ?B_TREE_04_15)),
+
+    ok.
+
+map_value_to_new(_, Value) ->
+    Value ++ "_new".
+
+%%--------------------------------------------------------------------
+%% TEST CASES: map - error
+%%--------------------------------------------------------------------
+
+map_error_test() ->
+    ?assertException(error, {empty_tree, ?B_TREE_05_00}, b_trees:map(fun map_value_to_new/2, ?B_TREE_05_00)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: number_key_values
 %%--------------------------------------------------------------------
 
@@ -653,10 +683,10 @@ update_b_tree_order_4_test() ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: update - key not exists
+%% TEST CASES: update - error
 %%--------------------------------------------------------------------
 
-update_key_not_exists_test() ->
+update_error_test() ->
     ?assertException(error, {empty_tree, ?B_TREE_05_00}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_00)),
     ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_02)),
     ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_29)),

@@ -162,7 +162,7 @@
     keys/1,
     largest/1,
     lookup/2,
-%%    map/1,
+    map/2,
 %%    next/1,
     number_key_values/1,
     size/1,
@@ -188,6 +188,8 @@
 
 -type key_value() :: {key(), value()}.
 -type key_values() :: [key_value()].
+
+-type map_function() :: fun((key(), value()) -> value()).
 
 -type tree() :: 'nil' | {pos_integer(), boolean(), key_values(), trees()}.
 -type trees() :: [tree()].
@@ -286,7 +288,7 @@ insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, _, K
 
 -spec is_defined(key(), b_tree()) -> boolean().
 
-is_defined(_Key, {_, _, _, 0, nil}) ->
+is_defined(_, {_, _, _, 0, nil}) ->
     false;
 is_defined(Key, {_, _, _, _, Tree}) ->
     case lookup_1(Key, Tree) == none of
@@ -331,6 +333,15 @@ lookup(_Key, {_, _, _, 0, nil}) ->
     none;
 lookup(Key, {_, _, _, _, Tree}) ->
     lookup_1(Key, Tree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec map(map_function(), b_tree()) -> b_tree().
+
+map(_, {_, _, _, 0, nil} = BTree) ->
+    erlang:error({empty_tree, BTree});
+map(Function, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -392,13 +403,17 @@ values({_, _, _, _, Tree}) ->
 
 binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
     TreeNo = case Lower > length(KeyValues) of
-                 true -> Upper;
-                 _ -> Lower
+                 true ->
+                     Upper;
+                 _ ->
+                     Lower
              end,
     {KeyLast, _} = lists:nth(TreeNo, KeyValues),
     case Key < KeyLast of
-        true -> {none, TreeNo};
-        _ -> {none, TreeNo + 1}
+        true ->
+            {none, TreeNo};
+        _ ->
+            {none, TreeNo + 1}
     end;
 binary_search(Key, KeyValues, Lower, Upper) ->
     Mid = (Upper + Lower) div 2,
@@ -534,15 +549,40 @@ largest_tree({_, _, _, Trees}) ->
 lookup_1(Key, {_, IsLeaf, KeyValues, ChildTrees}) ->
     {Value, Pos} = sequential_search(Key, KeyValues, 0),
     case Value == none of
-        true -> case IsLeaf of
-                    true ->
-                        none;
-                    _ ->
-                        ChildTree = lists:nth(Pos, ChildTrees),
-                        lookup_1(Key, ChildTree)
-                end;
-        _ -> {value, Value}
+        true ->
+            case IsLeaf of
+                true ->
+                    none;
+                _ ->
+                    ChildTree = lists:nth(Pos, ChildTrees),
+                    lookup_1(Key, ChildTree)
+            end;
+        _ ->
+            {value, Value}
     end.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec map_key_values(map_function(), [key_values(), ...], [key_values(), ...]) -> [key_values(), ...].
+
+map_key_values(_, [], KeyValuesMapped) ->
+    KeyValuesMapped;
+map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
+    map_key_values(Function, Tail, KeyValuesMapped ++ [{Key, Function(Key, Value)}]).
+
+-spec map_tree(map_function(), tree()) -> tree().
+
+map_tree(Function, {KeyNo, true = IsLeaf, KeyValues, Trees}) ->
+    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), Trees};
+map_tree(Function, {KeyNo, IsLeaf, KeyValues, Trees}) ->
+    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), map_trees(Function, Trees, [])}.
+
+-spec map_trees(map_function(), [tree(), ...], [tree(), ...]) -> [tree(), ...].
+
+map_trees(_, [], TreesMapped) ->
+    TreesMapped;
+map_trees(Function, [Tree | Tail], TreesMapped) ->
+    map_trees(Function, Tail, TreesMapped ++ [map_tree(Function, Tree)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -728,3 +768,4 @@ values_trees([Tree | Tail], Values) ->
 %%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_05_01~n ~p~n", [test_generator:generate_b_tree_from_number(5, 01, 2)]),
 %%
 %%    ok.
+
