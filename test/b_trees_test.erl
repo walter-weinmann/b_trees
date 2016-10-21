@@ -715,7 +715,7 @@ update_b_tree_order_4_test() ->
 %%--------------------------------------------------------------------
 
 update_error_test() ->
-    ?assertException(error, {empty_tree, ?B_TREE_05_00}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_00)),
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_00)),
     ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_02)),
     ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", ?B_TREE_05_29)),
     ?assertException(error, {key_not_found, "k_30"}, b_trees:update("k_30", "v_30_new", ?B_TREE_05_29)),
@@ -732,9 +732,9 @@ update_error_test() ->
 
 values_test() ->
     ?assertEqual([], b_trees:values(?B_TREE_05_00)),
-    
+
     ?assertEqual(["v_01"], b_trees:values(?B_TREE_05_01)),
-    
+
     ?assertEqual(2, length(b_trees:values(?B_TREE_05_02))),
     ?assertEqual(5, length(b_trees:values(?B_TREE_05_05))),
     ?assertEqual(9, length(b_trees:values(?B_TREE_05_09))),

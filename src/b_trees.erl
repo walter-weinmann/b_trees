@@ -215,10 +215,10 @@ empty(Order, b_star) when Order > 3 ->
 -spec enter(key(), value(), b_tree()) -> b_tree().
 
 enter(Key, Value, BTree) ->
-    case is_defined(Key, BTree) of
-        true ->
-            update(Key, Value, BTree);
-        false ->
+    try
+        update(Key, Value, BTree)
+    catch
+        error:{key_not_found, _} ->
             insert(Key, Value, BTree)
     end.
 
@@ -577,8 +577,8 @@ to_list([KeyValue | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], KeyV
 
 -spec update(key(), value(), b_tree()) -> b_tree().
 
-update(_, _, ?B_TREE_EMPTY = BTree) ->
-    erlang:error({empty_tree, BTree});
+update(Key, _, ?B_TREE_EMPTY) ->
+    erlang:error({key_not_found, Key});
 update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_1({Key, Value}, Tree)}.
 
