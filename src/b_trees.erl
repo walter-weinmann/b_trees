@@ -53,7 +53,7 @@
 %% - from_dict(O, b_star, L): turns a list L of {Key, Value} pairs into
 %%   a B*-tree of order O. The list must not contain duplicate keys.
 %%
-%% - get(K, B): retreives the value stored with key K in 
+%% - get(K, B): retrieves the value stored with key K in 
 %%   B-tree / B*-tree T. Assumes that the key is present in the tree.
 %%
 %% - height(B): returns the height of the B-tree / B*-tree B as an integer.
@@ -314,7 +314,7 @@ insert_into_tree(KeyValue, {KeyNo, true = IsLeaf, KeyValues, Trees} = _Tree, _Ke
     TreeOut = {KeyNo + 1, IsLeaf, insert_into_key_values(KeyValue, KeyValues, []), Trees ++ [nil]},
     TreeOut;
 insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} = _Tree, KeyNoMin, KeyNoMax) ->
-    {ValueFound, TreeUpperPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_FROM_LENGTH),
+    {ValueFound, TreeUpperPos} = search(Key, KeyValues, KeyNo),
     case ValueFound of
         none ->
             TreeUpper = lists:nth(TreeUpperPos, Trees),
@@ -334,7 +334,7 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} 
                                                                                                        end
                                                                                                end,
                                                                                   {KeyValuesSplit, TreesSplit} = split_tree_non_root(TreeUpper, KeyNoSplit, KeyValues, Trees, TreeUpperPos),
-                                                                                  {none, TreeUpperPosSplit} = search(Key, KeyValuesSplit, length(KeyValuesSplit), ?BINARY_SEARCH_FROM_LENGTH),
+                                                                                  {none, TreeUpperPosSplit} = search(Key, KeyValuesSplit, length(KeyValuesSplit)),
                                                                                   {lists:nth(TreeUpperPosSplit, TreesSplit), KeyValuesSplit, TreesSplit, TreeUpperPosSplit};
                                                                               _ ->
                                                                                   {TreeUpper, KeyValues, Trees, TreeUpperPos}
@@ -585,7 +585,7 @@ update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
 -spec update_1(key_value(), tree()) -> {tree(), boolean()}.
 
 update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
-    {ValueFound, KeyPos} = search(Key, KeyValues, KeyNo, ?BINARY_SEARCH_FROM_LENGTH),
+    {ValueFound, KeyPos} = search(Key, KeyValues, KeyNo),
     case ValueFound of
         none ->
             case IsLeaf of
@@ -675,8 +675,8 @@ binary_search(Key, KeyValues, Lower, Upper) ->
 
 -spec lookup_1(key(), tree()) -> 'none' | {'value', value()}.
 
-lookup_1(Key, {_, IsLeaf, KeyValues, ChildTrees}) ->
-    {Value, Pos} = sequential_search(Key, KeyValues, 0),
+lookup_1(Key, {KeyNo, IsLeaf, KeyValues, ChildTrees}) ->
+    {Value, Pos} = search(Key, KeyValues, KeyNo),
     case Value == none of
         true ->
             case IsLeaf of
@@ -692,11 +692,11 @@ lookup_1(Key, {_, IsLeaf, KeyValues, ChildTrees}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec search(key(), key_values(), pos_integer(), pos_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
+-spec search(key(), key_values(), pos_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
 
-search(Key, KeyValues, Upper, Limit) when Upper =< Limit ->
+search(Key, KeyValues, Upper) when Upper =< ?BINARY_SEARCH_FROM_LENGTH ->
     sequential_search(Key, KeyValues, 0);
-search(Key, KeyValues, Upper, _Limit) ->
+search(Key, KeyValues, Upper) ->
     binary_search(Key, KeyValues, 1, Upper).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
