@@ -171,8 +171,6 @@
     values/1
 ]).
 
--define(BINARY_SEARCH_FROM_LENGTH, 4).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
 %% - {BTreeType, Minimum, Maximum, NumberKeyValues, Tree}, 
@@ -314,7 +312,7 @@ insert_into_tree(KeyValue, {KeyNo, true = IsLeaf, KeyValues, Trees} = _Tree, _Ke
     TreeOut = {KeyNo + 1, IsLeaf, insert_into_key_values(KeyValue, KeyValues, []), Trees ++ [nil]},
     TreeOut;
 insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} = _Tree, KeyNoMin, KeyNoMax) ->
-    {ValueFound, TreeUpperPos} = search(Key, KeyValues, KeyNo),
+    {ValueFound, TreeUpperPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
             TreeUpper = lists:nth(TreeUpperPos, Trees),
@@ -334,7 +332,8 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees} 
                                                                                                        end
                                                                                                end,
                                                                                   {KeyValuesSplit, TreesSplit} = split_tree_non_root(TreeUpper, KeyNoSplit, KeyValues, Trees, TreeUpperPos),
-                                                                                  {none, TreeUpperPosSplit} = search(Key, KeyValuesSplit, length(KeyValuesSplit)),
+                                                                                  KeyNoEff = length(KeyValuesSplit),
+                                                                                  {none, TreeUpperPosSplit} = binary_search(Key, KeyValuesSplit, KeyNoEff, 1, KeyNoEff),
                                                                                   {lists:nth(TreeUpperPosSplit, TreesSplit), KeyValuesSplit, TreesSplit, TreeUpperPosSplit};
                                                                               _ ->
                                                                                   {TreeUpper, KeyValues, Trees, TreeUpperPos}
@@ -585,7 +584,7 @@ update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
 -spec update_1(key_value(), tree()) -> {tree(), boolean()}.
 
 update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
-    {ValueFound, KeyPos} = search(Key, KeyValues, KeyNo),
+    {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
             case IsLeaf of
@@ -636,10 +635,10 @@ values([{_, Value} | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], Val
 %% Helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec binary_search(key(), key_values(), pos_integer(), pos_integer()) -> {none, pos_integer()} | {any(), pos_integer()}.
+-spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer()) -> {none, pos_integer()} | {any(), pos_integer()}.
 
-binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
-    TreeNo = case Lower > length(KeyValues) of
+binary_search(Key, KeyValues, KeyNo, Lower, Upper) when Lower > Upper ->
+    TreeNo = case Lower > KeyNo of
                  true ->
                      Upper;
                  _ ->
@@ -652,14 +651,14 @@ binary_search(Key, KeyValues, Lower, Upper) when Lower > Upper ->
         _ ->
             {none, TreeNo + 1}
     end;
-binary_search(Key, KeyValues, Lower, Upper) ->
+binary_search(Key, KeyValues, KeyNo, Lower, Upper) ->
     Mid = (Upper + Lower) div 2,
     {MidKey, MidValue} = lists:nth(Mid, KeyValues),
     if
         Key > MidKey ->
-            binary_search(Key, KeyValues, Mid + 1, Upper);
+            binary_search(Key, KeyValues, KeyNo, Mid + 1, Upper);
         Key < MidKey ->
-            binary_search(Key, KeyValues, Lower, Mid - 1);
+            binary_search(Key, KeyValues, KeyNo, Lower, Mid - 1);
         true ->
             {MidValue, Mid}
     end.
@@ -676,7 +675,7 @@ binary_search(Key, KeyValues, Lower, Upper) ->
 -spec lookup_1(key(), tree()) -> 'none' | {'value', value()}.
 
 lookup_1(Key, {KeyNo, IsLeaf, KeyValues, ChildTrees}) ->
-    {Value, Pos} = search(Key, KeyValues, KeyNo),
+    {Value, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case Value == none of
         true ->
             case IsLeaf of
@@ -688,35 +687,6 @@ lookup_1(Key, {KeyNo, IsLeaf, KeyValues, ChildTrees}) ->
             end;
         _ ->
             {value, Value}
-    end.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec search(key(), key_values(), pos_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
-
-search(Key, KeyValues, Upper) when Upper =< ?BINARY_SEARCH_FROM_LENGTH ->
-    sequential_search(Key, KeyValues, 0);
-search(Key, KeyValues, Upper) ->
-    binary_search(Key, KeyValues, 1, Upper).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec sequential_search(key(), key_values(), non_neg_integer()) -> {'none', pos_integer()} | {value(), pos_integer()}.
-
-sequential_search(_, [], Pos) ->
-    {none, Pos + 1};
-sequential_search(Key, [{KeyLast, ValueLast} | Tail], Pos) ->
-    PosNew = Pos + 1,
-    case Key < KeyLast of
-        true ->
-            {none, PosNew};
-        _ ->
-            case Key > KeyLast of
-                true ->
-                    sequential_search(Key, Tail, PosNew);
-                _ ->
-                    {ValueLast, PosNew}
-            end
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
