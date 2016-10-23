@@ -1,8 +1,8 @@
--define(NODEBUG, true).
-
--include_lib("eunit/include/eunit.hrl").
-
--include_lib("../include/b_trees_templates.hrl").
+%%-define(NODEBUG, true).
+%%
+%%-include_lib("eunit/include/eunit.hrl").
+%%
+%%-include_lib("../include/b_trees_templates.hrl").
 
 %%
 %% %CopyrightBegin%
@@ -175,12 +175,7 @@
 %% Data structure:
 %% - {BTreeType, Minimum, Maximum, NumberKeyValues, Tree},
 %%   where `Tree' is composed of :
-%%   - {KeyNo, IsLeaf, [{Key, Value}], [Tree]}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Some macros.
-
--define(B_TREE_EMPTY, {_, _, _, _, nil}).
+%%   - {KeyNo,  [{Key, Value}], [Tree]}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
@@ -247,7 +242,7 @@ from_dict_1([{Key, Value} | Tail], BTree) ->
 
 -spec get(key(), b_tree()) -> value().
 
-get(Key, ?B_TREE_EMPTY) ->
+get(Key, {_, _, _, _, nil}) ->
     erlang:error({key_not_found, Key});
 get(Key, {_, _, _, _, Tree}) ->
     case lookup_1(Key, Tree) of
@@ -261,16 +256,16 @@ get(Key, {_, _, _, _, Tree}) ->
 
 -spec height(b_tree()) -> non_neg_integer().
 
-height(?B_TREE_EMPTY) ->
+height({_, _, _, _, nil}) ->
     0;
 height({_, _, _, _, Tree}) ->
     height(Tree, 1).
 
 -spec height(tree(), pos_integer()) -> pos_integer().
 
-height({_, true, _, _}, Number) ->
+height({_, _, []}, Number) ->
     Number;
-height({_, _, _, [Tree | _]}, Number) ->
+height({_, _, [Tree | _]}, Number) ->
     height(Tree, Number + 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -278,8 +273,8 @@ height({_, _, _, [Tree | _]}, Number) ->
 -spec insert(key(), value(), b_tree()) -> b_tree().
 
 insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, 0, nil}) ->
-    {BTreeType, KeyNoMin, KeyNoMax, 1, {1, true, [{Key, Value}], []}};
-insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, _IsLeaf, KeyValues, _} = BTree}) ->
+    {BTreeType, KeyNoMin, KeyNoMax, 1, {1, [{Key, Value}], []}};
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, _} = BTree}) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, case KeyNo == KeyNoMax of
                                                                                             true ->
                                                                                                 KeyNoSplit = case KeyNoMax rem 2 of
@@ -312,14 +307,14 @@ insert_into_key_values({Key, _Value}, _KeyValues, _KeyValuesAcc) ->
 
 -spec insert_into_tree(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
 
-insert_into_tree(KeyValue, {KeyNo, IsLeaf, KeyValues, []}, _KeyNoMin, _KeyNoMax) ->
-    {KeyNo + 1, IsLeaf, insert_into_key_values(KeyValue, KeyValues, []), []};
-insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees}, KeyNoMin, KeyNoMax) ->
+insert_into_tree(KeyValue, {KeyNo, KeyValues, []}, _KeyNoMin, _KeyNoMax) ->
+    {KeyNo + 1, insert_into_key_values(KeyValue, KeyValues, []), []};
+insert_into_tree({Key, _} = KeyValue, {KeyNo, KeyValues, Trees}, KeyNoMin, KeyNoMax) ->
     {ValueFound, TreeUpperPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
             TreeUpper = lists:nth(TreeUpperPos, Trees),
-            {KeyNoUpper, _, KeyValuesUpper, _} = TreeUpper,
+            {KeyNoUpper, KeyValuesUpper, _} = TreeUpper,
             {TreeUpperRepl, KeyValuesRepl, TreesRepl, TreeUpperPosRepl} = case KeyNoUpper == KeyNoMax of
                                                                               true ->
                                                                                   KeyNoSplit = case KeyNoMax rem 2 of
@@ -343,7 +338,6 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees},
                                                                           end,
             {
                 length(KeyValuesRepl),
-                IsLeaf,
                 KeyValuesRepl,
                     lists:sublist(TreesRepl, 1, TreeUpperPosRepl - 1) ++
                     [insert_into_tree(KeyValue, TreeUpperRepl, KeyNoMin, KeyNoMax)] ++
@@ -355,72 +349,70 @@ insert_into_tree({Key, _} = KeyValue, {KeyNo, false = IsLeaf, KeyValues, Trees},
 
 -spec split_tree_non_root(tree(), pos_integer(), key_values(), trees(), pos_integer()) -> {key_values(), trees()}.
 
-split_tree_non_root({KeyNo, IsLeaf, KeyValues, []}, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
+split_tree_non_root({KeyNo, KeyValues, []}, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
     {insert_into_key_values(lists:nth(KeyNoSplit, KeyValues), KeyValuesLower, []),
             lists:sublist(TreesLower, 1, TreeNo - 1) ++
             [
                 {
-                    KeyNoSplit - 1, IsLeaf,
+                    KeyNoSplit - 1,
                     lists:sublist(KeyValues, 1, KeyNoSplit - 1),
                     []
                 },
                 {
-                    KeyNo - KeyNoSplit, IsLeaf,
+                    KeyNo - KeyNoSplit,
                     lists:sublist(KeyValues, KeyNoSplit + 1, KeyNo),
                     []
                 }
-            ] ++ lists:sublist(TreesLower, TreeNo + 1, length(TreesLower))};
-split_tree_non_root({KeyNo, IsLeaf, KeyValues, Trees}, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
+            ] ++ lists:sublist(TreesLower, TreeNo + 1, length(TreesLower))
+    };
+split_tree_non_root({KeyNo, KeyValues, Trees}, KeyNoSplit, KeyValuesLower, TreesLower, TreeNo) ->
     {insert_into_key_values(lists:nth(KeyNoSplit, KeyValues), KeyValuesLower, []),
             lists:sublist(TreesLower, 1, TreeNo - 1) ++
             [
                 {
-                    KeyNoSplit - 1, IsLeaf,
+                    KeyNoSplit - 1,
                     lists:sublist(KeyValues, 1, KeyNoSplit - 1),
                     lists:sublist(Trees, 1, KeyNoSplit)
                 },
                 {
-                    KeyNo - KeyNoSplit, IsLeaf,
+                    KeyNo - KeyNoSplit,
                     lists:sublist(KeyValues, KeyNoSplit + 1, KeyNo),
                     lists:sublist(Trees, KeyNoSplit + 1, KeyNo)
                 }
-            ] ++ lists:sublist(TreesLower, TreeNo + 1, KeyNo + 1)}.
+            ] ++ lists:sublist(TreesLower, TreeNo + 1, KeyNo + 1)
+    }.
 
 -spec split_tree_root(tree(), pos_integer()) -> tree().
 
-split_tree_root({KeyNo, IsLeaf, KeyValues, []}, KeyNoSplit) ->
+split_tree_root({KeyNo, KeyValues, []}, KeyNoSplit) ->
     {
-        1, false,
+        1,
         [lists:nth(KeyNoSplit, KeyValues)],
         [
             {
                 KeyNoSplit - 1,
-                IsLeaf,
                 lists:sublist(KeyValues, 1, KeyNoSplit - 1),
                 []
             },
             {
                 KeyNo - KeyNoSplit,
-                IsLeaf,
                 lists:sublist(KeyValues, KeyNoSplit + 1, KeyNo),
                 []
             }
         ]
     };
-split_tree_root({KeyNo, IsLeaf, KeyValues, Trees}, KeyNoSplit) ->
+split_tree_root({KeyNo, KeyValues, Trees}, KeyNoSplit) ->
     {
-        1, false,
+        1,
         [lists:nth(KeyNoSplit, KeyValues)],
         [
             {
                 KeyNoSplit - 1,
-                IsLeaf,
                 lists:sublist(KeyValues, 1, KeyNoSplit - 1),
                 lists:sublist(Trees, 1, KeyNoSplit)
             },
             {
                 KeyNo - KeyNoSplit,
-                IsLeaf,
                 lists:sublist(KeyValues, KeyNoSplit + 1, KeyNo),
                 lists:sublist(Trees, KeyNoSplit + 1, KeyNo)
             }
@@ -433,7 +425,7 @@ split_tree_root({KeyNo, IsLeaf, KeyValues, Trees}, KeyNoSplit) ->
 
 -spec is_defined(key(), b_tree()) -> boolean().
 
-is_defined(_, ?B_TREE_EMPTY) ->
+is_defined(_, {_, _, _, _, nil}) ->
     false;
 is_defined(Key, {_, _, _, _, Tree}) ->
     case lookup_1(Key, Tree) == none of
@@ -447,7 +439,7 @@ is_defined(Key, {_, _, _, _, Tree}) ->
 
 -spec is_empty(b_tree()) -> boolean().
 
-is_empty(?B_TREE_EMPTY) ->
+is_empty({_, _, _, _, nil}) ->
     true;
 is_empty(_) ->
     false.
@@ -456,7 +448,7 @@ is_empty(_) ->
 
 %%-spec iterator(b_tree()) -> [key_value(),...].
 %%
-%%iterator({_, _, _, 0, nil}) ->
+%%iterator({_, _, _, _, nil}) ->
 %%    [].
 %%iterator({_, _, _, _, Tree}) ->
 %%    iterator_1(Tree,[]).
@@ -475,43 +467,43 @@ is_empty(_) ->
 
 -spec keys(b_tree()) -> keys().
 
-keys(?B_TREE_EMPTY) ->
+keys({_, _, _, _, nil}) ->
     [];
-keys({_, _, _, _, {_, _, KeyValues, Trees}}) ->
+keys({_, _, _, _, {_, KeyValues, Trees}}) ->
     keys(KeyValues, Trees, []).
 
 -spec keys(key_values(), trees(), keys()) -> keys().
 
 keys([], [], Keys) ->
     Keys;
-keys([], [{_, _, KeyValues, Trees}], Keys) ->
+keys([], [{_, KeyValues, Trees}], Keys) ->
     Keys ++ keys(KeyValues, Trees, []);
 keys([{Key, _} | Tail], [], Keys) ->
     keys(Tail, [], Keys ++ [Key]);
-keys([{Key, _} | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], Keys) ->
+keys([{Key, _} | TailKeyValues], [{_, KeyValues, Trees} | TailTrees], Keys) ->
     keys(TailKeyValues, TailTrees, Keys ++ keys(KeyValues, Trees, []) ++ [Key]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec largest(b_tree()) -> key_value().
 
-largest(?B_TREE_EMPTY = BTree) ->
+largest({_, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
 largest({_, _, _, _, Tree}) ->
     largest_1(Tree).
 
 -spec largest_1(tree()) -> key_value().
 
-largest_1({_, true, KeyValues, _}) ->
+largest_1({_, KeyValues, []}) ->
     lists:nth(length(KeyValues), KeyValues);
-largest_1({KeyNo, _IsLeaf, _, Trees}) ->
+largest_1({KeyNo, _, Trees}) ->
     largest_1(lists:nth(KeyNo + 1, Trees)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
 
-lookup(_Key, ?B_TREE_EMPTY) ->
+lookup(_Key, {_, _, _, _, nil}) ->
     none;
 lookup(Key, {_, _, _, _, Tree}) ->
     lookup_1(Key, Tree).
@@ -520,7 +512,7 @@ lookup(Key, {_, _, _, _, Tree}) ->
 
 -spec map(map_function(), b_tree()) -> b_tree().
 
-map(_, ?B_TREE_EMPTY = BTree) ->
+map(_, {_, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
 map(Function, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
@@ -534,10 +526,10 @@ map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
 
 -spec map_tree(map_function(), tree()) -> tree().
 
-map_tree(Function, {KeyNo, true = IsLeaf, KeyValues, Trees}) ->
-    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), Trees};
-map_tree(Function, {KeyNo, IsLeaf, KeyValues, Trees}) ->
-    {KeyNo, IsLeaf, map_key_values(Function, KeyValues, []), map_trees(Function, Trees, [])}.
+map_tree(Function, {KeyNo, KeyValues, []}) ->
+    {KeyNo, map_key_values(Function, KeyValues, []), []};
+map_tree(Function, {KeyNo, KeyValues, Trees}) ->
+    {KeyNo, map_key_values(Function, KeyValues, []), map_trees(Function, Trees, [])}.
 
 -spec map_trees(map_function(), [tree(), ...], [tree(), ...]) -> [tree(), ...].
 
@@ -557,16 +549,16 @@ number_key_values({_, _, _, NumberKeyValues, _}) ->
 
 -spec size(b_tree()) -> non_neg_integer().
 
-size(?B_TREE_EMPTY) ->
+size({_, _, _, _, nil}) ->
     0;
 size({_, _, _, _, Tree}) ->
     size_tree(Tree, 0).
 
 -spec size_tree(tree(), pos_integer()) -> pos_integer().
 
-size_tree({_, true, _, _}, Number) ->
+size_tree({_, _, []}, Number) ->
     Number + 1;
-size_tree({_, _, _, Trees}, Number) ->
+size_tree({_, _, Trees}, Number) ->
     size_trees(Trees, Number + 1).
 
 -spec size_trees([tree(), ...], pos_integer()) -> pos_integer().
@@ -580,50 +572,50 @@ size_trees([Tree | Tail], Number) ->
 
 -spec smallest(b_tree()) -> key_value().
 
-smallest(?B_TREE_EMPTY = BTree) ->
+smallest({_, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
 smallest({_, _, _, _, Tree}) ->
     smallest_1(Tree).
 
 -spec smallest_1(tree()) -> key_value().
 
-smallest_1({_, true, KeyValues, _}) ->
+smallest_1({_, KeyValues, []}) ->
     lists:nth(1, KeyValues);
-smallest_1({_, _, _, Trees}) ->
+smallest_1({_, _, Trees}) ->
     smallest_1(lists:nth(1, Trees)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec to_list(b_tree()) -> key_values().
 
-to_list(?B_TREE_EMPTY = BTree) ->
+to_list({_, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-to_list({_, _, _, _, {_, _, KeyValues, Trees}}) ->
+to_list({_, _, _, _, {_, KeyValues, Trees}}) ->
     to_list(KeyValues, Trees, []).
 
 -spec to_list(key_values(), trees(), key_values()) -> key_values().
 
 to_list([], [], KeyValueList) ->
     KeyValueList;
-to_list([], [{_, _, KeyValues, Trees}], KeyValueList) ->
+to_list([], [{_, KeyValues, Trees}], KeyValueList) ->
     KeyValueList ++ to_list(KeyValues, Trees, []);
 to_list([KeyValue | Tail], [], KeyValueList) ->
     to_list(Tail, [], KeyValueList ++ [KeyValue]);
-to_list([KeyValue | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], KeyValueList) ->
+to_list([KeyValue | TailKeyValues], [{_, KeyValues, Trees} | TailTrees], KeyValueList) ->
     to_list(TailKeyValues, TailTrees, KeyValueList ++ to_list(KeyValues, Trees, []) ++ [KeyValue]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec update(key(), value(), b_tree()) -> b_tree().
 
-update(Key, _, ?B_TREE_EMPTY) ->
+update(Key, _, {_, _, _, _, nil}) ->
     erlang:error({key_not_found, Key});
 update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_1({Key, Value}, Tree)}.
 
 -spec update_1(key_value(), tree()) -> {tree(), boolean()}.
 
-update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, []}) ->
+update_1({Key, _} = KeyValue, {KeyNo, KeyValues, []}) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
@@ -631,20 +623,18 @@ update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, []}) ->
         _ ->
             {
                 KeyNo,
-                IsLeaf,
                     lists:sublist(KeyValues, 1, KeyPos - 1) ++
                     [KeyValue] ++
                     lists:sublist(KeyValues, KeyPos + 1, KeyNo),
                 []
             }
     end;
-update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
+update_1({Key, _} = KeyValue, {KeyNo, KeyValues, Trees}) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
             {
                 KeyNo,
-                IsLeaf,
                 KeyValues,
                     lists:sublist(Trees, 1, KeyPos - 1) ++
                     [update_1(KeyValue, lists:nth(KeyPos, Trees))] ++
@@ -653,7 +643,6 @@ update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
         _ ->
             {
                 KeyNo,
-                IsLeaf,
                     lists:sublist(KeyValues, 1, KeyPos - 1) ++
                     [KeyValue] ++
                     lists:sublist(KeyValues, KeyPos + 1, KeyNo),
@@ -665,20 +654,20 @@ update_1({Key, _} = KeyValue, {KeyNo, IsLeaf, KeyValues, Trees}) ->
 
 -spec values(b_tree()) -> values().
 
-values(?B_TREE_EMPTY) ->
+values({_, _, _, _, nil}) ->
     [];
-values({_, _, _, _, {_, _, KeyValues, Trees}}) ->
+values({_, _, _, _, {_, KeyValues, Trees}}) ->
     values(KeyValues, Trees, []).
 
 -spec values(key_values(), trees(), values()) -> values().
 
 values([], [], Values) ->
     Values;
-values([], [{_, _, KeyValues, Trees}], Values) ->
+values([], [{_, KeyValues, Trees}], Values) ->
     Values ++ values(KeyValues, Trees, []);
 values([{_, Value} | Tail], [], Values) ->
     values(Tail, [], Values ++ [Value]);
-values([{_, Value} | TailKeyValues], [{_, _, KeyValues, Trees} | TailTrees], Values) ->
+values([{_, Value} | TailKeyValues], [{_, KeyValues, Trees} | TailTrees], Values) ->
     values(TailKeyValues, TailTrees, Values ++ values(KeyValues, Trees, []) ++ [Value]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -724,7 +713,7 @@ binary_search(Key, KeyValues, KeyNo, Lower, Upper) ->
 
 -spec lookup_1(key(), tree()) -> 'none' | {'value', value()}.
 
-lookup_1(Key, {KeyNo, _IsLeaf, KeyValues, []}) ->
+lookup_1(Key, {KeyNo, KeyValues, []}) ->
     {Value, _} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case Value == none of
         true ->
@@ -732,7 +721,7 @@ lookup_1(Key, {KeyNo, _IsLeaf, KeyValues, []}) ->
         _ ->
             {value, Value}
     end;
-lookup_1(Key, {KeyNo, _IsLeaf, KeyValues, ChildTrees}) ->
+lookup_1(Key, {KeyNo, KeyValues, ChildTrees}) ->
     {Value, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case Value == none of
         true ->
