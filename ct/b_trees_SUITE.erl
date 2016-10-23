@@ -39,11 +39,11 @@ end_per_suite(_Config) ->
 
 all() ->
     [
-        empty_b_tree_test,
         empty_b_star_tree_test,
+        empty_b_tree_test,
         enter_b_tree_order_4_test,
-        from_dict_b_tree_test,
         from_dict_b_star_tree_test,
+        from_dict_b_tree_test,
         get_test,
         height_test,
         insert_b_tree_order_5_test,
@@ -67,21 +67,21 @@ all() ->
     ].
 
 %%--------------------------------------------------------------------
-%% TEST CASES: empty - b-tree
-%%--------------------------------------------------------------------
-
-empty_b_tree_test(_Config) ->
-    ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
-    ?assert(b_trees:is_empty(b_trees:empty(33))),
-    ?assertEqual(0, b_trees:size(b_trees:empty(33))),
-
-    ok.
-
-%%--------------------------------------------------------------------
 %% TEST CASES: empty - b*-tree
 %%--------------------------------------------------------------------
 
 empty_b_star_tree_test(_Config) ->
+    ?assertEqual(?B_STAR_TREE_33_00, b_trees:empty(33, b_star)),
+    ?assert(b_trees:is_empty(b_trees:empty(33, b_star))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(33, b_star))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: empty - b-tree
+%%--------------------------------------------------------------------
+
+empty_b_tree_test(_Config) ->
     ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
     ?assert(b_trees:is_empty(b_trees:empty(33))),
     ?assertEqual(0, b_trees:size(b_trees:empty(33))),
@@ -129,6 +129,15 @@ enter_b_tree_order_4_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: from_dict - b*-tree
+%%--------------------------------------------------------------------
+
+from_dict_b_star_tree_test(_Config) ->
+    ?assertEqual(?B_STAR_TREE_33_01, b_trees:from_dict(33, b_star, test_generator:generate_key_values_from(1, 2))),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: from_dict - b-tree
 %%--------------------------------------------------------------------
 
@@ -137,15 +146,6 @@ from_dict_b_tree_test(_Config) ->
     ?assertEqual(?B_TREE_05_01, b_trees:from_dict(5, test_generator:generate_key_values_from(1, 2))),
     ?assertEqual(?B_TREE_05_29, b_trees:from_dict(5, test_generator:generate_key_values_from(29, 2))),
     ?assertEqual(?B_TREE_19_19, b_trees:from_dict(19, test_generator:generate_key_values_from(19, 2))),
-
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: from_dict - b*-tree
-%%--------------------------------------------------------------------
-
-from_dict_b_star_tree_test(_Config) ->
-    ?assertEqual(?B_STAR_TREE_33_01, b_trees:from_dict(33, b_star, test_generator:generate_key_values_from(1, 2))),
 
     ok.
 
