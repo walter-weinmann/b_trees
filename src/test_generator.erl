@@ -32,17 +32,17 @@ generate_b_tree_from_list(Order, Keys, Width) when Order > 3 ->
 
 generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_1(lists:seq(1, Number), [], Width, b_trees:empty(Order)).
-generate_b_tree_from_number(Order, b_star, Number, Width) when Order > 2, Number >= 0 ->
+generate_b_tree_from_number(Order, b_star, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_1(lists:seq(1, Number), [], Width, b_trees:empty(Order, b_star)).
 
 generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order)).
-generate_b_tree_from_number_update(Order, b_star, Number, Width) when Order > 2, Number >= 0 ->
+generate_b_tree_from_number_update(Order, b_star, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order, b_star)).
 
 generate_b_tree_till_number(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_1(lists:seq(Number, 1, -1), [], Width, b_trees:empty(Order)).
-generate_b_tree_till_number(Order, b_star, Number, Width) when Order > 2, Number >= 0 ->
+generate_b_tree_till_number(Order, b_star, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_1(lists:seq(Number, 1, -1), [], Width, b_trees:empty(Order, b_star)).
 
 generate_gb_tree_from_list(Keys, Width) ->

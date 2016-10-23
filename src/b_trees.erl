@@ -1,8 +1,8 @@
-%%-define(NODEBUG, true).
-%%
-%%-include_lib("eunit/include/eunit.hrl").
-%%
-%%-include_lib("../include/b_trees_templates.hrl").
+% -define(NODEBUG, true).
+
+-include_lib("eunit/include/eunit.hrl").
+
+-include_lib("../include/b_trees_templates.hrl").
 
 %%
 %% %CopyrightBegin%
@@ -180,22 +180,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
 
+-type b_tree() :: {b_tree_type(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
+-type b_tree_type() :: 'b' | 'b_star'.
+
 % -type iterator() :: none | {key(), value(), tree()}.
 
 -type key() :: any().
--type keys() :: [any(), ...].
--type value() :: any().
--type values() :: [any(), ...].
+-type keys() :: [any()].
 
 -type key_value() :: {key(), value()}.
--type key_values() :: [key_value(), ...].
+-type key_values() :: [key_value()].
 
 -type map_function() :: fun((key(), value()) -> value()).
 
--type tree() :: 'nil' | {pos_integer(), boolean(), key_values(), trees()}.
--type trees() :: [tree(), ...].
+-type tree() :: 'nil'
+| {pos_integer(), key_values(), []}
+| {pos_integer(), key_values(), trees()}.
+-type trees() :: [tree()].
 
--type b_tree() :: {atom(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
+-type value() :: any().
+-type values() :: [any()].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -274,7 +278,7 @@ height({_, _, [Tree | _]}, Number) ->
 
 insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, 0, nil}) ->
     {BTreeType, KeyNoMin, KeyNoMax, 1, {1, [{Key, Value}], []}};
-insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, _} = BTree}) ->
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, _} = Tree}) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, case KeyNo == KeyNoMax of
                                                                                             true ->
                                                                                                 KeyNoSplit = case KeyNoMax rem 2 of
@@ -289,9 +293,9 @@ insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyV
                                                                                                                              KeyNoMin + 1
                                                                                                                      end
                                                                                                              end,
-                                                                                                split_tree_root(BTree, KeyNoSplit);
+                                                                                                split_tree_root(Tree, KeyNoSplit);
                                                                                             _ ->
-                                                                                                BTree
+                                                                                                Tree
                                                                                         end, KeyNoMin, KeyNoMax)}.
 
 -spec insert_into_key_values(key_value(), key_values(), key_values()) -> key_values().
@@ -302,12 +306,12 @@ insert_into_key_values({Key, _} = KeyValue, [{KeyCurr, _} = KeyValueCurr | Tail]
     insert_into_key_values(KeyValue, Tail, KeyValuesAcc ++ [KeyValueCurr]);
 insert_into_key_values({Key, _} = KeyValue, [{KeyCurr, _} | _] = KeyValues, KeyValuesAcc) when Key < KeyCurr ->
     KeyValuesAcc ++ [KeyValue] ++ KeyValues;
-insert_into_key_values({Key, _Value}, _KeyValues, _KeyValuesAcc) ->
+insert_into_key_values({Key, _}, _, _) ->
     erlang:error({key_exists, Key}).
 
 -spec insert_into_tree(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
 
-insert_into_tree(KeyValue, {KeyNo, KeyValues, []}, _KeyNoMin, _KeyNoMax) ->
+insert_into_tree(KeyValue, {KeyNo, KeyValues, []}, _, _) ->
     {KeyNo + 1, insert_into_key_values(KeyValue, KeyValues, []), []};
 insert_into_tree({Key, _} = KeyValue, {KeyNo, KeyValues, Trees}, KeyNoMin, KeyNoMax) ->
     {ValueFound, TreeUpperPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
@@ -517,7 +521,7 @@ map(_, {_, _, _, _, nil} = BTree) ->
 map(Function, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
 
--spec map_key_values(map_function(), [key_values(), ...], [key_values(), ...]) -> [key_values(), ...].
+-spec map_key_values(map_function(), key_values(), key_values()) -> key_values().
 
 map_key_values(_, [], KeyValuesMapped) ->
     KeyValuesMapped;
@@ -531,7 +535,7 @@ map_tree(Function, {KeyNo, KeyValues, []}) ->
 map_tree(Function, {KeyNo, KeyValues, Trees}) ->
     {KeyNo, map_key_values(Function, KeyValues, []), map_trees(Function, Trees, [])}.
 
--spec map_trees(map_function(), [tree(), ...], [tree(), ...]) -> [tree(), ...].
+-spec map_trees(map_function(), trees(), trees()) -> trees().
 
 map_trees(_, [], TreesMapped) ->
     TreesMapped;
@@ -554,14 +558,14 @@ size({_, _, _, _, nil}) ->
 size({_, _, _, _, Tree}) ->
     size_tree(Tree, 0).
 
--spec size_tree(tree(), pos_integer()) -> pos_integer().
+-spec size_tree(tree(), non_neg_integer()) -> non_neg_integer().
 
 size_tree({_, _, []}, Number) ->
     Number + 1;
 size_tree({_, _, Trees}, Number) ->
     size_trees(Trees, Number + 1).
 
--spec size_trees([tree(), ...], pos_integer()) -> pos_integer().
+-spec size_trees(trees(), non_neg_integer()) -> non_neg_integer().
 
 size_trees([], Number) ->
     Number;
@@ -613,7 +617,7 @@ update(Key, _, {_, _, _, _, nil}) ->
 update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
     {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_1({Key, Value}, Tree)}.
 
--spec update_1(key_value(), tree()) -> {tree(), boolean()}.
+-spec update_1(key_value(), tree()) -> tree().
 
 update_1({Key, _} = KeyValue, {KeyNo, KeyValues, []}) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
@@ -731,13 +735,13 @@ lookup_1(Key, {KeyNo, KeyValues, ChildTrees}) ->
             {value, Value}
     end.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Test functions.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Test functions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
 %%direct_test() ->
 %%
-%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n b_trees:keys(?B_TREE_05_16): ~p~n", [b_trees:keys(?B_TREE_05_16)]),
+%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n test_generator:generate_b_tree_from_number(3, 10, 2): ~p~n", [test_generator:generate_b_tree_from_number(3, 10, 2)]),
 %%
 %%%%    GBTree = test_generator:generate_gb_tree_from_number(10, 2),
 %%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n GBTree: ~p~n", [GBTree]),
