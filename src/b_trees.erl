@@ -7,7 +7,7 @@
 %%
 %% %CopyrightBegin%
 %%
-%% Copyright Ericsson AB 2001-2015. All Rights Reserved.
+%% Copyright Ericsson AB 2001-2016. All Rights Reserved.
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -35,16 +35,16 @@
 %% -----------------------------------------------------------------------------
 %% Operations:
 %%
-%% - empty(O): returns empty B-tree of order O. Order is defined as 
+%% - empty(O): returns empty B-tree of order O. Order is defined as
 %%   the maximum number of children nodes a non-leaf node may hold.
 %%   The minimum value is 4.
 %%
-%% - empty(O, b_star): returns empty B*-tree of order O. Order is 
-%%   defined as the maximum number of children nodes a non-leaf node 
+%% - empty(O, b_star): returns empty B*-tree of order O. Order is
+%%   defined as the maximum number of children nodes a non-leaf node
 %%   may hold. The minimum value is 4.
 %%
-%% - enter(K, V, B): inserts key K with value V into B-tree / B*-tree B 
-%%   if the key is not present in the tree, otherwise updates key K to 
+%% - enter(K, V, B): inserts key K with value V into B-tree / B*-tree B
+%%   if the key is not present in the tree, otherwise updates key K to
 %%   value V in B. Returns the new tree.
 %%
 %% - from_dict(O, L): turns a list L of {Key, Value} pairs into
@@ -53,24 +53,24 @@
 %% - from_dict(O, b_star, L): turns a list L of {Key, Value} pairs into
 %%   a B*-tree of order O. The list must not contain duplicate keys.
 %%
-%% - get(K, B): retrieves the value stored with key K in 
+%% - get(K, B): retrieves the value stored with key K in
 %%   B-tree / B*-tree T. Assumes that the key is present in the tree.
 %%
 %% - height(B): returns the height of the B-tree / B*-tree B as an integer.
 %%   Returns 0 (zero) if the B-tree / B*-tree B is empty.
 %%
-%% - insert(K, V, B): inserts key K with value V into B-tree / B*-tree B; 
-%%   returns the new B-tree / B*-tree. Assumes that the key K is *not* 
+%% - insert(K, V, B): inserts key K with value V into B-tree / B*-tree B;
+%%   returns the new B-tree / B*-tree. Assumes that the key K is *not*
 %%   present in the B-tree / B*-tree B.
 %%
-%% - is_defined(K, B): returns `true' if key K is present in 
+%% - is_defined(K, B): returns `true' if key K is present in
 %%   B-tree / B*-tree B, and `false' otherwise.
 %%
-%% - is_empty(B): returns 'true' if B is an empty B-tree / B*-tree, 
+%% - is_empty(B): returns 'true' if B is an empty B-tree / B*-tree,
 %%   and 'false' otherwise.
 %%
 %% - iterator(B): returns an iterator that can be used for traversing
-%%   the entries of B-tree / B*-tree B; see `next'. The implementation 
+%%   the entries of B-tree / B*-tree B; see `next'. The implementation
 %%   of this is very efficient; traversing the whole tree using `next'
 %%   is only slightly slower than getting the list of all elements using
 %%   `to_list' and traversing that. The main advantage of the iterator
@@ -78,20 +78,20 @@
 %%   elements to be built in memory at one time.
 %%
 %% - iterator_from(K, B): returns an iterator that can be used for
-%%   traversing the entries of B-tree / B*-tree B with key greater 
+%%   traversing the entries of B-tree / B*-tree B with key greater
 %%   than or equal to K; see `next'.
 %%
 %% - keys(B): returns an ordered list of all keys in B-tree / B*-tree B.
 %%
-%% - largest(B): returns {K, V}, where K is the largest key in 
-%%   B-tree / B*-tree B, and V is the value associated with K in B. 
+%% - largest(B): returns {K, V}, where K is the largest key in
+%%   B-tree / B*-tree B, and V is the value associated with K in B.
 %%   Assumes that the B-tree / B*-tree B is nonempty.
 %%
-%% - lookup(K, B): looks up key K in B-tree / B*-tree B; returns {value, V}, 
+%% - lookup(K, B): looks up key K in B-tree / B*-tree B; returns {value, V},
 %%   or `none' if the key K is not present.
 %%
 %% - map(F, B): maps the function F(K, V) -> V' to all key-value pairs
-%%   of the B-tree / B*-tree B and returns a new B-tree / B*-tree B' 
+%%   of the B-tree / B*-tree B and returns a new B-tree / B*-tree B'
 %%   with the same set of keys as B and the new set of values V'.
 %%
 %% - next(I): returns {K, V, I1} where K is the smallest key referred to
@@ -99,25 +99,25 @@
 %%   traversing the remaining entries, or the atom `none' if no entries
 %%   remain.
 %%
-%% - number_key_values(B): returns the number of key / value pairs in the 
-%%   B-tree / B*-tree B as an integer. Returns 0 (zero) if the 
+%% - number_key_values(B): returns the number of key / value pairs in the
+%%   B-tree / B*-tree B as an integer. Returns 0 (zero) if the
 %%   B-tree / B*-tree B is empty.
 %%
-%% - size(B): returns the number of nodes in the B-tree / B*-tree B 
+%% - size(B): returns the number of nodes in the B-tree / B*-tree B
 %%   as an integer. Returns 0 (zero) if the B-tree / B*-tree B is empty.
 %%
-%% - smallest(B): returns {K, V}, where K is the smallest key in 
-%%   B-tree / B*-tree B, and V is the value associated with K in B. 
+%% - smallest(B): returns {K, V}, where K is the smallest key in
+%%   B-tree / B*-tree B, and V is the value associated with K in B.
 %%   Assumes that the B-tree / B*-tree B is nonempty.
 %%
-%% - to_list(B): returns an ordered list of {Key, Value} pairs 
+%% - to_list(B): returns an ordered list of {Key, Value} pairs
 %%   for all keys in B-tree / B*-tree B.
 
-%% - update(K, V, B): updates key K to value V in B-tree / B*-tree B; 
+%% - update(K, V, B): updates key K to value V in B-tree / B*-tree B;
 %%   returns the new tree. Assumes that the key is present in the tree.
 %%
-%% - values(B): returns the list of values for all keys in 
-%%   B-tree / B*-tree B, sorted by their corresponding keys. 
+%% - values(B): returns the list of values for all keys in
+%%   B-tree / B*-tree B, sorted by their corresponding keys.
 %%   Duplicates are not removed.
 %%
 
@@ -173,7 +173,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {BTreeType, Minimum, Maximum, NumberKeyValues, Tree}, 
+%% - {BTreeType, Minimum, Maximum, NumberKeyValues, Tree},
 %%   where `Tree' is composed of :
 %%   - {KeyNo, IsLeaf, [{Key, Value}], [Tree]}.
 
@@ -184,6 +184,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
+
+% -type iterator() :: none | {key(), value(), tree()}.
 
 -type key() :: any().
 -type keys() :: [any(), ...].
