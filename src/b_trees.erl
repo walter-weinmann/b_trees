@@ -278,25 +278,22 @@ height({_, _, [Tree | _]}, Number) ->
 
 insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, 0, nil}) ->
     {BTreeType, KeyNoMin, KeyNoMax, 1, {1, [{Key, Value}], []}};
-insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, _} = Tree}) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, case KeyNo == KeyNoMax of
-                                                                                            true ->
-                                                                                                KeyNoSplit = case KeyNoMax rem 2 of
-                                                                                                                 1 ->
-                                                                                                                     KeyNoMin + 1;
-                                                                                                                 _ ->
-                                                                                                                     {KeyKeyNoMin, _} = lists:nth(KeyNoMin, KeyValues),
-                                                                                                                     case Key < KeyKeyNoMin of
-                                                                                                                         true ->
-                                                                                                                             KeyNoMin;
-                                                                                                                         _ ->
-                                                                                                                             KeyNoMin + 1
-                                                                                                                     end
-                                                                                                             end,
-                                                                                                split_tree_root(Tree, KeyNoSplit);
-                                                                                            _ ->
-                                                                                                Tree
-                                                                                        end, KeyNoMin, KeyNoMax)}.
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, _} = Tree}) when KeyNo == KeyNoMax ->
+    KeyNoSplit = case KeyNoMax rem 2 of
+                     1 ->
+                         KeyNoMin + 1;
+                     _ ->
+                         {KeyKeyNoMin, _} = lists:nth(KeyNoMin, KeyValues),
+                         case Key < KeyKeyNoMin of
+                             true ->
+                                 KeyNoMin;
+                             _ ->
+                                 KeyNoMin + 1
+                         end
+                 end,
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, split_tree_root(Tree, KeyNoSplit), KeyNoMin, KeyNoMax)};
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_into_tree({Key, Value}, Tree, KeyNoMin, KeyNoMax)}.
 
 -spec insert_into_key_values(key_value(), key_values(), key_values()) -> key_values().
 
@@ -313,43 +310,44 @@ insert_into_key_values({Key, _}, _, _) ->
 
 insert_into_tree(KeyValue, {KeyNo, KeyValues, []}, _, _) ->
     {KeyNo + 1, insert_into_key_values(KeyValue, KeyValues, []), []};
-insert_into_tree({Key, _} = KeyValue, {KeyNo, KeyValues, Trees}, KeyNoMin, KeyNoMax) ->
-    {ValueFound, TreeUpperPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
+insert_into_tree({Key, _} = KeyValue, {KeyNo, KeyValues, Trees} = Tree, KeyNoMin, KeyNoMax) ->
+    {ValueFound, TreeTargetPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
-            TreeUpper = lists:nth(TreeUpperPos, Trees),
-            {KeyNoUpper, KeyValuesUpper, _} = TreeUpper,
-            {TreeUpperRepl, KeyValuesRepl, TreesRepl, TreeUpperPosRepl} = case KeyNoUpper == KeyNoMax of
-                                                                              true ->
-                                                                                  KeyNoSplit = case KeyNoMax rem 2 of
-                                                                                                   1 ->
-                                                                                                       KeyNoMin + 1;
-                                                                                                   _ ->
-                                                                                                       {KeyKeyNoMin, _} = lists:nth(KeyNoMin, KeyValuesUpper),
-                                                                                                       case Key < KeyKeyNoMin of
-                                                                                                           true ->
-                                                                                                               KeyNoMin;
-                                                                                                           _ ->
-                                                                                                               KeyNoMin + 1
-                                                                                                       end
-                                                                                               end,
-                                                                                  {KeyValuesSplit, TreesSplit} = split_tree_non_root(TreeUpper, KeyNoSplit, KeyValues, Trees, TreeUpperPos),
-                                                                                  KeyNoEff = length(KeyValuesSplit),
-                                                                                  {none, TreeUpperPosSplit} = binary_search(Key, KeyValuesSplit, KeyNoEff, 1, KeyNoEff),
-                                                                                  {lists:nth(TreeUpperPosSplit, TreesSplit), KeyValuesSplit, TreesSplit, TreeUpperPosSplit};
-                                                                              _ ->
-                                                                                  {TreeUpper, KeyValues, Trees, TreeUpperPos}
-                                                                          end,
+            TreeTarget = lists:nth(TreeTargetPos, Trees),
+            {TreeTargetRepl, KeyValuesRepl, TreesRepl, TreeTargetPosRepl} = insert_into_tree_1(KeyValue, Tree, KeyNoMin, KeyNoMax, TreeTarget, TreeTargetPos),
             {
                 length(KeyValuesRepl),
                 KeyValuesRepl,
-                    lists:sublist(TreesRepl, 1, TreeUpperPosRepl - 1) ++
-                    [insert_into_tree(KeyValue, TreeUpperRepl, KeyNoMin, KeyNoMax)] ++
-                    lists:sublist(TreesRepl, TreeUpperPosRepl + 1, length(TreesRepl))
+                    lists:sublist(TreesRepl, 1, TreeTargetPosRepl - 1) ++
+                    [insert_into_tree(KeyValue, TreeTargetRepl, KeyNoMin, KeyNoMax)] ++
+                    lists:sublist(TreesRepl, TreeTargetPosRepl + 1, length(TreesRepl))
             };
         _ ->
             erlang:error({key_exists, Key})
     end.
+
+-spec insert_into_tree_1(key_value(), tree(), pos_integer(), pos_integer(), tree(), pos_integer()) -> {tree(), key_values(), trees(), pos_integer()}.
+
+insert_into_tree_1({Key, _}, {_, KeyValues, Trees}, KeyNoMin, KeyNoMax, {KeyNoTarget, KeyValuesTarget, _} = TreeTarget, TreeTargetPos) when KeyNoTarget == KeyNoMax ->
+    KeyNoSplit = case KeyNoMax rem 2 of
+                     1 ->
+                         KeyNoMin + 1;
+                     _ ->
+                         {KeyKeyNoMin, _} = lists:nth(KeyNoMin, KeyValuesTarget),
+                         case Key < KeyKeyNoMin of
+                             true ->
+                                 KeyNoMin;
+                             _ ->
+                                 KeyNoMin + 1
+                         end
+                 end,
+    {KeyValuesSplit, TreesSplit} = split_tree_non_root(TreeTarget, KeyNoSplit, KeyValues, Trees, TreeTargetPos),
+    KeyNoEff = length(KeyValuesSplit),
+    {none, TreeTargetPosSplit} = binary_search(Key, KeyValuesSplit, KeyNoEff, 1, KeyNoEff),
+    {lists:nth(TreeTargetPosSplit, TreesSplit), KeyValuesSplit, TreesSplit, TreeTargetPosSplit};
+insert_into_tree_1(_, {_, KeyValues, Trees}, _, _, TreeTarget, TreeTargetPos) ->
+    {TreeTarget, KeyValues, Trees, TreeTargetPos}.
 
 -spec split_tree_non_root(tree(), pos_integer(), key_values(), trees(), pos_integer()) -> {key_values(), trees()}.
 
@@ -721,7 +719,7 @@ lookup_1(Key, {KeyNo, KeyValues, []}) ->
     {Value, _} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case Value == none of
         true ->
-            none;
+            Value;
         _ ->
             {value, Value}
     end;

@@ -1,3 +1,1 @@
-{level, details}.
-
-{incl_mods, [b_trees, test_generator]}.
+{incl_app, b_trees, details}.

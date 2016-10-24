@@ -1,8 +1,12 @@
-{application, b_trees,
-    [{description, "B-trees & B*-trees in Erlang"},
-        {vsn, "1.0.0"},
-        {registered, []},
+{
+    application, b_trees,
+    [
         {applications, [kernel, stdlib]},
-        {mod, {b_trees, []}},
+        {description, "B-trees & B*-trees in Erlang"},
         {env, []},
-        {modules, [b_trees]}]}.
+        {mod, {b_trees, []}},
+        {modules, [b_trees]},
+        {registered, []},
+        {vsn, "1.0.0"}
+    ]
+}.

@@ -1,10 +1,9 @@
 .eunit
-.rebar
 *.beam
 *.o
 *.plt
-deps
-ebin
-erl_crash.dump
+/_build
 /ct/*.beam
 /ct/logs
+/erl_crash.dump
+/rebar.lock
