@@ -3,10 +3,7 @@
     [
         {applications, [kernel, stdlib]},
         {description, "B-trees & B*-trees in Erlang"},
-        {env, []},
-        {mod, {b_trees, []}},
         {modules, [b_trees]},
-        {registered, []},
         {vsn, "1.0.0"}
     ]
 }.
