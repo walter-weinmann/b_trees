@@ -339,7 +339,20 @@ insert({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, KeyN
             erlang:error({key_exists, Key})
     end.
 
-split_node_non_root({Key, _} = _KeyValue, KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeKeyValues, TreeSubtrees} = _Tree, SubtreePos, KeyNoMin, KeyNoMax) ->
+-spec insert_key_values(key_value(), key_values(), key_values()) -> key_values().
+
+insert_key_values(KeyValue, [], KeyValuesAcc) ->
+    KeyValuesAcc ++ [KeyValue];
+insert_key_values({Key, _} = KeyValue, [{KeyCurr, _} = KeyValueCurr | Tail], KeyValuesAcc) when Key > KeyCurr ->
+    insert_key_values(KeyValue, Tail, KeyValuesAcc ++ [KeyValueCurr]);
+insert_key_values({Key, _} = KeyValue, [{KeyCurr, _} | _] = KeyValues, KeyValuesAcc) when Key < KeyCurr ->
+    KeyValuesAcc ++ [KeyValue] ++ KeyValues;
+insert_key_values({Key, _}, _, _) ->
+    erlang:error({key_exists, Key}).
+
+-spec split_node_non_root(key_value(), pos_integer(), key_values(), subtrees(), tree(), pos_integer(), pos_integer(), pos_integer()) -> {key_values(), subtrees(), tree(), subtrees()}.
+
+split_node_non_root({Key, _} = _KeyValue, KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeKeyValues, TreeSubtrees}, SubtreePos, KeyNoMin, KeyNoMax) ->
     KeyNoSplit = case KeyNoMax rem 2 of
                      1 ->
                          KeyNoMin;
@@ -352,57 +365,40 @@ split_node_non_root({Key, _} = _KeyValue, KeyNo, KeyValues, Subtrees, {TreeKeyNo
                                  KeyNoMin + 1
                          end
                  end,
-    TreeKeyValue = lists:nth(KeyNoSplit, TreeKeyValues),
-    SplitKeyValues = insert_key_values(TreeKeyValue, KeyValues, []),
-    SplitTree1 = {
-        KeyNoSplit - 1,
-        lists:sublist(TreeKeyValues, 1, KeyNoSplit - 1),
-        % Leaf node to be splitted ?
-        case length(TreeSubtrees) == 0 of
-            true ->
-                [];
-            _ ->
-                lists:sublist(TreeSubtrees, 1, KeyNoSplit)
-        end
-    },
-    SplitTree2 = {
-        TreeKeyNo - KeyNoSplit,
-        lists:sublist(TreeKeyValues, KeyNoSplit + 1, TreeKeyNo),
-        % Leaf node to be splitted ?
-        case length(TreeSubtrees) == 0 of
-            true ->
-                [];
-            _ ->
-                lists:sublist(TreeSubtrees, KeyNoSplit + 1, TreeKeyNo + 1)
-        end
-    },
-    case Key > TreeKeyValue of
-        true ->
-            {
-                SplitKeyValues,
-                    lists:sublist(Subtrees, 1, SubtreePos - 1) ++ [SplitTree1],
-                SplitTree2,
-                lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
-            };
-        _ ->
-            {
-                SplitKeyValues,
-                lists:sublist(Subtrees, 1, SubtreePos - 1),
-                SplitTree1,
-                    [SplitTree1] ++ lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
-            }
-    end.
-
--spec insert_key_values(key_value(), key_values(), key_values()) -> key_values().
-
-insert_key_values(KeyValue, [], KeyValuesAcc) ->
-    KeyValuesAcc ++ [KeyValue];
-insert_key_values({Key, _} = KeyValue, [{KeyCurr, _} = KeyValueCurr | Tail], KeyValuesAcc) when Key > KeyCurr ->
-    insert_key_values(KeyValue, Tail, KeyValuesAcc ++ [KeyValueCurr]);
-insert_key_values({Key, _} = KeyValue, [{KeyCurr, _} | _] = KeyValues, KeyValuesAcc) when Key < KeyCurr ->
-    KeyValuesAcc ++ [KeyValue] ++ KeyValues;
-insert_key_values({Key, _}, _, _) ->
-    erlang:error({key_exists, Key}).
+    % {SplitKeyValues, SplitSubtrees1, SplitTree, SplitSubtrees2}
+    {
+        % SplitKeyValues .......................................................
+        insert_key_values(lists:nth(KeyNoSplit, TreeKeyValues), KeyValues, []),
+        % SplitSubtrees1 .......................................................
+            lists:sublist(Subtrees, 1, SubtreePos - 1) ++
+            [
+                {
+                    KeyNoSplit - 1,
+                    lists:sublist(TreeKeyValues, 1, KeyNoSplit - 1),
+                    % Leaf node to be splitted ?
+                    case length(TreeSubtrees) == 0 of
+                        true ->
+                            [];
+                        _ ->
+                            lists:sublist(TreeSubtrees, 1, KeyNoSplit)
+                    end
+                }
+            ],
+        % SplitTree ............................................................
+        {
+            TreeKeyNo - KeyNoSplit,
+            lists:sublist(TreeKeyValues, KeyNoSplit + 1, TreeKeyNo),
+            % Leaf node to be splitted ?
+            case length(TreeSubtrees) == 0 of
+                true ->
+                    [];
+                _ ->
+                    lists:sublist(TreeSubtrees, KeyNoSplit + 1, TreeKeyNo + 1)
+            end
+        },
+        % SplitSubtrees2 .......................................................
+        lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
+    }.
 
 -spec split_node_root(tree(), pos_integer()) -> tree().
 
