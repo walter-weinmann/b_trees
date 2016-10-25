@@ -177,7 +177,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {BTreeType, Minimum, Maximum, NumberKeyValues, Tree},
+%% - {BTreeType, MinimumKeys, MaximumKeys, NumberKeyValues, Tree},
 %%   where `Tree' is composed of :
 %%   - {KeyNo, [{Key, Value}], [Tree]}.
 
