@@ -1,9 +1,4 @@
-.eunit
-*.beam
-*.o
-*.plt
 /_build
-/ct/*.beam
-/ct/logs
 /erl_crash.dump
 /rebar.lock
+/test/*.beam

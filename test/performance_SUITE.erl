@@ -34,6 +34,8 @@ suite() ->
 init_per_suite(Config) ->
     [
         {key_values_from, test_generator:generate_key_values_from(?NUMBER_INSERTS, 4)},
+        {key_values_from_even_odd, test_generator:generate_key_values_from_even(?NUMBER_INSERTS, 4) ++ test_generator:generate_key_values_from_odd(?NUMBER_INSERTS, 4)},
+        {key_values_from_odd_even, test_generator:generate_key_values_from_odd(?NUMBER_INSERTS, 4) ++ test_generator:generate_key_values_from_even(?NUMBER_INSERTS, 4)},
         {key_values_from_update, test_generator:generate_key_values_from_update(?NUMBER_INSERTS, 4)},
         {key_values_rand_update, test_generator:generate_key_values_rand_update(?NUMBER_UPDATES, ?NUMBER_UPDATES, 4)},
         {keys_from, test_generator:generate_keys_from(?NUMBER_INSERTS, 4)},
@@ -42,6 +44,7 @@ init_per_suite(Config) ->
         {gbtree, test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4)},
         {gbtree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_INSERTS, 4)},
 
+        {btree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_INSERTS, 4)},
         {btree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_INSERTS, 4)},
         {btree_5_new, test_generator:generate_b_tree_from_number_update(5, ?NUMBER_INSERTS, 4)},
         {btree_5_till, test_generator:generate_b_tree_till_number(5, ?NUMBER_INSERTS, 4)},
@@ -85,6 +88,8 @@ all() ->
         enter_gb_tree_test,
 
         from_dict_b_tree_order_5_test,
+        from_dict_b_tree_order_9_even_odd_test,
+        from_dict_b_tree_order_9_odd_even_test,
         from_dict_b_tree_order_9_test,
         from_dict_b_tree_order_17_test,
         from_dict_b_tree_order_33_test,
@@ -106,6 +111,7 @@ all() ->
         get_b_tree_order_1025_test,
         get_gb_tree_test,
 
+        insert_b_tree_order_4_test,
         insert_b_tree_order_5_test,
         insert_b_tree_order_5_till_test,
         insert_b_tree_order_9_test,
@@ -439,6 +445,26 @@ from_dict_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: performance from_dict b_tree order 9 - even / odd
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_9_even_odd_test(Config) ->
+    _BTree = ?config(btree_9, Config),
+    _KeyValues = ?config(key_values_from_even_odd, Config),
+    ?assertEqual(_BTree, b_trees:from_dict(9, _KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance from_dict b_tree order 9 - odd / even
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_9_odd_even_test(Config) ->
+    _BTree = ?config(btree_9, Config),
+    _KeyValues = ?config(key_values_from_odd_even, Config),
+    ?assertEqual(_BTree, b_trees:from_dict(9, _KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: performance from_dict b_tree order 9
 %%--------------------------------------------------------------------
 
@@ -576,7 +602,7 @@ get_gb_tree([Key | Tail], GBTree) ->
 insert_b_tree_order_1025_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(1025, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_1025, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(1025 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(1025 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 129
@@ -585,7 +611,7 @@ insert_b_tree_order_1025_test(_Config) ->
 insert_b_tree_order_129_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(129, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_129, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(129 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(129 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 17
@@ -594,7 +620,7 @@ insert_b_tree_order_129_test(_Config) ->
 insert_b_tree_order_17_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(17, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_17, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(17 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(17 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 257
@@ -603,7 +629,7 @@ insert_b_tree_order_17_test(_Config) ->
 insert_b_tree_order_257_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(257, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_257, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(257 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(257 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 33
@@ -612,16 +638,25 @@ insert_b_tree_order_257_test(_Config) ->
 insert_b_tree_order_33_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(33, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_33, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(33 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(33 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: performance insert b_tree order 4
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_test(_Config) ->
+    _BTree = test_generator:generate_b_tree_till_number(4, ?NUMBER_INSERTS, 4),
+    ?assertEqual(?config(btree_4, _Config), _BTree),
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(4 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 5
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_5_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_INSERTS, 4),
-    ?assertEqual(?config(btree_5, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
+    _BTree = test_generator:generate_b_tree_till_number(5, ?NUMBER_INSERTS, 4),
+    ?assertEqual(?config(btree_5_till, _Config), _BTree),
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 5 - till
@@ -629,7 +664,7 @@ insert_b_tree_order_5_test(_Config) ->
 
 insert_b_tree_order_5_till_test(_Config) ->
     _BTree = test_generator:generate_b_tree_till_number(5, ?NUMBER_INSERTS, 4),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 513
@@ -638,7 +673,7 @@ insert_b_tree_order_5_till_test(_Config) ->
 insert_b_tree_order_513_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(513, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_513, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(513 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(513 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 65
@@ -647,7 +682,7 @@ insert_b_tree_order_513_test(_Config) ->
 insert_b_tree_order_65_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(65, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_65, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(65 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(65 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert b_tree order 9
@@ -656,7 +691,7 @@ insert_b_tree_order_65_test(_Config) ->
 insert_b_tree_order_9_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(9, ?NUMBER_INSERTS, 4),
     ?assertEqual(?config(btree_9, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< int_ceil((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: performance insert gb_tree
@@ -1597,14 +1632,3 @@ values_gb_tree_test(Config) ->
     _Keys = gb_trees:values(GBTree),
     ?assertEqual(?NUMBER_INSERTS, length(_Keys)),
     ok.
-
-%%--------------------------------------------------------------------
-%% Helper functions.
-%%--------------------------------------------------------------------
-
-int_ceil(X) ->
-    T = trunc(X),
-    if
-        X > T -> T + 1;
-        true -> T
-    end.

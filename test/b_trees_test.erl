@@ -42,7 +42,7 @@ empty_b_tree_test() ->
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_4_test() ->
-    BTree_04_15_01 = b_trees:enter("k_01", "v_01", ?B_TREE_04_15),
+    BTree_04_15_01 = b_trees:enter("k_01", "v_01", ?B_TREE_04_00),
     BTree_04_15_02 = b_trees:enter("k_02", "v_02", BTree_04_15_01),
     BTree_04_15_03 = b_trees:enter("k_03", "v_03", BTree_04_15_02),
     BTree_04_15_04 = b_trees:enter("k_04", "v_04", BTree_04_15_03),
@@ -199,23 +199,11 @@ get_test() ->
 %%--------------------------------------------------------------------
 
 height_test() ->
-    ?assertEqual(0, b_trees:height(?B_TREE_05_00)),
-    ?assertEqual(1, b_trees:height(?B_TREE_05_02)),
-    ?assertEqual(2, b_trees:height(?B_TREE_05_05)),
-    ?assertEqual(3, b_trees:height(?B_TREE_05_16)),
+    ?assertException(error, {empty_tree, _}, b_trees:height(?B_TREE_05_00)),
 
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: insert - error
-%%--------------------------------------------------------------------
-
-insert_error_test() ->
-    ?assertException(error, {key_exists, "k_01"}, b_trees:insert("k_01", "v_01", test_generator:generate_b_tree_from_number(5, 5, 2))),
-    ?assertException(error, {key_exists, "k_02"}, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(5, 5, 2))),
-    ?assertException(error, {key_exists, "k_03"}, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(5, 5, 2))),
-    ?assertException(error, {key_exists, "k_04"}, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(5, 5, 2))),
-    ?assertException(error, {key_exists, "k_05"}, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertEqual(0, b_trees:height(?B_TREE_05_02)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_05)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_16)),
 
     ok.
 
@@ -226,62 +214,62 @@ insert_error_test() ->
 insert_b_tree_order_5_test() ->
     ?assertEqual(?B_TREE_05_00, b_trees:empty(5)),
     ?assertEqual(0, b_trees:number_key_values(?B_TREE_05_00)),
-    ?assertEqual(0, b_trees:height(?B_TREE_05_00)),
+    ?assertException(error, {empty_tree, _}, b_trees:height(?B_TREE_05_00)),
     ?assertEqual(0, b_trees:size(?B_TREE_05_00)),
 
     ?assertEqual(?B_TREE_05_01, b_trees:insert("k_01", "v_01", ?B_TREE_05_00)),
     ?assertEqual(1, b_trees:number_key_values(?B_TREE_05_01)),
-    ?assertEqual(1, b_trees:height(?B_TREE_05_01)),
+    ?assertEqual(0, b_trees:height(?B_TREE_05_01)),
     ?assertEqual(1, b_trees:size(?B_TREE_05_01)),
 
     ?assertEqual(?B_TREE_05_02, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(5, 1, 2))),
     ?assertEqual(2, b_trees:number_key_values(?B_TREE_05_02)),
-    ?assertEqual(1, b_trees:height(?B_TREE_05_02)),
+    ?assertEqual(0, b_trees:height(?B_TREE_05_02)),
     ?assertEqual(1, b_trees:size(?B_TREE_05_02)),
 
     ?assertEqual(?B_TREE_05_03, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(5, 2, 2))),
     ?assertEqual(3, b_trees:number_key_values(?B_TREE_05_03)),
-    ?assertEqual(1, b_trees:height(?B_TREE_05_03)),
+    ?assertEqual(0, b_trees:height(?B_TREE_05_03)),
     ?assertEqual(1, b_trees:size(?B_TREE_05_03)),
 
     ?assertEqual(?B_TREE_05_04, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(5, 3, 2))),
     ?assertEqual(4, b_trees:number_key_values(?B_TREE_05_04)),
-    ?assertEqual(1, b_trees:height(?B_TREE_05_04)),
+    ?assertEqual(0, b_trees:height(?B_TREE_05_04)),
     ?assertEqual(1, b_trees:size(?B_TREE_05_04)),
 
     ?assertEqual(?B_TREE_05_05, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(5, 4, 2))),
     ?assertEqual(5, b_trees:number_key_values(?B_TREE_05_05)),
-    ?assertEqual(2, b_trees:height(?B_TREE_05_05)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_05)),
     ?assertEqual(3, b_trees:size(?B_TREE_05_05)),
 
     ?assertEqual(?B_TREE_05_09, b_trees:insert("k_09", "v_09", test_generator:generate_b_tree_from_number(5, 8, 2))),
     ?assertEqual(9, b_trees:number_key_values(?B_TREE_05_09)),
-    ?assertEqual(2, b_trees:height(?B_TREE_05_09)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_09)),
     ?assertEqual(4, b_trees:size(?B_TREE_05_09)),
 
     ?assertEqual(?B_TREE_05_13, b_trees:insert("k_13", "v_13", test_generator:generate_b_tree_from_number(5, 12, 2))),
     ?assertEqual(13, b_trees:number_key_values(?B_TREE_05_13)),
-    ?assertEqual(2, b_trees:height(?B_TREE_05_13)),
+    ?assertEqual(1, b_trees:height(?B_TREE_05_13)),
     ?assertEqual(5, b_trees:size(?B_TREE_05_13)),
 
     ?assertEqual(?B_TREE_05_17, b_trees:insert("k_17", "v_17", test_generator:generate_b_tree_from_number(5, 16, 2))),
     ?assertEqual(17, b_trees:number_key_values(?B_TREE_05_17)),
-    ?assertEqual(3, b_trees:height(?B_TREE_05_17)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_17)),
     ?assertEqual(9, b_trees:size(?B_TREE_05_17)),
 
     ?assertEqual(?B_TREE_05_21, b_trees:insert("k_21", "v_21", test_generator:generate_b_tree_from_number(5, 20, 2))),
     ?assertEqual(21, b_trees:number_key_values(?B_TREE_05_21)),
-    ?assertEqual(3, b_trees:height(?B_TREE_05_21)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_21)),
     ?assertEqual(10, b_trees:size(?B_TREE_05_21)),
 
     ?assertEqual(?B_TREE_05_25, b_trees:insert("k_25", "v_25", test_generator:generate_b_tree_from_number(5, 24, 2))),
     ?assertEqual(25, b_trees:number_key_values(?B_TREE_05_25)),
-    ?assertEqual(3, b_trees:height(?B_TREE_05_25)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_25)),
     ?assertEqual(12, b_trees:size(?B_TREE_05_25)),
 
     ?assertEqual(?B_TREE_05_29, b_trees:insert("k_29", "v_29", test_generator:generate_b_tree_from_number(5, 28, 2))),
     ?assertEqual(29, b_trees:number_key_values(?B_TREE_05_29)),
-    ?assertEqual(3, b_trees:height(?B_TREE_05_29)),
+    ?assertEqual(2, b_trees:height(?B_TREE_05_29)),
     ?assertEqual(14, b_trees:size(?B_TREE_05_29)),
 
     ok.
@@ -293,12 +281,12 @@ insert_b_tree_order_5_test() ->
 insert_b_tree_order_7_test() ->
     ?assertEqual(?B_TREE_07_00, b_trees:empty(7)),
     ?assertEqual(0, b_trees:number_key_values(?B_TREE_07_00)),
-    ?assertEqual(0, b_trees:height(?B_TREE_07_00)),
+    ?assertException(error, {empty_tree, _}, b_trees:height(?B_TREE_07_00)),
     ?assertEqual(0, b_trees:size(?B_TREE_07_00)),
 
     ?assertEqual(?B_TREE_07_07, b_trees:insert("k_07", "v_07", test_generator:generate_b_tree_from_number(7, 6, 2))),
     ?assertEqual(7, b_trees:number_key_values(?B_TREE_07_07)),
-    ?assertEqual(2, b_trees:height(?B_TREE_07_07)),
+    ?assertEqual(1, b_trees:height(?B_TREE_07_07)),
     ?assertEqual(3, b_trees:size(?B_TREE_07_07)),
 
     ?assertEqual(?B_TREE_07_80, test_generator:generate_b_tree_from_list(7,
@@ -316,8 +304,24 @@ insert_b_tree_order_7_test() ->
         ],
         3)),
     ?assertEqual(80, b_trees:number_key_values(?B_TREE_07_80)),
-    ?assertEqual(3, b_trees:height(?B_TREE_07_80)),
+    ?assertEqual(2, b_trees:height(?B_TREE_07_80)),
     ?assertEqual(26, b_trees:size(?B_TREE_07_80)),
+
+    B_TREE_07_80_Spec = test_generator:generate_b_tree_from_list(7,
+        [
+            907, 919, 937, 947, 967,
+            811, 823, 829, 853, 859, 877, 883,
+            709, 727, 739, 751, 761, 773, 797,
+            607, 617, 631, 643, 653, 661, 677, 691,
+            509, 523, 547, 563, 571, 587, 599,
+            401, 419, 431, 439, 449, 461, 467, 487, 499,
+            307, 313, 331, 347, 353, 367, 379, 389,
+            211, 227, 233, 241, 257, 269, 277, 283,
+            103, 109, 127, 137, 149, 157, 167, 179, 191, 197,
+            11, 17, 23, 31, 41, 47, 59, 67, 73, 83, 97
+        ],
+        3),
+    ?assertEqual(2, b_trees:height(B_TREE_07_80_Spec)),
 
     ok.
 
@@ -328,18 +332,31 @@ insert_b_tree_order_7_test() ->
 insert_b_tree_order_8_test() ->
     ?assertEqual(?B_TREE_08_16, b_trees:insert("k_16", "v_16", test_generator:generate_b_tree_from_number(8, 15, 2))),
     ?assertEqual(16, b_trees:number_key_values(?B_TREE_08_16)),
-    ?assertEqual(2, b_trees:height(?B_TREE_08_16)),
-    ?assertEqual(4, b_trees:size(?B_TREE_08_16)),
+    ?assertEqual(1, b_trees:height(?B_TREE_08_16)),
+    ?assertEqual(5, b_trees:size(?B_TREE_08_16)),
 
     ?assertEqual(?B_TREE_08_32, b_trees:insert("k_32", "v_32", test_generator:generate_b_tree_from_number(8, 31, 2))),
     ?assertEqual(32, b_trees:number_key_values(?B_TREE_08_32)),
-    ?assertEqual(2, b_trees:height(?B_TREE_08_32)),
-    ?assertEqual(7, b_trees:size(?B_TREE_08_32)),
+    ?assertEqual(1, b_trees:height(?B_TREE_08_32)),
+    ?assertEqual(9, b_trees:size(?B_TREE_08_32)),
 
     ?assertEqual(?B_TREE_08_64, b_trees:insert("k_64", "v_64", test_generator:generate_b_tree_from_number(8, 63, 2))),
     ?assertEqual(64, b_trees:number_key_values(?B_TREE_08_64)),
-    ?assertEqual(3, b_trees:height(?B_TREE_08_64)),
-    ?assertEqual(17, b_trees:size(?B_TREE_08_64)),
+    ?assertEqual(2, b_trees:height(?B_TREE_08_64)),
+    ?assertEqual(20, b_trees:size(?B_TREE_08_64)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert - error
+%%--------------------------------------------------------------------
+
+insert_error_test() ->
+    ?assertException(error, {key_exists, "k_01"}, b_trees:insert("k_01", "v_01", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_02"}, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_03"}, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_04"}, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(5, 5, 2))),
+    ?assertException(error, {key_exists, "k_05"}, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(5, 5, 2))),
 
     ok.
 

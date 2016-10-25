@@ -21,10 +21,14 @@
     generate_gb_tree_from_number/2,
     generate_gb_tree_from_number_update/2,
     generate_key_values_from/2,
+    generate_key_values_from_even/2,
+    generate_key_values_from_odd/2,
     generate_key_values_from_update/2,
     generate_key_values_rand/3,
     generate_key_values_rand_update/3,
     generate_keys_from/2,
+    generate_keys_from_even/2,
+    generate_keys_from_odd/2,
     generate_keys_rand/3]).
 
 generate_b_tree_from_list(Order, Keys, Width) when Order > 3 ->
@@ -58,6 +62,14 @@ generate_key_values_from(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1(Keys, [], Width).
 
+generate_key_values_from_even(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(1, Number),
+    generate_key_values_1_even(Keys, [], Width).
+
+generate_key_values_from_odd(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(1, Number),
+    generate_key_values_1_odd(Keys, [], Width).
+
 generate_key_values_from_update(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1(Keys, "_new", Width).
@@ -73,6 +85,14 @@ generate_key_values_rand_update(Range, Number, Width) when Number >= 0 ->
 generate_keys_from(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_keys_1(Keys, Width).
+
+generate_keys_from_even(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(1, Number),
+    generate_keys_1_even(Keys, Width).
+
+generate_keys_from_odd(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(1, Number),
+    generate_keys_1_odd(Keys, Width).
 
 generate_keys_rand(Range, Number, Width) when Number >= 0 ->
     Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],
@@ -112,11 +132,41 @@ generate_key_values_1(Keys, Suffix, Width) ->
     Format = "~" ++ integer_to_list(Width) ++ "..0B",
     generate_key_values_2(Keys, Suffix, Format, []).
 
+generate_key_values_1_even(Keys, Suffix, Width) ->
+    Format = "~" ++ integer_to_list(Width) ++ "..0B",
+    generate_key_values_2_even(Keys, Suffix, Format, []).
+
+generate_key_values_1_odd(Keys, Suffix, Width) ->
+    Format = "~" ++ integer_to_list(Width) ++ "..0B",
+    generate_key_values_2_odd(Keys, Suffix, Format, []).
+
 generate_key_values_2([], _, _, KeyValues) ->
     KeyValues;
 generate_key_values_2([Key | Tail], Suffix, Format, KeyValues) ->
     LastString = lists:flatten(io_lib:format(Format, [Key])),
     generate_key_values_2(Tail, Suffix, Format, KeyValues ++ [{"k_" ++ LastString, "v_" ++ LastString ++ Suffix}]).
+
+generate_key_values_2_even([], _, _, KeyValues) ->
+    KeyValues;
+generate_key_values_2_even([Key | Tail], Suffix, Format, KeyValues) ->
+    case Key rem 2 of
+        0 ->
+            LastString = lists:flatten(io_lib:format(Format, [Key])),
+            generate_key_values_2_even(Tail, Suffix, Format, KeyValues ++ [{"k_" ++ LastString, "v_" ++ LastString ++ Suffix}]);
+        _ ->
+            generate_key_values_2_even(Tail, Suffix, Format, KeyValues)
+    end.
+
+generate_key_values_2_odd([], _, _, KeyValues) ->
+    KeyValues;
+generate_key_values_2_odd([Key | Tail], Suffix, Format, KeyValues) ->
+    case Key rem 2 of
+        0 ->
+            LastString = lists:flatten(io_lib:format(Format, [Key])),
+            generate_key_values_2_odd(Tail, Suffix, Format, KeyValues ++ [{"k_" ++ LastString, "v_" ++ LastString ++ Suffix}]);
+        _ ->
+            generate_key_values_2_odd(Tail, Suffix, Format, KeyValues)
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -124,8 +174,38 @@ generate_keys_1(Keys, Width) ->
     Format = "~" ++ integer_to_list(Width) ++ "..0B",
     generate_keys_2(Keys, Format, []).
 
+generate_keys_1_even(Keys, Width) ->
+    Format = "~" ++ integer_to_list(Width) ++ "..0B",
+    generate_keys_2_even(Keys, Format, []).
+
+generate_keys_1_odd(Keys, Width) ->
+    Format = "~" ++ integer_to_list(Width) ++ "..0B",
+    generate_keys_2_odd(Keys, Format, []).
+
 generate_keys_2([], _, Keys) ->
     Keys;
 generate_keys_2([Key | Tail], Format, Keys) ->
     LastString = lists:flatten(io_lib:format(Format, [Key])),
     generate_keys_2(Tail, Format, Keys ++ ["k_" ++ LastString]).
+
+generate_keys_2_even([], _, Keys) ->
+    Keys;
+generate_keys_2_even([Key | Tail], Format, Keys) ->
+    case Key rem 2 of
+        0 ->
+            LastString = lists:flatten(io_lib:format(Format, [Key])),
+            generate_keys_2_even(Tail, Format, Keys ++ ["k_" ++ LastString]);
+        _ ->
+            generate_keys_2_even(Tail, Format, Keys)
+    end.
+
+generate_keys_2_odd([], _, Keys) ->
+    Keys;
+generate_keys_2_odd([Key | Tail], Format, Keys) ->
+    case Key rem 2 of
+        1 ->
+            LastString = lists:flatten(io_lib:format(Format, [Key])),
+            generate_keys_2_odd(Tail, Format, Keys ++ ["k_" ++ LastString]);
+        _ ->
+            generate_keys_2_odd(Tail, Format, Keys)
+    end.
