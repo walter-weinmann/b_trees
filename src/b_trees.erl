@@ -160,7 +160,7 @@
     insert/3,
     is_defined/2,
     is_empty/1,
-%%    iterator/1,
+    iterator/1,
 %%    iterator_from/2,
     keys/1,
     largest/1,
@@ -187,7 +187,7 @@
 -type b_tree() :: {b_tree_type(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 -type b_tree_type() :: 'b' | 'b_star'.
 
-% -type iterator() :: none | {key(), value(), tree()}.
+-type iterator() :: none | {key(), value(), tree()}.
 
 -type key() :: any().
 -type keys() :: [any()].
@@ -268,16 +268,16 @@ get(Key, {_, _, _, _, Tree}) ->
 height({_, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
 height({_, _, _, _, Tree}) ->
-    height(Tree, 0).
+    height_1(Tree, 0).
 
--spec height(tree(), non_neg_integer()) -> non_neg_integer().
+-spec height_1(tree(), non_neg_integer()) -> non_neg_integer().
 
 % Leaf node.
-height({_, _, []}, Number) ->
+height_1({_, _, []}, Number) ->
     Number;
 % The most left subtree.
-height({_, _, [Tree | _]}, Number) ->
-    height(Tree, Number + 1).
+height_1({_, _, [Tree | _]}, Number) ->
+    height_1(Tree, Number + 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -300,16 +300,16 @@ insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyV
                                  KeyNoMin + 1
                          end
                  end,
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert({Key, Value}, split_node_root(Tree, KeyNoSplit), KeyNoMin, KeyNoMax)};
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_1({Key, Value}, split_node_root(Tree, KeyNoSplit), KeyNoMin, KeyNoMax)};
 insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree} = _BTree) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert({Key, Value}, Tree, KeyNoMin, KeyNoMax)}.
+    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_1({Key, Value}, Tree, KeyNoMin, KeyNoMax)}.
 
--spec insert(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
+-spec insert_1(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
 
 % Leaf node.
-insert(KeyValue, {KeyNo, KeyValues, []} = _Tree, _, _) ->
+insert_1(KeyValue, {KeyNo, KeyValues, []} = _Tree, _, _) ->
     {KeyNo + 1, insert_key_values(KeyValue, KeyValues, []), []};
-insert({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, KeyNoMax) ->
+insert_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, KeyNoMax) ->
     {ValueFound, SubtreePos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
@@ -323,7 +323,7 @@ insert({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, KeyN
                         KeyNo + 1,
                         SplitKeyValues,
                             SplitSubtrees1 ++
-                            [insert(KeyValue, SplitTree, KeyNoMin, KeyNoMax)] ++
+                            [insert_1(KeyValue, SplitTree, KeyNoMin, KeyNoMax)] ++
                             SplitSubtrees2
                     };
                 _ ->
@@ -331,7 +331,7 @@ insert({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, KeyN
                         KeyNo,
                         KeyValues,
                             lists:sublist(Subtrees, 1, SubtreePos - 1) ++
-                            [insert(KeyValue, Subtree, KeyNoMin, KeyNoMax)] ++
+                            [insert_1(KeyValue, Subtree, KeyNoMin, KeyNoMax)] ++
                             lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
                     }
             end;
@@ -465,12 +465,34 @@ is_empty(_) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%-spec iterator(b_tree()) -> [key_value(),...].
+-spec iterator(b_tree()) -> [key_value()].
+
+iterator({_, _, _, _, nil}) ->
+    [].
+iterator({_, _, _, _, Tree}) ->
+    iterator_1(Tree, []).
+
+%% The iterator structure is really just a list corresponding to
+%% the call stack of an in-order traversal. This is quite fast.
+
+iterator_1({_, _, nil, _} = T, As) ->
+    [T | As];
+iterator_1({_, _, L, _} = T, As) ->
+    iterator_1(L, [T | As]);
+iterator_1(nil, As) ->
+    As.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%%iterator({_, _, _, _, nil}) ->
-%%    [].
-%%iterator({_, _, _, _, Tree}) ->
-%%    iterator_1(Tree,[]).
+%%-spec iterator(Tree) -> Iter when
+%%    Tree :: tree(Key, Value),
+%%    Iter :: iter(Key, Value).
+%%
+%%iterator({_, T}) ->
+%%    iterator_1(T).
+%%
+%%iterator_1(T) ->
+%%    iterator(T, []).
 %%
 %%%% The iterator structure is really just a list corresponding to
 %%%% the call stack of an in-order traversal. This is quite fast.
@@ -481,7 +503,7 @@ is_empty(_) ->
 %%    iterator(L, [T | As]);
 %%iterator(nil, As) ->
 %%    As.
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec keys(b_tree()) -> keys().
@@ -489,21 +511,21 @@ is_empty(_) ->
 keys({_, _, _, _, nil}) ->
     [];
 keys({_, _, _, _, {_, KeyValues, Subtrees}}) ->
-    keys(KeyValues, Subtrees, []).
+    keys_1(KeyValues, Subtrees, []).
 
--spec keys(key_values(), subtrees(), keys()) -> keys().
+-spec keys_1(key_values(), subtrees(), keys()) -> keys().
 
-keys([], [], Keys) ->
+keys_1([], [], Keys) ->
     Keys;
 % Leaf node.
-keys([{Key, _} | Tail], [], Keys) ->
-    keys(Tail, [], Keys ++ [Key]);
+keys_1([{Key, _} | Tail], [], Keys) ->
+    keys_1(Tail, [], Keys ++ [Key]);
 % The most right subtree.
-keys([], [{_, KeyValues, Subtrees}], Keys) ->
-    Keys ++ keys(KeyValues, Subtrees, []);
+keys_1([], [{_, KeyValues, Subtrees}], Keys) ->
+    Keys ++ keys_1(KeyValues, Subtrees, []);
 % Left subtree and current key.
-keys([{Key, _} | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], Keys) ->
-    keys(TailKeyValues, TailTrees, Keys ++ keys(KeyValues, Subtrees, []) ++ [Key]).
+keys_1([{Key, _} | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], Keys) ->
+    keys_1(TailKeyValues, TailTrees, Keys ++ keys_1(KeyValues, Subtrees, []) ++ [Key]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -619,21 +641,21 @@ smallest_1({_, _, Subtrees}) ->
 to_list({_, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
 to_list({_, _, _, _, {_, KeyValues, Subtrees}}) ->
-    to_list(KeyValues, Subtrees, []).
+    to_list_1(KeyValues, Subtrees, []).
 
--spec to_list(key_values(), subtrees(), key_values()) -> key_values().
+-spec to_list_1(key_values(), subtrees(), key_values()) -> key_values().
 
-to_list([], [], KeyValueList) ->
+to_list_1([], [], KeyValueList) ->
     KeyValueList;
 % Leaf node.
-to_list([KeyValue | Tail], [], KeyValueList) ->
-    to_list(Tail, [], KeyValueList ++ [KeyValue]);
+to_list_1([KeyValue | Tail], [], KeyValueList) ->
+    to_list_1(Tail, [], KeyValueList ++ [KeyValue]);
 % The most right subtree.
-to_list([], [{_, KeyValues, Subtrees}], KeyValueList) ->
-    KeyValueList ++ to_list(KeyValues, Subtrees, []);
+to_list_1([], [{_, KeyValues, Subtrees}], KeyValueList) ->
+    KeyValueList ++ to_list_1(KeyValues, Subtrees, []);
 % Left subtree and key / value from current key.
-to_list([KeyValue | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], KeyValueList) ->
-    to_list(TailKeyValues, TailTrees, KeyValueList ++ to_list(KeyValues, Subtrees, []) ++ [KeyValue]).
+to_list_1([KeyValue | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], KeyValueList) ->
+    to_list_1(TailKeyValues, TailTrees, KeyValueList ++ to_list_1(KeyValues, Subtrees, []) ++ [KeyValue]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -689,21 +711,21 @@ update_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees}) ->
 values({_, _, _, _, nil}) ->
     [];
 values({_, _, _, _, {_, KeyValues, Subtrees}}) ->
-    values(KeyValues, Subtrees, []).
+    values_1(KeyValues, Subtrees, []).
 
--spec values(key_values(), subtrees(), values()) -> values().
+-spec values_1(key_values(), subtrees(), values()) -> values().
 
-values([], [], Values) ->
+values_1([], [], Values) ->
     Values;
 % Leaf node.
-values([{_, Value} | Tail], [], Values) ->
-    values(Tail, [], Values ++ [Value]);
+values_1([{_, Value} | Tail], [], Values) ->
+    values_1(Tail, [], Values ++ [Value]);
 % The most right subtree.
-values([], [{_, KeyValues, Subtrees}], Values) ->
-    Values ++ values(KeyValues, Subtrees, []);
+values_1([], [{_, KeyValues, Subtrees}], Values) ->
+    Values ++ values_1(KeyValues, Subtrees, []);
 % Left subtree and value from current key.
-values([{_, Value} | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], Values) ->
-    values(TailKeyValues, TailTrees, Values ++ values(KeyValues, Subtrees, []) ++ [Value]).
+values_1([{_, Value} | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], Values) ->
+    values_1(TailKeyValues, TailTrees, Values ++ values_1(KeyValues, Subtrees, []) ++ [Value]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Helper functions.
