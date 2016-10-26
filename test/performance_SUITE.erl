@@ -135,6 +135,17 @@ all() ->
         is_defined_b_tree_order_1025_test,
         is_defined_gb_tree_test,
 
+        iterate_next_b_tree_order_5_test,
+        iterate_next_b_tree_order_9_test,
+        iterate_next_b_tree_order_17_test,
+        iterate_next_b_tree_order_33_test,
+        iterate_next_b_tree_order_65_test,
+        iterate_next_b_tree_order_129_test,
+        iterate_next_b_tree_order_257_test,
+        iterate_next_b_tree_order_513_test,
+        iterate_next_b_tree_order_1025_test,
+        iterate_next_gb_tree_test,
+
         keys_b_tree_order_5_test,
         keys_b_tree_order_9_test,
         keys_b_tree_order_17_test,
@@ -243,7 +254,7 @@ enter_b_tree([{Key, Value} | Tail], BTree) ->
     enter_b_tree(Tail, b_trees:enter(Key, Value, BTree)).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 129
+%% TEST CASES: enter b_tree order 129
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_129_test(Config) ->
@@ -256,7 +267,7 @@ enter_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 17
+%% TEST CASES: enter b_tree order 17
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_17_test(Config) ->
@@ -269,7 +280,7 @@ enter_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 257
+%% TEST CASES: enter b_tree order 257
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_257_test(Config) ->
@@ -282,7 +293,7 @@ enter_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 33
+%% TEST CASES: enter b_tree order 33
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_33_test(Config) ->
@@ -295,7 +306,7 @@ enter_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 5
+%% TEST CASES: enter b_tree order 5
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_5_test(Config) ->
@@ -308,7 +319,7 @@ enter_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 513
+%% TEST CASES: enter b_tree order 513
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_513_test(Config) ->
@@ -321,7 +332,7 @@ enter_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 65
+%% TEST CASES: enter b_tree order 65
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_65_test(Config) ->
@@ -334,7 +345,7 @@ enter_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter b_tree order 9
+%% TEST CASES: enter b_tree order 9
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_9_test(Config) ->
@@ -347,7 +358,7 @@ enter_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance enter gb_tree
+%% TEST CASES: enter gb_tree
 %%--------------------------------------------------------------------
 
 enter_gb_tree_test(Config) ->
@@ -365,7 +376,7 @@ enter_gb_tree([{Key, Value} | Tail], GBTree) ->
     enter_gb_tree(Tail, gb_trees:enter(Key, Value, GBTree)).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 1025
+%% TEST CASES: from_dict b_tree order 1025
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_1025_test(Config) ->
@@ -375,7 +386,7 @@ from_dict_b_tree_order_1025_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 129
+%% TEST CASES: from_dict b_tree order 129
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_129_test(Config) ->
@@ -385,7 +396,7 @@ from_dict_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 17
+%% TEST CASES: from_dict b_tree order 17
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_17_test(Config) ->
@@ -395,7 +406,7 @@ from_dict_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 257
+%% TEST CASES: from_dict b_tree order 257
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_257_test(Config) ->
@@ -405,7 +416,7 @@ from_dict_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 33
+%% TEST CASES: from_dict b_tree order 33
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_33_test(Config) ->
@@ -415,7 +426,7 @@ from_dict_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 5
+%% TEST CASES: from_dict b_tree order 5
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_5_test(Config) ->
@@ -425,7 +436,7 @@ from_dict_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 513
+%% TEST CASES: from_dict b_tree order 513
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_513_test(Config) ->
@@ -435,7 +446,7 @@ from_dict_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 65
+%% TEST CASES: from_dict b_tree order 65
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_65_test(Config) ->
@@ -445,7 +456,7 @@ from_dict_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 9 - even / odd
+%% TEST CASES: from_dict b_tree order 9 - even / odd
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_9_even_odd_test(Config) ->
@@ -455,7 +466,7 @@ from_dict_b_tree_order_9_even_odd_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 9 - odd / even
+%% TEST CASES: from_dict b_tree order 9 - odd / even
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_9_odd_even_test(Config) ->
@@ -465,7 +476,7 @@ from_dict_b_tree_order_9_odd_even_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict b_tree order 9
+%% TEST CASES: from_dict b_tree order 9
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_9_test(Config) ->
@@ -475,7 +486,7 @@ from_dict_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance from_dict gb_tree
+%% TEST CASES: from_dict gb_tree
 %%--------------------------------------------------------------------
 
 from_dict_gb_tree_test(Config) ->
@@ -484,7 +495,7 @@ from_dict_gb_tree_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 1025
+%% TEST CASES: get b_tree order 1025
 %%--------------------------------------------------------------------
 
 get_b_tree_order_1025_test(Config) ->
@@ -500,7 +511,7 @@ get_b_tree([Key | Tail], BTree) ->
     get_b_tree(Tail, BTree).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 129
+%% TEST CASES: get b_tree order 129
 %%--------------------------------------------------------------------
 
 get_b_tree_order_129_test(Config) ->
@@ -510,7 +521,7 @@ get_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 17
+%% TEST CASES: get b_tree order 17
 %%--------------------------------------------------------------------
 
 get_b_tree_order_17_test(Config) ->
@@ -520,7 +531,7 @@ get_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 257
+%% TEST CASES: get b_tree order 257
 %%--------------------------------------------------------------------
 
 get_b_tree_order_257_test(Config) ->
@@ -530,7 +541,7 @@ get_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 33
+%% TEST CASES: get b_tree order 33
 %%--------------------------------------------------------------------
 
 get_b_tree_order_33_test(Config) ->
@@ -540,7 +551,7 @@ get_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 5
+%% TEST CASES: get b_tree order 5
 %%--------------------------------------------------------------------
 
 get_b_tree_order_5_test(Config) ->
@@ -550,7 +561,7 @@ get_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 513
+%% TEST CASES: get b_tree order 513
 %%--------------------------------------------------------------------
 
 get_b_tree_order_513_test(Config) ->
@@ -560,7 +571,7 @@ get_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 65
+%% TEST CASES: get b_tree order 65
 %%--------------------------------------------------------------------
 
 get_b_tree_order_65_test(Config) ->
@@ -570,7 +581,7 @@ get_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get b_tree order 9
+%% TEST CASES: get b_tree order 9
 %%--------------------------------------------------------------------
 
 get_b_tree_order_9_test(Config) ->
@@ -580,7 +591,7 @@ get_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance get gb_tree
+%% TEST CASES: get gb_tree
 %%--------------------------------------------------------------------
 
 get_gb_tree_test(Config) ->
@@ -596,7 +607,7 @@ get_gb_tree([Key | Tail], GBTree) ->
     get_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 1025
+%% TEST CASES: insert b_tree order 1025
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_1025_test(_Config) ->
@@ -605,7 +616,7 @@ insert_b_tree_order_1025_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(1025 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 129
+%% TEST CASES: insert b_tree order 129
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_129_test(_Config) ->
@@ -614,7 +625,7 @@ insert_b_tree_order_129_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(129 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 17
+%% TEST CASES: insert b_tree order 17
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_17_test(_Config) ->
@@ -623,7 +634,7 @@ insert_b_tree_order_17_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(17 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 257
+%% TEST CASES: insert b_tree order 257
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_257_test(_Config) ->
@@ -632,7 +643,7 @@ insert_b_tree_order_257_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(257 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 33
+%% TEST CASES: insert b_tree order 33
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_33_test(_Config) ->
@@ -641,7 +652,7 @@ insert_b_tree_order_33_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(33 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 4
+%% TEST CASES: insert b_tree order 4
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_test(_Config) ->
@@ -650,7 +661,7 @@ insert_b_tree_order_4_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(4 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 5
+%% TEST CASES: insert b_tree order 5
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_5_test(_Config) ->
@@ -659,7 +670,7 @@ insert_b_tree_order_5_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 5 - till
+%% TEST CASES: insert b_tree order 5 - till
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_5_till_test(_Config) ->
@@ -667,7 +678,7 @@ insert_b_tree_order_5_till_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(5 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 513
+%% TEST CASES: insert b_tree order 513
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_513_test(_Config) ->
@@ -676,7 +687,7 @@ insert_b_tree_order_513_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(513 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 65
+%% TEST CASES: insert b_tree order 65
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_65_test(_Config) ->
@@ -685,7 +696,7 @@ insert_b_tree_order_65_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(65 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert b_tree order 9
+%% TEST CASES: insert b_tree order 9
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_9_test(_Config) ->
@@ -694,14 +705,14 @@ insert_b_tree_order_9_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance insert gb_tree
+%% TEST CASES: insert gb_tree
 %%--------------------------------------------------------------------
 
 insert_gb_tree_test(_Config) ->
     ?assertEqual(?config(gbtree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4)).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 1025
+%% TEST CASES: is_defined b_tree order 1025
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_1025_test(Config) ->
@@ -717,7 +728,7 @@ is_defined_b_tree([Key | Tail], BTree) ->
     is_defined_b_tree(Tail, BTree).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 129
+%% TEST CASES: is_defined b_tree order 129
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_129_test(Config) ->
@@ -727,7 +738,7 @@ is_defined_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 17
+%% TEST CASES: is_defined b_tree order 17
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_17_test(Config) ->
@@ -737,7 +748,7 @@ is_defined_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 257
+%% TEST CASES: is_defined b_tree order 257
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_257_test(Config) ->
@@ -747,7 +758,7 @@ is_defined_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 33
+%% TEST CASES: is_defined b_tree order 33
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_33_test(Config) ->
@@ -757,7 +768,7 @@ is_defined_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 5
+%% TEST CASES: is_defined b_tree order 5
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_5_test(Config) ->
@@ -767,7 +778,7 @@ is_defined_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 513
+%% TEST CASES: is_defined b_tree order 513
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_513_test(Config) ->
@@ -777,7 +788,7 @@ is_defined_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 65
+%% TEST CASES: is_defined b_tree order 65
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_65_test(Config) ->
@@ -787,7 +798,7 @@ is_defined_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined b_tree order 9
+%% TEST CASES: is_defined b_tree order 9
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_9_test(Config) ->
@@ -797,7 +808,7 @@ is_defined_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance is_defined gb_tree
+%% TEST CASES: is_defined gb_tree
 %%--------------------------------------------------------------------
 
 is_defined_gb_tree_test(Config) ->
@@ -813,7 +824,119 @@ is_defined_gb_tree([Key | Tail], GBTree) ->
     is_defined_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 1025
+%% TEST CASES: iterate & next b_tree order 1025
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_1025_test(Config) ->
+    BTree = ?config(btree_1025, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+iterate_next_b_tree(_, 0, KeyValues) ->
+    KeyValues;
+iterate_next_b_tree(Iterator, Count, KeyValues) ->
+    {Key, Value, IteratorNew} = b_trees:next(Iterator),
+    iterate_next_b_tree(IteratorNew, Count - 1, KeyValues ++ [{Key, Value}]).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 129
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_129_test(Config) ->
+    BTree = ?config(btree_129, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 17
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_17_test(Config) ->
+    BTree = ?config(btree_17, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 257
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_257_test(Config) ->
+    BTree = ?config(btree_257, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 33
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_33_test(Config) ->
+    BTree = ?config(btree_33, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 5
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_5_test(Config) ->
+    BTree = ?config(btree_5, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 513
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_513_test(Config) ->
+    BTree = ?config(btree_513, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 65
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_65_test(Config) ->
+    BTree = ?config(btree_65, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 9
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_9_test(Config) ->
+    BTree = ?config(btree_9, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next gb_tree
+%%--------------------------------------------------------------------
+
+iterate_next_gb_tree_test(Config) ->
+    GBTree = ?config(gbtree, Config),
+    _Iterator = gb_trees:iterator(GBTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_gb_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+iterate_next_gb_tree(_, 0, KeyValues) ->
+    KeyValues;
+iterate_next_gb_tree(Iterator, Count, KeyValues) ->
+    {Key, Value, IteratorNew} = gb_trees:next(Iterator),
+    iterate_next_gb_tree(IteratorNew, Count - 1, KeyValues ++ [{Key, Value}]).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: keys b_tree order 1025
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_1025_test(Config) ->
@@ -824,7 +947,7 @@ keys_b_tree_order_1025_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 129
+%% TEST CASES: keys b_tree order 129
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_129_test(Config) ->
@@ -835,7 +958,7 @@ keys_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 17
+%% TEST CASES: keys b_tree order 17
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_17_test(Config) ->
@@ -846,7 +969,7 @@ keys_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 257
+%% TEST CASES: keys b_tree order 257
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_257_test(Config) ->
@@ -857,7 +980,7 @@ keys_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 33
+%% TEST CASES: keys b_tree order 33
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_33_test(Config) ->
@@ -868,7 +991,7 @@ keys_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 5
+%% TEST CASES: keys b_tree order 5
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_5_test(Config) ->
@@ -879,7 +1002,7 @@ keys_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 513
+%% TEST CASES: keys b_tree order 513
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_513_test(Config) ->
@@ -890,7 +1013,7 @@ keys_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 65
+%% TEST CASES: keys b_tree order 65
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_65_test(Config) ->
@@ -901,7 +1024,7 @@ keys_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand b_tree order 9
+%% TEST CASES: keys b_tree order 9
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_9_test(Config) ->
@@ -912,7 +1035,7 @@ keys_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance keys_rand gb_tree
+%% TEST CASES: keys_rand gb_tree
 %%--------------------------------------------------------------------
 
 keys_gb_tree_test(Config) ->
@@ -923,7 +1046,7 @@ keys_gb_tree_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 1025
+%% TEST CASES: largest b_tree order 1025
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_1025_test(Config) ->
@@ -932,7 +1055,7 @@ largest_b_tree_order_1025_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 129
+%% TEST CASES: largest b_tree order 129
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_129_test(Config) ->
@@ -941,7 +1064,7 @@ largest_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 17
+%% TEST CASES: largest b_tree order 17
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_17_test(Config) ->
@@ -950,7 +1073,7 @@ largest_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 257
+%% TEST CASES: largest b_tree order 257
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_257_test(Config) ->
@@ -959,7 +1082,7 @@ largest_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 33
+%% TEST CASES: largest b_tree order 33
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_33_test(Config) ->
@@ -968,7 +1091,7 @@ largest_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 5
+%% TEST CASES: largest b_tree order 5
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_5_test(Config) ->
@@ -977,7 +1100,7 @@ largest_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 513
+%% TEST CASES: largest b_tree order 513
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_513_test(Config) ->
@@ -986,7 +1109,7 @@ largest_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 65
+%% TEST CASES: largest b_tree order 65
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_65_test(Config) ->
@@ -995,7 +1118,7 @@ largest_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest b_tree order 9
+%% TEST CASES: largest b_tree order 9
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_9_test(Config) ->
@@ -1004,7 +1127,7 @@ largest_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance largest gb_tree
+%% TEST CASES: largest gb_tree
 %%--------------------------------------------------------------------
 
 largest_gb_tree_test(_Config) ->
@@ -1012,7 +1135,7 @@ largest_gb_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 1025
+%% TEST CASES: lookup b_tree order 1025
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_1025_test(Config) ->
@@ -1028,7 +1151,7 @@ lookup_b_tree([Key | Tail], BTree) ->
     lookup_b_tree(Tail, BTree).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 129
+%% TEST CASES: lookup b_tree order 129
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_129_test(Config) ->
@@ -1038,7 +1161,7 @@ lookup_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 17
+%% TEST CASES: lookup b_tree order 17
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_17_test(Config) ->
@@ -1048,7 +1171,7 @@ lookup_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 257
+%% TEST CASES: lookup b_tree order 257
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_257_test(Config) ->
@@ -1058,7 +1181,7 @@ lookup_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 33
+%% TEST CASES: lookup b_tree order 33
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_33_test(Config) ->
@@ -1068,7 +1191,7 @@ lookup_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 5
+%% TEST CASES: lookup b_tree order 5
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_5_test(Config) ->
@@ -1078,7 +1201,7 @@ lookup_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 513
+%% TEST CASES: lookup b_tree order 513
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_513_test(Config) ->
@@ -1088,7 +1211,7 @@ lookup_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 65
+%% TEST CASES: lookup b_tree order 65
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_65_test(Config) ->
@@ -1098,7 +1221,7 @@ lookup_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup b_tree order 9
+%% TEST CASES: lookup b_tree order 9
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_9_test(Config) ->
@@ -1108,7 +1231,7 @@ lookup_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance lookup gb_tree
+%% TEST CASES: lookup gb_tree
 %%--------------------------------------------------------------------
 
 lookup_gb_tree_test(Config) ->
@@ -1124,7 +1247,7 @@ lookup_gb_tree([Key | Tail], GBTree) ->
     lookup_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 1025
+%% TEST CASES: map b_tree order 1025
 %%--------------------------------------------------------------------
 
 map_b_tree_order_1025_test(Config) ->
@@ -1137,7 +1260,7 @@ map_value_to_new(_, Value) ->
     Value ++ "_new".
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 129
+%% TEST CASES: map b_tree order 129
 %%--------------------------------------------------------------------
 
 map_b_tree_order_129_test(Config) ->
@@ -1147,7 +1270,7 @@ map_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 17
+%% TEST CASES: map b_tree order 17
 %%--------------------------------------------------------------------
 
 map_b_tree_order_17_test(Config) ->
@@ -1157,7 +1280,7 @@ map_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 257
+%% TEST CASES: map b_tree order 257
 %%--------------------------------------------------------------------
 
 map_b_tree_order_257_test(Config) ->
@@ -1167,7 +1290,7 @@ map_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 33
+%% TEST CASES: map b_tree order 33
 %%--------------------------------------------------------------------
 
 map_b_tree_order_33_test(Config) ->
@@ -1177,7 +1300,7 @@ map_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 5
+%% TEST CASES: map b_tree order 5
 %%--------------------------------------------------------------------
 
 map_b_tree_order_5_test(Config) ->
@@ -1187,7 +1310,7 @@ map_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 513
+%% TEST CASES: map b_tree order 513
 %%--------------------------------------------------------------------
 
 map_b_tree_order_513_test(Config) ->
@@ -1197,7 +1320,7 @@ map_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 65
+%% TEST CASES: map b_tree order 65
 %%--------------------------------------------------------------------
 
 map_b_tree_order_65_test(Config) ->
@@ -1207,7 +1330,7 @@ map_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map b_tree order 9
+%% TEST CASES: map b_tree order 9
 %%--------------------------------------------------------------------
 
 map_b_tree_order_9_test(Config) ->
@@ -1217,7 +1340,7 @@ map_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance map gb_tree
+%% TEST CASES: map gb_tree
 %%--------------------------------------------------------------------
 
 map_gb_tree_test(_Config) ->
@@ -1225,7 +1348,7 @@ map_gb_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 1025
+%% TEST CASES: smallest b_tree order 1025
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_1025_test(Config) ->
@@ -1234,7 +1357,7 @@ smallest_b_tree_order_1025_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 129
+%% TEST CASES: smallest b_tree order 129
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_129_test(Config) ->
@@ -1243,7 +1366,7 @@ smallest_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 17
+%% TEST CASES: smallest b_tree order 17
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_17_test(Config) ->
@@ -1252,7 +1375,7 @@ smallest_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 257
+%% TEST CASES: smallest b_tree order 257
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_257_test(Config) ->
@@ -1261,7 +1384,7 @@ smallest_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 33
+%% TEST CASES: smallest b_tree order 33
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_33_test(Config) ->
@@ -1270,7 +1393,7 @@ smallest_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 5
+%% TEST CASES: smallest b_tree order 5
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_5_test(Config) ->
@@ -1279,7 +1402,7 @@ smallest_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 513
+%% TEST CASES: smallest b_tree order 513
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_513_test(Config) ->
@@ -1288,7 +1411,7 @@ smallest_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 65
+%% TEST CASES: smallest b_tree order 65
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_65_test(Config) ->
@@ -1297,7 +1420,7 @@ smallest_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest b_tree order 9
+%% TEST CASES: smallest b_tree order 9
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_9_test(Config) ->
@@ -1306,7 +1429,7 @@ smallest_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance smallest gb_tree
+%% TEST CASES: smallest gb_tree
 %%--------------------------------------------------------------------
 
 smallest_gb_tree_test(_Config) ->
@@ -1314,7 +1437,7 @@ smallest_gb_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 1025
+%% TEST CASES: to_list b_tree order 1025
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_1025_test(Config) ->
@@ -1325,7 +1448,7 @@ to_list_b_tree_order_1025_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 129
+%% TEST CASES: to_list b_tree order 129
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_129_test(Config) ->
@@ -1336,7 +1459,7 @@ to_list_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 17
+%% TEST CASES: to_list b_tree order 17
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_17_test(Config) ->
@@ -1347,7 +1470,7 @@ to_list_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 257
+%% TEST CASES: to_list b_tree order 257
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_257_test(Config) ->
@@ -1358,7 +1481,7 @@ to_list_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 33
+%% TEST CASES: to_list b_tree order 33
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_33_test(Config) ->
@@ -1369,7 +1492,7 @@ to_list_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 5
+%% TEST CASES: to_list b_tree order 5
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_5_test(Config) ->
@@ -1380,7 +1503,7 @@ to_list_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 513
+%% TEST CASES: to_list b_tree order 513
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_513_test(Config) ->
@@ -1391,7 +1514,7 @@ to_list_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 65
+%% TEST CASES: to_list b_tree order 65
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_65_test(Config) ->
@@ -1402,7 +1525,7 @@ to_list_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list b_tree order 9
+%% TEST CASES: to_list b_tree order 9
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_9_test(Config) ->
@@ -1413,7 +1536,7 @@ to_list_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance to_list gb_tree
+%% TEST CASES: to_list gb_tree
 %%--------------------------------------------------------------------
 
 to_list_gb_tree_test(Config) ->
@@ -1424,7 +1547,7 @@ to_list_gb_tree_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 1025
+%% TEST CASES: update b_tree order 1025
 %%--------------------------------------------------------------------
 
 update_b_tree_order_1025_test(Config) ->
@@ -1439,7 +1562,7 @@ update_b_tree([{Key, Value} | Tail], BTree) ->
     update_b_tree(Tail, b_trees:update(Key, Value, BTree)).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 129
+%% TEST CASES: update b_tree order 129
 %%--------------------------------------------------------------------
 
 update_b_tree_order_129_test(Config) ->
@@ -1449,7 +1572,7 @@ update_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 17
+%% TEST CASES: update b_tree order 17
 %%--------------------------------------------------------------------
 
 update_b_tree_order_17_test(Config) ->
@@ -1459,7 +1582,7 @@ update_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 257
+%% TEST CASES: update b_tree order 257
 %%--------------------------------------------------------------------
 
 update_b_tree_order_257_test(Config) ->
@@ -1469,7 +1592,7 @@ update_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 33
+%% TEST CASES: update b_tree order 33
 %%--------------------------------------------------------------------
 
 update_b_tree_order_33_test(Config) ->
@@ -1479,7 +1602,7 @@ update_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 5
+%% TEST CASES: update b_tree order 5
 %%--------------------------------------------------------------------
 
 update_b_tree_order_5_test(Config) ->
@@ -1489,7 +1612,7 @@ update_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 513
+%% TEST CASES: update b_tree order 513
 %%--------------------------------------------------------------------
 
 update_b_tree_order_513_test(Config) ->
@@ -1499,7 +1622,7 @@ update_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 65
+%% TEST CASES: update b_tree order 65
 %%--------------------------------------------------------------------
 
 update_b_tree_order_65_test(Config) ->
@@ -1509,7 +1632,7 @@ update_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update b_tree order 9
+%% TEST CASES: update b_tree order 9
 %%--------------------------------------------------------------------
 
 update_b_tree_order_9_test(Config) ->
@@ -1519,7 +1642,7 @@ update_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance update gb_tree
+%% TEST CASES: update gb_tree
 %%--------------------------------------------------------------------
 
 update_gb_tree_test(Config) ->
@@ -1534,7 +1657,7 @@ update_gb_tree([{Key, Value} | Tail], GBTree) ->
     update_gb_tree(Tail, gb_trees:update(Key, Value, GBTree)).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 1025
+%% TEST CASES: values b_tree order 1025
 %%--------------------------------------------------------------------
 
 values_b_tree_order_1025_test(Config) ->
@@ -1544,7 +1667,7 @@ values_b_tree_order_1025_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 129
+%% TEST CASES: values b_tree order 129
 %%--------------------------------------------------------------------
 
 values_b_tree_order_129_test(Config) ->
@@ -1554,7 +1677,7 @@ values_b_tree_order_129_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 17
+%% TEST CASES: values b_tree order 17
 %%--------------------------------------------------------------------
 
 values_b_tree_order_17_test(Config) ->
@@ -1564,7 +1687,7 @@ values_b_tree_order_17_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 257
+%% TEST CASES: values b_tree order 257
 %%--------------------------------------------------------------------
 
 values_b_tree_order_257_test(Config) ->
@@ -1574,7 +1697,7 @@ values_b_tree_order_257_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 33
+%% TEST CASES: values b_tree order 33
 %%--------------------------------------------------------------------
 
 values_b_tree_order_33_test(Config) ->
@@ -1584,7 +1707,7 @@ values_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 5
+%% TEST CASES: values b_tree order 5
 %%--------------------------------------------------------------------
 
 values_b_tree_order_5_test(Config) ->
@@ -1594,7 +1717,7 @@ values_b_tree_order_5_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 513
+%% TEST CASES: values b_tree order 513
 %%--------------------------------------------------------------------
 
 values_b_tree_order_513_test(Config) ->
@@ -1604,7 +1727,7 @@ values_b_tree_order_513_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 65
+%% TEST CASES: values b_tree order 65
 %%--------------------------------------------------------------------
 
 values_b_tree_order_65_test(Config) ->
@@ -1614,7 +1737,7 @@ values_b_tree_order_65_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values b_tree order 9
+%% TEST CASES: values b_tree order 9
 %%--------------------------------------------------------------------
 
 values_b_tree_order_9_test(Config) ->
@@ -1624,7 +1747,7 @@ values_b_tree_order_9_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: performance values gb_tree
+%% TEST CASES: values gb_tree
 %%--------------------------------------------------------------------
 
 values_gb_tree_test(Config) ->

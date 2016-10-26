@@ -81,10 +81,6 @@
 %%   approach is that it does not require the complete list of all
 %%   elements to be built in memory at one time.
 %%
-%% - iterator_from(K, B): returns an iterator that can be used for
-%%   traversing the entries of B-tree / B*-tree B with key greater
-%%   than or equal to K; see `next'.
-%%
 %% - keys(B): returns an ordered list of all keys in B-tree / B*-tree B.
 %%
 %% - largest(B): returns {K, V}, where K is the largest key in
@@ -161,12 +157,11 @@
     is_defined/2,
     is_empty/1,
     iterator/1,
-%%    iterator_from/2,
     keys/1,
     largest/1,
     lookup/2,
     map/2,
-%%    next/1,
+    next/1,
     number_key_values/1,
     size/1,
     smallest/1,
@@ -187,7 +182,7 @@
 -type b_tree() :: {b_tree_type(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 -type b_tree_type() :: 'b' | 'b_star'.
 
--type iterator() :: none | {key(), value(), tree()}.
+-type iterator() :: [{key_values(), subtrees()}].
 
 -type key() :: any().
 -type keys() :: [any()].
@@ -440,7 +435,7 @@ split_node_root({KeyNo, KeyValues, Subtrees} = _Tree, KeyNoSplit) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% This is a specialized version of `lookup'.
+% This is a specialized version of `lookup'.
 
 -spec is_defined(key(), b_tree()) -> boolean().
 
@@ -465,45 +460,26 @@ is_empty(_) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec iterator(b_tree()) -> [key_value()].
+-spec iterator(b_tree()) -> iterator().
 
 iterator({_, _, _, _, nil}) ->
-    [].
-iterator({_, _, _, _, Tree}) ->
-    iterator_1(Tree, []).
+    [];
+iterator({_, _, _, _, {_, KeyValues, Subtrees}}) ->
+    iterator_1({KeyValues, Subtrees}, []).
 
-%% The iterator structure is really just a list corresponding to
-%% the call stack of an in-order traversal. This is quite fast.
+% The iterator structure is really just a list corresponding to
+% the call stack of an in-order traversal. This is quite fast.
 
-iterator_1({_, _, nil, _} = T, As) ->
-    [T | As];
-iterator_1({_, _, L, _} = T, As) ->
-    iterator_1(L, [T | As]);
-iterator_1(nil, As) ->
-    As.
+-spec iterator_1({key_values(), subtrees()}, iterator()) -> iterator().
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%%-spec iterator(Tree) -> Iter when
-%%    Tree :: tree(Key, Value),
-%%    Iter :: iter(Key, Value).
-%%
-%%iterator({_, T}) ->
-%%    iterator_1(T).
-%%
-%%iterator_1(T) ->
-%%    iterator(T, []).
-%%
-%%%% The iterator structure is really just a list corresponding to
-%%%% the call stack of an in-order traversal. This is quite fast.
-%%
-%%iterator({_, _, nil, _} = T, As) ->
-%%    [T | As];
-%%iterator({_, _, L, _} = T, As) ->
-%%    iterator(L, [T | As]);
-%%iterator(nil, As) ->
-%%    As.
-%%
+% The most left key / value.
+iterator_1({KeyValues, []}, Iterator) ->
+    [{KeyValues, []} | Iterator];
+% The most left subtree.
+iterator_1({KeyValues, Subtrees}, Iterator) ->
+    {_, KeyValues_1, Subtrees_1} = lists:nth(1, Subtrees),
+    iterator_1({KeyValues_1, Subtrees_1}, [{KeyValues, Subtrees} | Iterator]).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec keys(b_tree()) -> keys().
@@ -584,6 +560,26 @@ map_subtrees(_, [], TreesMapped) ->
     TreesMapped;
 map_subtrees(Function, [Tree | Tail], TreesMapped) ->
     map_subtrees(Function, Tail, TreesMapped ++ [map_tree(Function, Tree)]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec next(iterator()) -> 'none' | {key(), value(), iterator()}.
+
+% One level up.
+next([{[], _}, {[], _} = Iterator | TailIterator]) ->
+    next([Iterator] ++ TailIterator);
+% End of leaf node.
+next([{[], _}, {[{Key, Value} | TailKeyValues], [_ | TailSubtrees]} | TailIterator]) ->
+    {Key, Value, iterator_1({TailKeyValues, TailSubtrees}, TailIterator)};
+% Processing a leaf node..
+next([{[{Key, Value} | KeyValues], []} | Iterator]) ->
+    {Key, Value, [{KeyValues, []} | Iterator]};
+% End of iterator.
+next([{[], _}]) ->
+    none;
+% Empty iterator.
+next([]) ->
+    none.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -794,31 +790,21 @@ lookup_1(Key, {KeyNo, KeyValues, ChildTrees}) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 direct_test() ->
+    ?debugFmt("wwe debugging direct_test/0 ===> ~n Start", []),
 
-%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n B-tree: ~p~n", [test_generator:generate_b_tree_from_number(16, 16, 2)]),
+    ok.
 
-%%    BTREE_I = b_trees:insert("k_06", "v_06", ?B_TREE_03_05),
-%%    BTREE_P = ?B_TREE_03_06,
-%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n P: ~p~n I: ~p~n", [BTREE_P, BTREE_I]),
-%%    ?assertEqual(BTREE_P, BTREE_I),
-
-%%%%%%    GBTree = test_generator:generate_gb_tree_from_number(10, 2),
-%%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n GBTree: ~p~n", [GBTree]),
-%%%%%%    Iterator_01 = gb_trees:iterator(GBTree),
-%%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Iterator_01: ~p~n", [Iterator_01]),
-%%%%%%    {Key_01, Value_01, Iterator_02} = gb_trees:next(Iterator_01),
-%%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_02: ~p~n", [Key_01, Value_01, Iterator_02]),
-%%%%%%    {Key_02, Value_02, Iterator_03} = gb_trees:next(Iterator_02),
-%%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_03: ~p~n", [Key_02, Value_02, Iterator_03]),
-%%%%%%    {Key_03, Value_03, Iterator_04} = gb_trees:next(Iterator_03),
-%%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_04: ~p~n", [Key_03, Value_03, Iterator_04]),
-%%%%%%    {_Key_04, _Value_04, _Iterator_05} = gb_trees:next(Iterator_04),
-%%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_05: ~p~n", [_Key_04, _Value_04, _Iterator_05]),
-%%%%
 %%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
 %%%%%%
 %%%%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_04_00~n ~p~n", [b_trees:empty(4)]),
 %%%%%%
 %%%%%%    ?debugFmt("wwe debugging insert_insert_simple_split_test/0 =====================================> B-tree_05_01~n ~p~n", [test_generator:generate_b_tree_from_number(5, 01, 2)]),
 
-    ok.
+%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n BTree: ~p~n", [BTree_05_30]),
+%%
+%%    Iterator_05_30_01 = iterator(BTree_05_30),
+%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Iterator_05_30_01: ~p~n", [Iterator_05_30_01]),
+%%
+%%    {Key_05_30_01, Value_05_30_01, Iterator_05_30_02} = next(Iterator_05_30_01),
+%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Key: ~p~n Value: ~p~n Iterator_05_30_02: ~p~n", [Key_05_30_01, Value_05_30_01, Iterator_05_30_02]),
+%%
