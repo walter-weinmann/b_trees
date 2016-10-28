@@ -39,6 +39,12 @@
 %% -----------------------------------------------------------------------------
 %% Operations:
 %%
+%% - delete(K, B): removes key K from B-tree / B*-tree B; returns new tree.
+%%   Assumes that the key is present in the tree.
+%%
+%% - delete_any(K, T): removes key K from B-tree / B*-tree B if the key is
+%%   present in the tree, otherwise does nothing; returns new tree.
+%%
 %% - empty(O): returns empty B-tree of order O. Order is defined as
 %%   the maximum number of children nodes a non-leaf node may hold.
 %%   The minimum value is 4.
@@ -110,6 +116,14 @@
 %%   B-tree / B*-tree B, and V is the value associated with K in B.
 %%   Assumes that the B-tree / B*-tree B is nonempty.
 %%
+%% - take_largest(B): returns {K, V, B1}, where K is the largest key in
+%%   B-tree / B*-tree B, V is the value associated with K in B, and B1
+%%   is the tree B with key K deleted. Assumes that the tree B is nonempty.
+%%
+%% - take_smallest(B): returns {K, V, B1}, where K is the smallest key in
+%%   B-tree / B*-tree B, V is the value associated with K in B, and B1
+%%   is the tree B with key K deleted. Assumes that the tree B is nonempty.
+%%
 %% - to_list(B): returns an ordered list of {Key, Value} pairs
 %%   for all keys in B-tree / B*-tree B.
 
@@ -121,31 +135,11 @@
 %%   Duplicates are not removed.
 %%
 
-
-%% - balance(T): rebalances tree T. Note that this is rarely necessary,
-%%   but may be motivated when a large number of entries have been
-%%   deleted from the tree without further insertions. Rebalancing could
-%%   then be forced in order to minimise lookup times, since deletion
-%%   only does not rebalance the tree.
-%%
-%% - delete(X, T): removes key X from tree T; returns new tree. Assumes
-%%   that the key is present in the tree.
-%%
-%% - delete_any(X, T): removes key X from tree T if the key is present
-%%   in the tree, otherwise does nothing; returns new tree.
-%%
-%% - take_largest(T): returns {X, V, T1}, where X is the largest key
-%%   in tree T, V is the value associated with X in T, and T1 is the
-%%   tree T with key X deleted. Assumes that the tree T is nonempty.
-%%
-%% - take_smallest(T): returns {X, V, T1}, where X is the smallest key
-%%   in tree T, V is the value associated with X in T, and T1 is the
-%%   tree T with key X deleted. Assumes that the tree T is nonempty.
-%%
-
 -module(b_trees).
 
 -export([
+    delete/2,
+    delete_any/2,
     empty/1,
     empty/2,
     enter/3,
@@ -165,6 +159,8 @@
     number_key_values/1,
     size/1,
     smallest/1,
+    take_smallest/1,
+    take_largest/1,
     to_list/1,
     update/3,
     values/1
@@ -179,7 +175,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
 
--type b_tree() :: {b_tree_type(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
+-type b_tree() :: {b_tree_type(), pos_integer(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 -type b_tree_type() :: 'b' | 'b_star'.
 
 -type iterator() :: [{key_values(), subtrees()}].
@@ -203,13 +199,236 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% delete. Assumes that key is present.
+
+-spec delete(key(), b_tree()) -> b_tree().
+
+% Empty tree.
+delete(Key, {_ = _Key, _, _, _, _, nil} = _BTree) ->
+    ?debugFmt("wwe debugging delete/2 ===> Start ~n Key: ~p~n BTree: ~p~n", [_Key, _BTree]),
+    erlang:error({key_not_found, Key});
+% Root node is leaf node.
+delete(Key, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, []}} = _BTree) ->
+    ?debugFmt("wwe debugging delete/2 ===> Start ~n Key: ~p~n BTree: ~p~n", [Key, _BTree]),
+    {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
+    case ValueFound of
+        none ->
+            erlang:error({key_not_found, Key});
+        _ ->
+            {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues - 1, case KeyNo == 1 of
+                                                                                 true ->
+                                                                                     nil;
+                                                                                 _ ->
+                                                                                     {
+                                                                                         KeyNo - 1,
+                                                                                             lists:sublist(KeyValues, 1, KeyPos - 1) ++
+                                                                                             lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                                                                                         []
+                                                                                     }
+                                                                             end}
+    end;
+delete(Key, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, Subtrees} = Tree} = _BTree) ->
+    ?debugFmt("wwe debugging delete/2 ===> Start ~n Key: ~p~n BTree: ~p~n", [Key, _BTree]),
+    {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
+    case ValueFound of
+        none ->
+            {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues - 1, delete_1(Key, Tree, KeyPos, KeyNoMin, KeyNoMax)};
+        _ ->
+            {RootKeyNo, RootKeyValues, RootLeftSubtree, RootRightSubtree} = combine(Key, KeyPos, KeyNo, KeyValues, lists:nth(KeyPos, Subtrees), lists:nth(KeyPos + 1, Subtrees), KeyNoMin, KeyNoMax),
+            ?debugFmt("wwe debugging delete/2 ===> ~n RootKeyNo: ~p~n RootKeyValues: ~p~n RootLeftSubtree: ~p~n RootRightSubtree: ~p~n", [RootKeyNo, RootKeyValues, RootLeftSubtree, RootRightSubtree]),
+            RootSubtrees = lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                RootLeftSubtree ++
+                RootRightSubtree ++
+                lists:sublist(Subtrees, KeyPos + 2, KeyNo),
+            {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues - 1, {RootKeyNo, RootKeyValues, RootSubtrees}}
+    end.
+
+-spec combine(key(), pos_integer(), pos_integer(), key_values(), tree(), tree(), pos_integer(), pos_integer()) -> {pos_integer(), key_values(), subtrees(), subtrees()}.
+
+combine(Key, _KeyPos, RootKeyNo, RootKeyValues, {LeftKeyNo, LeftKeyValues, []} = _LeftSubtree, {RightKeyNo, RightKeyValues, []} = _RightSubtree, _, _) when RootKeyNo == 1 ->
+    ?debugFmt("wwe debugging combine/8 ===> Start ~n Key: ~p~n KeyPos: ~p~n RootKeyNo: ~p~n RootKeyValues: ~p~n LeftSubtree: ~p~n RightSubtree: ~p~n", [Key, _KeyPos, RootKeyNo, RootKeyValues, _LeftSubtree, _RightSubtree]),
+    {
+        LeftKeyNo + RightKeyNo,
+        delete_key_value(Key, LeftKeyValues ++ RootKeyValues ++ RightKeyValues, []),
+        [],
+        []
+    };
+combine(Key, KeyPos, RootKeyNo, RootKeyValues, {LeftKeyNo, LeftKeyValues, LeftSubtrees} = LeftSubtree, {RightKeyNo, RightKeyValues, RightSubtrees} = RightSubtree, KeyNoMin, KeyNoMax) ->
+    ?debugFmt("wwe debugging combine/8 ===> Start ~n Key: ~p~n KeyPos: ~p~n RootKeyNo: ~p~n RootKeyValues: ~p~n LeftSubtree: ~p~n RightSubtree: ~p~n", [Key, KeyPos, RootKeyNo, RootKeyValues, LeftSubtree, RightSubtree]),
+    case LeftKeyNo + RightKeyNo =< KeyNoMax of
+        true ->
+            ?debugFmt("wwe debugging combine/8 ===> ~n 1 ============>: ~n", []),
+            {
+                RootKeyNo - 1,
+                    lists:sublist(RootKeyValues, 1, KeyPos - 1) ++
+                    lists:sublist(RootKeyValues, KeyPos + 1, RootKeyNo),
+                [{LeftKeyNo + RightKeyNo, delete_key_value(Key, LeftKeyValues ++ [lists:nth(KeyPos, RootKeyValues)] ++ RightKeyValues, []), LeftSubtrees ++ RightSubtrees}],
+                []
+            };
+        _ ->
+            case LeftKeyNo > KeyNoMin of
+                true ->
+                    ?debugFmt("wwe debugging combine/8 ===> ~n 2 ============>: ~n", []),
+                    {
+                        RootKeyNo,
+                            lists:sublist(RootKeyValues, 1, KeyPos - 1) ++
+                            [lists:nth(LeftKeyNo, LeftKeyValues)] ++
+                            lists:sublist(RootKeyValues, KeyPos + 1, RootKeyNo),
+                        [
+                            {
+                                LeftKeyNo - 1,
+                                lists:sublist(LeftKeyValues, 1, LeftKeyNo - 1),
+                                case length(LeftSubtrees) == 0 of
+                                    true ->
+                                        [];
+                                    _ ->
+                                        lists:sublist(LeftSubtrees, 1, LeftKeyNo)
+                                end
+                            }
+                        ],
+                        [RightSubtree]
+                    };
+                _ ->
+                    ?debugFmt("wwe debugging combine/8 ===> ~n 3 ============>: ~n", []),
+                    ?debugFmt("wwe debugging combine/8 ===> ~n KeyPos: ~p~n RootKeyNo: ~p~n RootKeyValues: ~p~n LeftSubtree: ~p~n RightSubtree: ~p~n", [KeyPos, RootKeyNo, RootKeyValues, LeftSubtree, RightSubtree]),
+                    {
+                        RootKeyNo,
+                            lists:sublist(RootKeyValues, 1, KeyPos - 1) ++
+                            [lists:nth(1, RightKeyValues)] ++
+                            lists:sublist(RootKeyValues, KeyPos + 1, RootKeyNo),
+                        [LeftSubtree],
+                        [
+                            {
+                                RightKeyNo - 1,
+                                lists:sublist(RightKeyValues, 2, RightKeyNo),
+                                case length(RightSubtrees) == 0 of
+                                    true ->
+                                        [];
+                                    _ ->
+                                        lists:sublist(RightSubtrees, 2, RightKeyNo + 1)
+                                end
+                            }
+                        ]
+                    }
+            end
+    end.
+
+-spec delete_1(key(), tree(), pos_integer(), pos_integer(), pos_integer()) -> tree().
+
+% Leaf node.
+delete_1(Key, {KeyNo, KeyValues, []} = _Tree, _KeyPos, _, _) ->
+    ?debugFmt("wwe debugging delete_1/5 ===> Start ~n Key: ~p~n Tree: ~p~n KeyPos: ~p~n", [Key, _Tree, _KeyPos]),
+    {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
+    case ValueFound of
+        none ->
+            erlang:error({key_not_found, Key});
+        _ ->
+            {
+                KeyNo - 1,
+                    lists:sublist(KeyValues, 1, KeyPos - 1) ++
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                []
+            }
+    end;
+delete_1(Key, {KeyNo, KeyValues, Subtrees} = _Tree, KeyPos, KeyNoMin, KeyNoMax) ->
+    ?debugFmt("wwe debugging delete_1/5 ===> Start ~n Key: ~p~n Tree: ~p~n KeyPos: ~p~n", [Key, _Tree, KeyPos]),
+    {NextKeyNo, NextKeyValues, _NextSubtrees} = _NextTree = lists:nth(KeyPos, Subtrees),
+    ?debugFmt("wwe debugging delete_1/5 ===> ~n NextKeyNo: ~p~n NextKeyValues: ~p~n NextSubtrees: ~p~n", [NextKeyNo, NextKeyValues, _NextSubtrees]),
+    {ValueFound, NextKeyPos} = binary_search(Key, NextKeyValues, NextKeyNo, 1, NextKeyNo),
+    ?debugFmt("wwe debugging delete_1/5 ===> ~n NextKeyPos: ~p~n", [NextKeyPos]),
+    LeftPos = case KeyPos > KeyNo of
+                  true ->
+                      KeyPos - 1;
+                  _ ->
+                      case KeyPos == 1 of
+                          true ->
+                              KeyPos;
+                          _ ->
+                              KeyPos - 1
+                      end
+              end,
+    case ValueFound of
+        none ->
+            ?debugFmt("wwe debugging delete_1/5 ===> ~n 1 ============>: ~n", []),
+            {
+                KeyNo,
+                KeyValues,
+                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                    [delete_1(Key, lists:nth(KeyPos, Subtrees), NextKeyPos, KeyNoMin, KeyNoMax)] ++
+                    lists:sublist(Subtrees, KeyPos + 1, KeyNo + 1)
+            };
+        _ ->
+            case NextKeyNo == KeyNoMin of
+                true ->
+                    ?debugFmt("wwe debugging delete_1/5 ===> ~n 2 ============>: ~n", []),
+                    {RootKeyNo, RootKeyValues, RootLeftSubtree, RootRightSubtree} = combine(Key, LeftPos, KeyNo, KeyValues, lists:nth(LeftPos, Subtrees), lists:nth(LeftPos + 1, Subtrees), KeyNoMin, KeyNoMax),
+                    ?debugFmt("wwe debugging delete_1/5 ===> ~n RootKeyNo: ~p~n RootKeyValues: ~p~n RootLeftSubtree: ~p~n RootRightSubtree: ~p~n", [RootKeyNo, RootKeyValues, RootLeftSubtree, RootRightSubtree]),
+                    {
+                        RootKeyNo,
+                        RootKeyValues,
+                            lists:sublist(Subtrees, 1, LeftPos - 1) ++
+                            RootLeftSubtree ++
+                            RootRightSubtree ++
+                            lists:sublist(Subtrees, LeftPos + 2, KeyNo)
+                    };
+                _ ->
+                    ?debugFmt("wwe debugging delete_1/5 ===> ~n 3 ============>: ~n", []),
+                    {
+                        KeyNo,
+                        KeyValues,
+                            lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                            [delete_1(Key, lists:nth(KeyPos, Subtrees), NextKeyPos, KeyNoMin, KeyNoMax)] ++
+                            lists:sublist(Subtrees, KeyPos + 1, KeyNo + 1)
+                    }
+            end
+    end.
+
+-spec delete_key_value(key(), key_values(), key_values()) -> key_values().
+
+delete_key_value(Key, [], _) ->
+    erlang:error({key_not_found, Key});
+delete_key_value(Key, [{KeyCurr, _} | Tail], KeyValuesAcc) when KeyCurr == Key ->
+    KeyValuesAcc ++ Tail;
+delete_key_value(Key, [{KeyCurr, _} = KeyValueCurr | Tail], KeyValuesAcc) when KeyCurr < Key ->
+    delete_key_value(Key, Tail, KeyValuesAcc ++ [KeyValueCurr]);
+delete_key_value(Key, _, _) ->
+    erlang:error({key_not_found, Key}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec delete_any(key(), b_tree()) -> b_tree().
+
+delete_any(Key, BTree) ->
+    case is_defined(Key, BTree) of
+        true ->
+            delete(Key, BTree);
+        false ->
+            BTree
+    end.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec empty(pos_integer()) -> b_tree().
 -spec empty(pos_integer(), atom()) -> b_tree().
 
 empty(Order) when Order > 3 ->
-    {b, Order div 2, Order - 1, 0, nil}.
+    M = Order div 2,
+    R = Order rem 2,
+    {b, M, case R == 0 of
+               true ->
+                   M;
+               _ ->
+                   M + 1
+           end, Order - 1, 0, nil}.
 empty(Order, b_star) when Order > 3 ->
-    {b_star, Order * 2 div 3, Order - 1, 0, nil}.
+    M = Order * 2 div 3,
+    R = Order rem 2,
+    {b_star, M, case R == 0 of
+                    true ->
+                        M;
+                    _ ->
+                        M + 1
+                end, Order - 1, 0, nil}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -246,9 +465,9 @@ from_dict_1([{Key, Value} | Tail], BTree) ->
 
 -spec get(key(), b_tree()) -> value().
 
-get(Key, {_, _, _, _, nil}) ->
+get(Key, {_, _, _, _, _, nil}) ->
     erlang:error({key_not_found, Key});
-get(Key, {_, _, _, _, Tree}) ->
+get(Key, {_, _, _, _, _, Tree}) ->
     case lookup_1(Key, Tree) of
         {value, Value} ->
             Value;
@@ -260,9 +479,9 @@ get(Key, {_, _, _, _, Tree}) ->
 
 -spec height(b_tree()) -> non_neg_integer().
 
-height({_, _, _, _, nil} = BTree) ->
+height({_, _, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-height({_, _, _, _, Tree}) ->
+height({_, _, _, _, _, Tree}) ->
     height_1(Tree, 0).
 
 -spec height_1(tree(), non_neg_integer()) -> non_neg_integer().
@@ -279,46 +498,47 @@ height_1({_, _, [Tree | _]}, Number) ->
 -spec insert(key(), value(), b_tree()) -> b_tree().
 
 % First entry.
-insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, 0, nil} = _BTree) ->
-    {BTreeType, KeyNoMin, KeyNoMax, 1, {1, [{Key, Value}], []}};
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, 0, nil} = _BTree) ->
+    {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, 1, {1, [{Key, Value}], []}};
 % Split root node.
-insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, {KeyNo, KeyValues, _} = Tree} = _BTree) when KeyNo == KeyNoMax ->
-    KeyNoSplit = case KeyNoMax rem 2 of
-                     1 ->
-                         KeyNoMin;
-                     _ ->
-                         {KeyNoMinKey, _} = lists:nth(KeyNoMin, KeyValues),
-                         case Key < KeyNoMinKey of
-                             true ->
-                                 KeyNoMin;
-                             _ ->
-                                 KeyNoMin + 1
-                         end
-                 end,
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_1({Key, Value}, split_node_root(Tree, KeyNoSplit), KeyNoMin, KeyNoMax)};
-insert(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree} = _BTree) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues + 1, insert_1({Key, Value}, Tree, KeyNoMin, KeyNoMax)}.
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, {KeyNo, _, _} = Tree} = _BTree) when KeyNo == KeyNoMax ->
+    {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues + 1, insert_1({Key, Value}, split_node_root(Tree, KeyNoSplit), KeyNoMin, KeyNoMax)};
+insert(Key, Value, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, Tree} = _BTree) ->
+    {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues + 1, insert_1({Key, Value}, Tree, KeyNoSplit, KeyNoMax)}.
 
 -spec insert_1(key_value(), tree(), pos_integer(), pos_integer()) -> tree().
 
 % Leaf node.
 insert_1(KeyValue, {KeyNo, KeyValues, []} = _Tree, _, _) ->
-    {KeyNo + 1, insert_key_values(KeyValue, KeyValues, []), []};
-insert_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, KeyNoMax) ->
+    {KeyNo + 1, insert_key_value(KeyValue, KeyValues, []), []};
+insert_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoSplit, KeyNoMax) ->
     {ValueFound, SubtreePos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
     case ValueFound of
         none ->
             % Look ahead.
-            {SubtreeKeyNo, _, _} = Subtree = lists:nth(SubtreePos, Subtrees),
+            {SubtreeKeyNo, SubtreeKeyValues, _} = Subtree = lists:nth(SubtreePos, Subtrees),
             case SubtreeKeyNo == KeyNoMax of
                 % Split node.
                 true ->
-                    {SplitKeyValues, SplitSubtrees1, SplitTree, SplitSubtrees2} = split_node_non_root(KeyValue, KeyNo, KeyValues, Subtrees, Subtree, SubtreePos, KeyNoMin, KeyNoMax),
+                    {SplitKeyValues, SplitSubtrees1, SplitTree1, SplitTree2, SplitSubtrees2} = split_node_non_root(KeyNo, KeyValues, Subtrees, Subtree, SubtreePos, KeyNoSplit),
+                    % wwe ?debugFmt("wwe debugging insert_1 ===> ~n SplitKeyValues: ~p~n SplitSubtrees1: ~p~n SplitTree1: ~p~n SplitTree2: ~p~n SplitSubtrees2: ~p~n", [SplitKeyValues, SplitSubtrees1, SplitTree1, SplitTree2, SplitSubtrees2]),
+                    % wwe ?debugFmt("wwe debugging insert_1 ===> ~n Key: ~p~n lists:nth(KeyNoSplit, SubtreeKeyValues): ~p~n", [Key, lists:nth(KeyNoSplit, SubtreeKeyValues)]),
                     {
                         KeyNo + 1,
                         SplitKeyValues,
                             SplitSubtrees1 ++
-                            [insert_1(KeyValue, SplitTree, KeyNoMin, KeyNoMax)] ++
+                            case KeyValue < lists:nth(KeyNoSplit, SubtreeKeyValues) of
+                                true ->
+                                    [
+                                        insert_1(KeyValue, SplitTree1, KeyNoSplit, KeyNoMax),
+                                        SplitTree2
+                                    ];
+                                _ ->
+                                    [
+                                        SplitTree1,
+                                        insert_1(KeyValue, SplitTree2, KeyNoSplit, KeyNoMax)
+                                    ]
+                            end ++
                             SplitSubtrees2
                     };
                 _ ->
@@ -326,7 +546,7 @@ insert_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, Ke
                         KeyNo,
                         KeyValues,
                             lists:sublist(Subtrees, 1, SubtreePos - 1) ++
-                            [insert_1(KeyValue, Subtree, KeyNoMin, KeyNoMax)] ++
+                            [insert_1(KeyValue, Subtree, KeyNoSplit, KeyNoMax)] ++
                             lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
                     }
             end;
@@ -334,52 +554,40 @@ insert_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees} = _Tree, KeyNoMin, Ke
             erlang:error({key_exists, Key})
     end.
 
--spec insert_key_values(key_value(), key_values(), key_values()) -> key_values().
+-spec insert_key_value(key_value(), key_values(), key_values()) -> key_values().
 
-insert_key_values(KeyValue, [], KeyValuesAcc) ->
+insert_key_value(KeyValue, [], KeyValuesAcc) ->
     KeyValuesAcc ++ [KeyValue];
-insert_key_values({Key, _} = KeyValue, [{KeyCurr, _} = KeyValueCurr | Tail], KeyValuesAcc) when Key > KeyCurr ->
-    insert_key_values(KeyValue, Tail, KeyValuesAcc ++ [KeyValueCurr]);
-insert_key_values({Key, _} = KeyValue, [{KeyCurr, _} | _] = KeyValues, KeyValuesAcc) when Key < KeyCurr ->
+insert_key_value({Key, _} = KeyValue, [{KeyCurr, _} = KeyValueCurr | Tail], KeyValuesAcc) when Key > KeyCurr ->
+    insert_key_value(KeyValue, Tail, KeyValuesAcc ++ [KeyValueCurr]);
+insert_key_value({Key, _} = KeyValue, [{KeyCurr, _} | _] = KeyValues, KeyValuesAcc) when Key < KeyCurr ->
     KeyValuesAcc ++ [KeyValue] ++ KeyValues;
-insert_key_values({Key, _}, _, _) ->
+insert_key_value({Key, _}, _, _) ->
     erlang:error({key_exists, Key}).
 
--spec split_node_non_root(key_value(), pos_integer(), key_values(), subtrees(), tree(), pos_integer(), pos_integer(), pos_integer()) -> {key_values(), subtrees(), tree(), subtrees()}.
+-spec split_node_non_root(pos_integer(), key_values(), subtrees(), tree(), pos_integer(), pos_integer()) -> {key_values(), subtrees(), tree(), tree(), subtrees()}.
 
-split_node_non_root({Key, _} = _KeyValue, KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeKeyValues, TreeSubtrees}, SubtreePos, KeyNoMin, KeyNoMax) ->
-    KeyNoSplit = case KeyNoMax rem 2 of
-                     1 ->
-                         KeyNoMin;
-                     _ ->
-                         {KeyNoMinKey, _} = lists:nth(KeyNoMin, TreeKeyValues),
-                         case Key < KeyNoMinKey of
-                             true ->
-                                 KeyNoMin;
-                             _ ->
-                                 KeyNoMin + 1
-                         end
-                 end,
-    % {SplitKeyValues, SplitSubtrees1, SplitTree, SplitSubtrees2}
+split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeKeyValues, TreeSubtrees}, SubtreePos, KeyNoSplit) ->
+    % wwe ?debugFmt("wwe debugging split_node_non_root ===> ~n KeyNo: ~p~n KeyValues: ~p~n Subtrees: ~p~n SubtreePos: ~p~n", [KeyNo, KeyValues, Subtrees, SubtreePos]),
+    % wwe ?debugFmt("wwe debugging insert_1 ===> ~n KeyNoSplit: ~p~n TreeKeyValues: ~p~n SplitKey: ~p~n", [KeyNoSplit, TreeKeyValues, lists:nth(KeyNoSplit, TreeKeyValues)]),
     {
         % SplitKeyValues .......................................................
-        insert_key_values(lists:nth(KeyNoSplit, TreeKeyValues), KeyValues, []),
+        insert_key_value(lists:nth(KeyNoSplit, TreeKeyValues), KeyValues, []),
         % SplitSubtrees1 .......................................................
-            lists:sublist(Subtrees, 1, SubtreePos - 1) ++
-            [
-                {
-                    KeyNoSplit - 1,
-                    lists:sublist(TreeKeyValues, 1, KeyNoSplit - 1),
-                    % Leaf node to be splitted ?
-                    case length(TreeSubtrees) == 0 of
-                        true ->
-                            [];
-                        _ ->
-                            lists:sublist(TreeSubtrees, 1, KeyNoSplit)
-                    end
-                }
-            ],
-        % SplitTree ............................................................
+        lists:sublist(Subtrees, 1, SubtreePos - 1),
+        % SplitTree 1 ..........................................................
+        {
+            KeyNoSplit - 1,
+            lists:sublist(TreeKeyValues, 1, KeyNoSplit - 1),
+            % Leaf node to be splitted ?
+            case length(TreeSubtrees) == 0 of
+                true ->
+                    [];
+                _ ->
+                    lists:sublist(TreeSubtrees, 1, KeyNoSplit)
+            end
+        },
+        % SplitTree 2 ..........................................................
         {
             TreeKeyNo - KeyNoSplit,
             lists:sublist(TreeKeyValues, KeyNoSplit + 1, TreeKeyNo),
@@ -398,7 +606,8 @@ split_node_non_root({Key, _} = _KeyValue, KeyNo, KeyValues, Subtrees, {TreeKeyNo
 -spec split_node_root(tree(), pos_integer()) -> tree().
 
 % Leaf node.
-split_node_root({KeyNo, KeyValues, []} = _Tree, KeyNoSplit) ->
+split_node_root({KeyNo, KeyValues, []}, KeyNoSplit) ->
+    % wwe ?debugFmt("wwe debugging split_node_root ===> ~n KeyNo: ~p~n KeyValues: ~p~n Subtrees: ~p~n KeyNoSplit: ~p~n", [KeyNo, KeyValues, [], KeyNoSplit]),
     {
         1,
         [lists:nth(KeyNoSplit, KeyValues)],
@@ -415,7 +624,8 @@ split_node_root({KeyNo, KeyValues, []} = _Tree, KeyNoSplit) ->
             }
         ]
     };
-split_node_root({KeyNo, KeyValues, Subtrees} = _Tree, KeyNoSplit) ->
+split_node_root({KeyNo, KeyValues, Subtrees}, KeyNoSplit) ->
+    % wwe ?debugFmt("wwe debugging split_node_root ===> ~n KeyNo: ~p~n KeyValues: ~p~n Subtrees: ~p~n KeyNoSplit: ~p~n", [KeyNo, KeyValues, Subtrees, KeyNoSplit]),
     {
         1,
         [lists:nth(KeyNoSplit, KeyValues)],
@@ -439,9 +649,9 @@ split_node_root({KeyNo, KeyValues, Subtrees} = _Tree, KeyNoSplit) ->
 
 -spec is_defined(key(), b_tree()) -> boolean().
 
-is_defined(_, {_, _, _, _, nil}) ->
+is_defined(_, {_, _, _, _, _, nil}) ->
     false;
-is_defined(Key, {_, _, _, _, Tree}) ->
+is_defined(Key, {_, _, _, _, _, Tree}) ->
     case lookup_1(Key, Tree) == none of
         true ->
             false;
@@ -453,7 +663,7 @@ is_defined(Key, {_, _, _, _, Tree}) ->
 
 -spec is_empty(b_tree()) -> boolean().
 
-is_empty({_, _, _, _, nil}) ->
+is_empty({_, _, _, _, _, nil}) ->
     true;
 is_empty(_) ->
     false.
@@ -462,9 +672,9 @@ is_empty(_) ->
 
 -spec iterator(b_tree()) -> iterator().
 
-iterator({_, _, _, _, nil}) ->
+iterator({_, _, _, _, _, nil}) ->
     [];
-iterator({_, _, _, _, {_, KeyValues, Subtrees}}) ->
+iterator({_, _, _, _, _, {_, KeyValues, Subtrees}}) ->
     iterator_1({KeyValues, Subtrees}, []).
 
 % The iterator structure is really just a list corresponding to
@@ -484,9 +694,9 @@ iterator_1({KeyValues, Subtrees}, Iterator) ->
 
 -spec keys(b_tree()) -> keys().
 
-keys({_, _, _, _, nil}) ->
+keys({_, _, _, _, _, nil}) ->
     [];
-keys({_, _, _, _, {_, KeyValues, Subtrees}}) ->
+keys({_, _, _, _, _, {_, KeyValues, Subtrees}}) ->
     keys_1(KeyValues, Subtrees, []).
 
 -spec keys_1(key_values(), subtrees(), keys()) -> keys().
@@ -507,9 +717,9 @@ keys_1([{Key, _} | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], Keys)
 
 -spec largest(b_tree()) -> key_value().
 
-largest({_, _, _, _, nil} = BTree) ->
+largest({_, _, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-largest({_, _, _, _, Tree}) ->
+largest({_, _, _, _, _, Tree}) ->
     largest_1(Tree).
 
 -spec largest_1(tree()) -> key_value().
@@ -525,19 +735,19 @@ largest_1({KeyNo, _, Subtrees}) ->
 
 -spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
 
-lookup(_Key, {_, _, _, _, nil}) ->
+lookup(_Key, {_, _, _, _, _, nil}) ->
     none;
-lookup(Key, {_, _, _, _, Tree}) ->
+lookup(Key, {_, _, _, _, _, Tree}) ->
     lookup_1(Key, Tree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec map(map_function(), b_tree()) -> b_tree().
 
-map(_, {_, _, _, _, nil} = BTree) ->
+map(_, {_, _, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-map(Function, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
+map(Function, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, Tree}) when is_function(Function, 2) ->
+    {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, map_tree(Function, Tree)}.
 
 -spec map_key_values(map_function(), key_values(), key_values()) -> key_values().
 
@@ -585,16 +795,16 @@ next([]) ->
 
 -spec number_key_values(b_tree()) -> non_neg_integer().
 
-number_key_values({_, _, _, NumberKeyValues, _}) ->
+number_key_values({_, _, _, _, NumberKeyValues, _}) ->
     NumberKeyValues.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec size(b_tree()) -> non_neg_integer().
 
-size({_, _, _, _, nil}) ->
+size({_, _, _, _, _, nil}) ->
     0;
-size({_, _, _, _, Tree}) ->
+size({_, _, _, _, _, Tree}) ->
     size_tree(Tree, 0).
 
 -spec size_tree(tree(), non_neg_integer()) -> non_neg_integer().
@@ -616,9 +826,9 @@ size_subtrees([Tree | Tail], Number) ->
 
 -spec smallest(b_tree()) -> key_value().
 
-smallest({_, _, _, _, nil} = BTree) ->
+smallest({_, _, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-smallest({_, _, _, _, Tree}) ->
+smallest({_, _, _, _, _, Tree}) ->
     smallest_1(Tree).
 
 -spec smallest_1(tree()) -> key_value().
@@ -632,11 +842,27 @@ smallest_1({_, _, Subtrees}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec take_largest(b_tree()) -> {key(), value(), b_tree()}.
+
+take_largest(BTree) ->
+    {Key, Value} = largest(BTree),
+    {Key, Value, delete(Key, BTree)}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_smallest(b_tree()) -> {key(), value(), b_tree()}.
+
+take_smallest(BTree) ->
+    {Key, Value} = smallest(BTree),
+    {Key, Value, delete(Key, BTree)}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec to_list(b_tree()) -> key_values().
 
-to_list({_, _, _, _, nil} = BTree) ->
+to_list({_, _, _, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-to_list({_, _, _, _, {_, KeyValues, Subtrees}}) ->
+to_list({_, _, _, _, _, {_, KeyValues, Subtrees}}) ->
     to_list_1(KeyValues, Subtrees, []).
 
 -spec to_list_1(key_values(), subtrees(), key_values()) -> key_values().
@@ -657,10 +883,10 @@ to_list_1([KeyValue | TailKeyValues], [{_, KeyValues, Subtrees} | TailTrees], Ke
 
 -spec update(key(), value(), b_tree()) -> b_tree().
 
-update(Key, _, {_, _, _, _, nil}) ->
+update(Key, _, {_, _, _, _, _, nil}) ->
     erlang:error({key_not_found, Key});
-update(Key, Value, {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, Tree}) ->
-    {BTreeType, KeyNoMin, KeyNoMax, NumberKeyValues, update_1({Key, Value}, Tree)}.
+update(Key, Value, {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, Tree}) ->
+    {BTreeType, KeyNoMin, KeyNoSplit, KeyNoMax, NumberKeyValues, update_1({Key, Value}, Tree)}.
 
 -spec update_1(key_value(), tree()) -> tree().
 
@@ -704,9 +930,9 @@ update_1({Key, _} = KeyValue, {KeyNo, KeyValues, Subtrees}) ->
 
 -spec values(b_tree()) -> values().
 
-values({_, _, _, _, nil}) ->
+values({_, _, _, _, _, nil}) ->
     [];
-values({_, _, _, _, {_, KeyValues, Subtrees}}) ->
+values({_, _, _, _, _, {_, KeyValues, Subtrees}}) ->
     values_1(KeyValues, Subtrees, []).
 
 -spec values_1(key_values(), subtrees(), values()) -> values().
@@ -789,10 +1015,27 @@ lookup_1(Key, {KeyNo, KeyValues, ChildTrees}) ->
 %% Test functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-direct_test() ->
-    ?debugFmt("wwe debugging direct_test/0 ===> ~n Start", []),
-
-    ok.
+%%direct_test() ->
+%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Start", []),
+%%
+%%    _B_TREE_CLRS_498_PLUS_B = b_trees:insert("k_b", "v_b", ?B_TREE_CLRS_498),
+%%    ?assertEqual(?B_TREE_CLRS_498_PLUS_B, _B_TREE_CLRS_498_PLUS_B),
+%%
+%%    _B_TREE_CLRS_498_PLUS_B_Q = b_trees:insert("k_q", "v_q", ?B_TREE_CLRS_498_PLUS_B),
+%%    ?assertEqual(?B_TREE_CLRS_498_PLUS_B_Q, _B_TREE_CLRS_498_PLUS_B_Q),
+%%
+%%    _B_TREE_CLRS_498_PLUS_B_Q_L = b_trees:insert("k_l", "v_l", ?B_TREE_CLRS_498_PLUS_B_Q),
+%%    ?assertEqual(?B_TREE_CLRS_498_PLUS_B_Q_L, _B_TREE_CLRS_498_PLUS_B_Q_L),
+%%
+%%    _B_TREE_CLRS_498_PLUS_B_Q_L_F = b_trees:insert("k_f", "v_f", ?B_TREE_CLRS_498_PLUS_B_Q_L),
+%%    ?assertEqual(?B_TREE_CLRS_498_PLUS_B_Q_L_F, _B_TREE_CLRS_498_PLUS_B_Q_L_F),
+%%
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Btree P: ~p~n", [?B_TREE_CLRS_498_PLUS_B_Q]),
+%%%%    ?debugFmt("wwe debugging direct_test/0 ===> ~n Btree I: ~p~n", [_B_TREE_CLRS_498_PLUS_B_Q]),
+%%
+%%%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 17, 4)),
+%%
+%%    ok.
 
 %%%%%%    ?debugFmt("wwe debugging direct_test/0 ===> Start ~n Key: ~p~n KeyValues: ~p~n Lower: ~p~n Upper: ~p~n", [Key, KeyValues, Lower, Upper]),
 %%%%%%

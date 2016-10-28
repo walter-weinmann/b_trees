@@ -49,6 +49,7 @@ all() ->
         insert_b_tree_order_5_test,
         insert_b_tree_order_7_test,
         insert_b_tree_order_8_test,
+        insert_clrs_test,
         insert_error_test,
         is_defined_test,
         is_empty_test,
@@ -396,6 +397,25 @@ insert_b_tree_order_8_test(_Config) ->
     ?assertEqual(64, b_trees:number_key_values(?B_TREE_08_64)),
     ?assertEqual(2, b_trees:height(?B_TREE_08_64)),
     ?assertEqual(20, b_trees:size(?B_TREE_08_64)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert - Example from CLRS Introduction to Algorithms
+%%--------------------------------------------------------------------
+
+insert_clrs_test(_Config) ->
+    _B_TREE_CLRS_498_PLUS_B = b_trees:insert("k_b", "v_b", ?B_TREE_CLRS_498),
+    ?assertEqual(?B_TREE_CLRS_498_PLUS_B, _B_TREE_CLRS_498_PLUS_B),
+
+    _B_TREE_CLRS_498_PLUS_B_Q = b_trees:insert("k_q", "v_q", ?B_TREE_CLRS_498_PLUS_B),
+    ?assertEqual(?B_TREE_CLRS_498_PLUS_B_Q, _B_TREE_CLRS_498_PLUS_B_Q),
+
+    _B_TREE_CLRS_498_PLUS_B_Q_L = b_trees:insert("k_l", "v_l", ?B_TREE_CLRS_498_PLUS_B_Q),
+    ?assertEqual(?B_TREE_CLRS_498_PLUS_B_Q_L, _B_TREE_CLRS_498_PLUS_B_Q_L),
+
+    _B_TREE_CLRS_498_PLUS_B_Q_L_F = b_trees:insert("k_f", "v_f", ?B_TREE_CLRS_498_PLUS_B_Q_L),
+    ?assertEqual(?B_TREE_CLRS_498_PLUS_B_Q_L_F, _B_TREE_CLRS_498_PLUS_B_Q_L_F),
 
     ok.
 

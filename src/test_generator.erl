@@ -10,6 +10,8 @@
 -module(test_generator).
 
 -export([
+    delete_tree_from/3,
+    delete_tree_till/3,
     generate_b_tree_from_list/3,
     generate_b_tree_from_number/3,
     generate_b_tree_from_number/4,
@@ -29,7 +31,18 @@
     generate_keys_from/2,
     generate_keys_from_even/2,
     generate_keys_from_odd/2,
-    generate_keys_rand/3]).
+    generate_keys_rand/3,
+    generate_keys_till/2]).
+
+delete_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
+    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
+    Keys = test_generator:generate_keys_from(Number, Width),
+    delete_tree_1(Keys, BTree).
+
+delete_tree_till(Order, Number, Width) when Order > 3, Number > 0 ->
+    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
+    Keys = test_generator:generate_keys_till(Number, Width),
+    delete_tree_1(Keys, BTree).
 
 generate_b_tree_from_list(Order, Keys, Width) when Order > 3 ->
     generate_b_tree_1(Keys, [], Width, b_trees:empty(Order)).
@@ -98,9 +111,18 @@ generate_keys_rand(Range, Number, Width) when Number >= 0 ->
     Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],
     generate_keys_1(Keys, Width).
 
+generate_keys_till(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(Number, 1, -1),
+    generate_keys_1(Keys, Width).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+delete_tree_1([], BTree) ->
+    BTree;
+delete_tree_1([Key | Tail], BTree) ->
+    delete_tree_1(Tail, b_trees:delete(Key, BTree)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
