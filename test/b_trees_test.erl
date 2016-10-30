@@ -15,19 +15,34 @@
 
 -define(TIMEOUT, 60).
 
-%%%%--------------------------------------------------------------------
-%%%% TEST CASES: delete - order 5
-%%%%--------------------------------------------------------------------
-%%
-%%delete_b_tree_order_5_test() ->
-%%    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_00)),
-%%
-%%    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_01)),
-%%
-%%    ?assertEqual(?B_TREE_05_00, b_trees:delete("k_01", ?B_TREE_05_01)),
-%%
-%%    ?assertEqual(?B_TREE_05_03, b_trees:delete("k_04", ?B_TREE_05_04)),
-%%
+%%--------------------------------------------------------------------
+%% TEST CASES: delete_any
+%%--------------------------------------------------------------------
+
+delete_any_test() ->
+    ?assertEqual(?B_TREE_05_00, b_trees:delete_any("k_00", ?B_TREE_05_00)),
+    ?assertEqual(?B_TREE_05_00, b_trees:delete_any("k_01", ?B_TREE_05_01)),
+    ?assertEqual(?B_TREE_05_01, b_trees:delete_any("k_00", ?B_TREE_05_01)),
+    ?assertEqual(?B_TREE_05_03, b_trees:delete_any("k_04", ?B_TREE_05_04)),
+    ?assertEqual(?B_TREE_05_06, b_trees:delete_any("k_07", ?B_TREE_05_07)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete - order 5
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_5_test() ->
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_00)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_01)),
+
+    ?assertEqual(?B_TREE_05_00, b_trees:delete("k_01", ?B_TREE_05_01)),
+
+    ?assertEqual(?B_TREE_05_03, b_trees:delete("k_04", ?B_TREE_05_04)),
+
+    ?assertException(error, {key_not_found, "k_05"}, b_trees:delete("k_05", ?B_TREE_05_04)),
+
 %%    ?assertEqual(?B_TREE_05_04, b_trees:delete("k_05", ?B_TREE_05_05)),
 %%    ?assertEqual(?B_TREE_05_05_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_05)),
 %%    ?assertEqual(?B_TREE_05_05_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_05)),
@@ -70,21 +85,54 @@
 %%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 14, 4)),
 %%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 17, 4)),
 %%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 20, 4)),
-%%
-%%    ok.
-%%
-%%%%--------------------------------------------------------------------
-%%%% TEST CASES: delete_any
-%%%%--------------------------------------------------------------------
-%%
-%%delete_any_test() ->
-%%    ?assertEqual(?B_TREE_05_00, b_trees:delete_any("k_00", ?B_TREE_05_00)),
-%%    ?assertEqual(?B_TREE_05_00, b_trees:delete_any("k_01", ?B_TREE_05_01)),
-%%    ?assertEqual(?B_TREE_05_01, b_trees:delete_any("k_00", ?B_TREE_05_01)),
-%%    ?assertEqual(?B_TREE_05_03, b_trees:delete_any("k_04", ?B_TREE_05_04)),
-%%    ?assertEqual(?B_TREE_05_06, b_trees:delete_any("k_07", ?B_TREE_05_07)),
-%%
-%%    ok.
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete - Examples based on 
+%%                      CLRS Introduction to Algorithms
+%%--------------------------------------------------------------------
+
+delete_clrs_test() ->
+    % case 1
+    _B_TREE_CLRS_500_MINUS_F = b_trees:delete("k_f", ?B_TREE_CLRS_500),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F, _B_TREE_CLRS_500_MINUS_F),
+
+    % case 2a
+    _B_TREE_CLRS_500_MINUS_F_M = b_trees:delete("k_m", ?B_TREE_CLRS_500_MINUS_F),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M, _B_TREE_CLRS_500_MINUS_F_M),
+
+    % case 2b
+    _B_TREE_CLRS_500_MINUS_F_L = b_trees:delete("k_l", ?B_TREE_CLRS_500_MINUS_F_2),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_L, _B_TREE_CLRS_500_MINUS_F_L),
+
+    % case 3a - delete left
+    _B_TREE_CLRS_500_MINUS_F_M_G_D_A = b_trees:delete("k_a", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D_A, _B_TREE_CLRS_500_MINUS_F_M_G_D_A),
+    _B_TREE_CLRS_500_MINUS_F_M_G_D_B = b_trees:delete("k_b", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D_B, _B_TREE_CLRS_500_MINUS_F_M_G_D_B),
+    _B_TREE_CLRS_500_2_MINUS_F_M_G_D_E = b_trees:delete("k_e", ?B_TREE_CLRS_500_2_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_2_MINUS_F_M_G_D_E, _B_TREE_CLRS_500_2_MINUS_F_M_G_D_E),
+    _B_TREE_CLRS_500_2_MINUS_F_M_G_D_J = b_trees:delete("k_j", ?B_TREE_CLRS_500_2_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_2_MINUS_F_M_G_D_J, _B_TREE_CLRS_500_2_MINUS_F_M_G_D_J),
+    _B_TREE_CLRS_500_MINUS_F_M_G_D_N = b_trees:delete("k_n", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D_N, _B_TREE_CLRS_500_MINUS_F_M_G_D_N),
+    _B_TREE_CLRS_500_MINUS_F_M_G_D_O = b_trees:delete("k_o", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D_O, _B_TREE_CLRS_500_MINUS_F_M_G_D_O),
+
+    % case 3a delete right
+    _B_TREE_CLRS_500_MINUS_F_M_G_D_U = b_trees:delete("k_u", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D_U, _B_TREE_CLRS_500_MINUS_F_M_G_D_U),
+    _B_TREE_CLRS_500_MINUS_F_M_G_D_V = b_trees:delete("k_v", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D_V, _B_TREE_CLRS_500_MINUS_F_M_G_D_V),
+
+    % case 3b
+    _B_TREE_CLRS_500_MINUS_F_M_G_D = b_trees:delete("k_d", ?B_TREE_CLRS_500_MINUS_F_M_G),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_D, _B_TREE_CLRS_500_MINUS_F_M_G_D),
+    _B_TREE_CLRS_500_MINUS_F_M_G_U = b_trees:delete("k_u", ?B_TREE_CLRS_500_MINUS_F_M_G),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G_U, _B_TREE_CLRS_500_MINUS_F_M_G_U),
+
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: empty - b*-tree
@@ -419,7 +467,8 @@ insert_b_tree_order_8_test() ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: insert - Example from CLRS Introduction to Algorithms
+%% TEST CASES: insert - Examples based on 
+%%                      CLRS Introduction to Algorithms
 %%--------------------------------------------------------------------
 
 insert_clrs_test() ->

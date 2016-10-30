@@ -401,7 +401,8 @@ insert_b_tree_order_8_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: insert - Example from CLRS Introduction to Algorithms
+%% TEST CASES: insert - Examples based on 
+%%                      CLRS Introduction to Algorithms
 %%--------------------------------------------------------------------
 
 insert_clrs_test(_Config) ->
