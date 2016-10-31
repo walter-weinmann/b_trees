@@ -496,7 +496,7 @@ insert_b_tree_order_7_test(_Config) ->
     ?assertEqual(1, b_trees:height(?B_TREE_07_07)),
     ?assertEqual(3, b_trees:size(?B_TREE_07_07)),
 
-    ?assertEqual(?B_TREE_07_80, test_generator:generate_b_tree_from_list(7,
+    ?assertEqual(?B_TREE_07_80, test_generator:generate_b_tree_from_list_key_number(7,
         [
             11, 17, 23, 31, 41, 47, 59, 67, 73, 83, 97,
             103, 109, 127, 137, 149, 157, 167, 179, 191, 197,
@@ -514,7 +514,7 @@ insert_b_tree_order_7_test(_Config) ->
     ?assertEqual(2, b_trees:height(?B_TREE_07_80)),
     ?assertEqual(26, b_trees:size(?B_TREE_07_80)),
 
-    ?assertEqual(?B_TREE_07_80, test_generator:generate_b_tree_from_list(7,
+    ?assertEqual(?B_TREE_07_80, test_generator:generate_b_tree_from_list_key_number(7,
         [
             907, 919, 937, 947, 967,
             811, 823, 829, 853, 859, 877, 883,

@@ -1,4 +1,4 @@
-% -define(NODEBUG, true).
+-define(NODEBUG, true).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -175,6 +175,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
 
+-export_type([b_tree/0]).
+
 -type b_tree() :: {b_tree_type(), pos_integer(), pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 -type b_tree_type() :: 'b' | 'b_star'.
 
@@ -242,6 +244,7 @@ delete_1(Key, {KeyNo, 0, KeyValues, []} = _Tree, _, _, _) ->
             erlang:error({key_not_found, Key});
         _ ->
             % CLRS: case 1 
+            ?debugFmt("wwe debugging delete_1 ===> ~n CLRS: case 1 ~n", []),
             {
                 KeyNo - 1,
                 0,
@@ -743,12 +746,7 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, KeyNoSpli
                     {SplitKeyValues, SplitSubtrees1, SplitTree1, SplitTree2, SplitSubtrees2} = split_node_non_root(KeyNo, KeyValues, Subtrees, Subtree, SubtreePos, KeyNoSplit),
                     {
                         KeyNo + 1,
-                        case SubtreeNo == 0 of
-                            true ->
-                                0;
-                            _ ->
-                                SubtreeNo + 1
-                        end,
+                        SubtreeNo + 1,
                         SplitKeyValues,
                             SplitSubtrees1 ++
                             case KeyValue < lists:nth(KeyNoSplit, SubtreeKeyValues) of
@@ -1257,8 +1255,9 @@ lookup_1(Key, {KeyNo, _, KeyValues, ChildTrees}) ->
 %% Test functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-direct_test() ->
-    BTree = test_generator:generate_b_tree_from_number(9, 2000, 4),
-    test_generator:delete_b_tree_from_even(9, 2000, 4, BTree),
-
-    ok.
+%%direct_test() ->
+%%
+%%%%    ?debugFmt("wwe debugging direct_test ===> ~n BTree I: ~p~n", [b_trees:delete_any("k_07", ?B_TREE_05_07)]),
+%%%%    ?debugFmt("wwe debugging direct_test ===> ~n BTree P: ~p~n", [?B_TREE_05_06]),
+%%
+%%    ok.
