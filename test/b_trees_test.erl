@@ -33,58 +33,54 @@ delete_any_test() ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_5_test() ->
-    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_00)),
-
-    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_01)),
-
     ?assertEqual(?B_TREE_05_00, b_trees:delete("k_01", ?B_TREE_05_01)),
 
     ?assertEqual(?B_TREE_05_03, b_trees:delete("k_04", ?B_TREE_05_04)),
 
-    ?assertException(error, {key_not_found, "k_05"}, b_trees:delete("k_05", ?B_TREE_05_04)),
+    ?assertEqual(?B_TREE_05_04, b_trees:delete("k_05", ?B_TREE_05_05)),
+    ?assertEqual(?B_TREE_05_05_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_05)),
+    ?assertEqual(?B_TREE_05_05_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_05)),
+    ?assertEqual(?B_TREE_05_05_MINUS_03, b_trees:delete("k_03", ?B_TREE_05_05)),
+    ?assertEqual(?B_TREE_05_05_MINUS_04, b_trees:delete("k_04", ?B_TREE_05_05)),
 
-%%    ?assertEqual(?B_TREE_05_04, b_trees:delete("k_05", ?B_TREE_05_05)),
-%%    ?assertEqual(?B_TREE_05_05_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_05)),
-%%    ?assertEqual(?B_TREE_05_05_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_05)),
-%%    ?assertEqual(?B_TREE_05_05_MINUS_03, b_trees:delete("k_03", ?B_TREE_05_05)),
-%%    ?assertEqual(?B_TREE_05_05_MINUS_04, b_trees:delete("k_04", ?B_TREE_05_05)),
-%%
-%%    ?assertEqual(?B_TREE_05_06, b_trees:delete("k_07", ?B_TREE_05_07)),
-%%
-%%    ?assertEqual(?B_TREE_05_07, b_trees:delete("k_08", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_03, b_trees:delete("k_03", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_04, b_trees:delete("k_04", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_05, b_trees:delete("k_05", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_06, b_trees:delete("k_06", ?B_TREE_05_08)),
-%%    ?assertEqual(?B_TREE_05_08_MINUS_07, b_trees:delete("k_07", ?B_TREE_05_08)),
-%%
-%%    ?assertEqual(?B_TREE_05_08, b_trees:delete("k_09", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_03, b_trees:delete("k_03", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_04, b_trees:delete("k_04", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_05, b_trees:delete("k_05", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_06, b_trees:delete("k_06", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_07, b_trees:delete("k_07", ?B_TREE_05_09)),
-%%    ?assertEqual(?B_TREE_05_09_MINUS_08, b_trees:delete("k_08", ?B_TREE_05_09)),
-%%
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 1, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 5, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 8, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 11, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 14, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 17, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_from(5, 20, 4)),
-%%
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 1, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 5, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 8, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 11, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 14, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 17, 4)),
-%%    ?assertEqual(?B_TREE_05_00, test_generator:delete_tree_till(5, 20, 4)),
+    ?assertEqual(?B_TREE_05_06, b_trees:delete("k_07", ?B_TREE_05_07)),
+
+    ?assertEqual(?B_TREE_05_07, b_trees:delete("k_08", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_03, b_trees:delete("k_03", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_04, b_trees:delete("k_04", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_05, b_trees:delete("k_05", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_06, b_trees:delete("k_06", ?B_TREE_05_08)),
+    ?assertEqual(?B_TREE_05_08_MINUS_07, b_trees:delete("k_07", ?B_TREE_05_08)),
+
+    ?assertEqual(?B_TREE_05_08, b_trees:delete("k_09", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_01, b_trees:delete("k_01", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_02, b_trees:delete("k_02", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_03, b_trees:delete("k_03", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_04, b_trees:delete("k_04", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_05, b_trees:delete("k_05", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_06, b_trees:delete("k_06", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_07, b_trees:delete("k_07", ?B_TREE_05_09)),
+    ?assertEqual(?B_TREE_05_09_MINUS_08, b_trees:delete("k_08", ?B_TREE_05_09)),
+
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 1, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 5, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 8, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 11, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 14, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 17, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 20, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_from(5, 100, 4)),
+
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 1, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 5, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 8, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 11, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 14, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 17, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 20, 4)),
+    ?assertEqual(?B_TREE_05_00, test_generator:delete_b_tree_till(5, 100, 4)),
 
     ok.
 
@@ -105,6 +101,10 @@ delete_clrs_test() ->
     % case 2b
     _B_TREE_CLRS_500_MINUS_F_L = b_trees:delete("k_l", ?B_TREE_CLRS_500_MINUS_F_2),
     ?assertEqual(?B_TREE_CLRS_500_MINUS_F_L, _B_TREE_CLRS_500_MINUS_F_L),
+
+    % case 2c
+    _B_TREE_CLRS_500_MINUS_F_M_G = b_trees:delete("k_g", ?B_TREE_CLRS_500_MINUS_F_M),
+    ?assertEqual(?B_TREE_CLRS_500_MINUS_F_M_G, _B_TREE_CLRS_500_MINUS_F_M_G),
 
     % case 3a - delete left
     _B_TREE_CLRS_500_MINUS_F_M_G_D_A = b_trees:delete("k_a", ?B_TREE_CLRS_500_MINUS_F_M_G_D),
@@ -135,10 +135,31 @@ delete_clrs_test() ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete - error
+%%--------------------------------------------------------------------
+
+delete_error_test() ->
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_00)),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:delete("k_00", ?B_TREE_05_01)),
+
+    ?assertException(error, {key_not_found, "k_10"}, b_trees:delete("k_10", ?B_TREE_05_09)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: empty - b*-tree
 %%--------------------------------------------------------------------
 
 empty_b_star_tree_test() ->
+    ?assertEqual(?B_STAR_TREE_07_00, b_trees:empty(07, b_star)),
+    ?assert(b_trees:is_empty(b_trees:empty(07, b_star))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(07, b_star))),
+
+    ?assertEqual(?B_STAR_TREE_08_00, b_trees:empty(08, b_star)),
+    ?assert(b_trees:is_empty(b_trees:empty(08, b_star))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(08, b_star))),
+
     ?assertEqual(?B_STAR_TREE_33_00, b_trees:empty(33, b_star)),
     ?assert(b_trees:is_empty(b_trees:empty(33, b_star))),
     ?assertEqual(0, b_trees:size(b_trees:empty(33, b_star))),
@@ -150,6 +171,14 @@ empty_b_star_tree_test() ->
 %%--------------------------------------------------------------------
 
 empty_b_tree_test() ->
+    ?assertEqual(?B_TREE_04_00, b_trees:empty(04)),
+    ?assert(b_trees:is_empty(b_trees:empty(04))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(04))),
+
+    ?assertEqual(?B_TREE_05_00, b_trees:empty(05)),
+    ?assert(b_trees:is_empty(b_trees:empty(05))),
+    ?assertEqual(0, b_trees:size(b_trees:empty(05))),
+
     ?assertEqual(?B_TREE_33_00, b_trees:empty(33)),
     ?assert(b_trees:is_empty(b_trees:empty(33))),
     ?assertEqual(0, b_trees:size(b_trees:empty(33))),
@@ -892,6 +921,68 @@ smallest_test() ->
     ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_05_16)),
     ?assertEqual({"k_01", "v_01"}, b_trees:smallest(?B_TREE_19_19)),
     ?assertEqual({"k_011", "v_011"}, b_trees:smallest(?B_TREE_07_80)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest
+%%--------------------------------------------------------------------
+
+take_largest_test() ->
+    ?assertException(error, {empty_tree, _}, b_trees:take_largest(?B_TREE_05_00)),
+
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 3, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 6, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 9, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 12, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 15, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 18, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 21, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 24, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 27, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_largest_b_tree(4, 30, 2)),
+
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 4, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 8, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 12, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 16, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 20, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 24, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 28, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 32, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 36, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_largest_b_tree(5, 40, 2)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest
+%%--------------------------------------------------------------------
+
+take_smallest_test() ->
+    ?assertException(error, {empty_tree, _}, b_trees:take_smallest(?B_TREE_05_00)),
+
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 3, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 6, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 9, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 12, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 15, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 18, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 21, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 24, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 27, 2)),
+    ?assertEqual(?B_TREE_04_00, test_generator:take_smallest_b_tree(4, 30, 2)),
+
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 4, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 8, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 12, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 16, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 20, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 24, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 28, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 32, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 36, 2)),
+    ?assertEqual(?B_TREE_05_00, test_generator:take_smallest_b_tree(5, 40, 2)),
 
     ok.
 

@@ -17,6 +17,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
+-define(NUMBER_DELETES, 2000).
 -define(NUMBER_INSERTS, 2000).
 -define(NUMBER_KEYS, 10000).
 -define(NUMBER_UPDATES, 2000).
@@ -39,6 +40,8 @@ init_per_suite(Config) ->
         {key_values_from_update, test_generator:generate_key_values_from_update(?NUMBER_INSERTS, 4)},
         {key_values_rand_update, test_generator:generate_key_values_rand_update(?NUMBER_UPDATES, ?NUMBER_UPDATES, 4)},
         {keys_from, test_generator:generate_keys_from(?NUMBER_INSERTS, 4)},
+        {keys_from_even, test_generator:generate_keys_from_even(?NUMBER_INSERTS, 4)},
+        {keys_from_odd, test_generator:generate_keys_from_odd(?NUMBER_INSERTS, 4)},
         {keys_rand, test_generator:generate_keys_rand(?NUMBER_INSERTS, ?NUMBER_KEYS, 4)},
 
         {gbtree, test_generator:generate_gb_tree_from_number(?NUMBER_INSERTS, 4)},
@@ -76,164 +79,332 @@ end_per_suite(_Config) ->
 
 all() ->
     [
-        enter_b_tree_order_5_test,
-        enter_b_tree_order_9_test,
-        enter_b_tree_order_17_test,
-        enter_b_tree_order_33_test,
-        enter_b_tree_order_65_test,
-        enter_b_tree_order_129_test,
-        enter_b_tree_order_257_test,
-        enter_b_tree_order_513_test,
-        enter_b_tree_order_1025_test,
-        enter_gb_tree_test,
+        delete_b_tree_order_9_even_odd_test
+%%        delete_b_tree_order_9_odd_even_test,
+%%        insert_b_tree_order_9_even_odd_test,
+%%        insert_b_tree_order_9_odd_even_test
 
-        from_dict_b_tree_order_5_test,
-        from_dict_b_tree_order_9_even_odd_test,
-        from_dict_b_tree_order_9_odd_even_test,
-        from_dict_b_tree_order_9_test,
-        from_dict_b_tree_order_17_test,
-        from_dict_b_tree_order_33_test,
-        from_dict_b_tree_order_65_test,
-        from_dict_b_tree_order_129_test,
-        from_dict_b_tree_order_257_test,
-        from_dict_b_tree_order_513_test,
-        from_dict_b_tree_order_1025_test,
-        from_dict_gb_tree_test,
-
-        get_b_tree_order_5_test,
-        get_b_tree_order_9_test,
-        get_b_tree_order_17_test,
-        get_b_tree_order_33_test,
-        get_b_tree_order_65_test,
-        get_b_tree_order_129_test,
-        get_b_tree_order_257_test,
-        get_b_tree_order_513_test,
-        get_b_tree_order_1025_test,
-        get_gb_tree_test,
-
-        insert_b_tree_order_4_test,
-        insert_b_tree_order_5_test,
-        insert_b_tree_order_5_till_test,
-        insert_b_tree_order_9_test,
-        insert_b_tree_order_17_test,
-        insert_b_tree_order_33_test,
-        insert_b_tree_order_65_test,
-        insert_b_tree_order_129_test,
-        insert_b_tree_order_257_test,
-        insert_b_tree_order_513_test,
-        insert_b_tree_order_1025_test,
-        insert_gb_tree_test,
-
-        is_defined_b_tree_order_5_test,
-        is_defined_b_tree_order_9_test,
-        is_defined_b_tree_order_17_test,
-        is_defined_b_tree_order_33_test,
-        is_defined_b_tree_order_65_test,
-        is_defined_b_tree_order_129_test,
-        is_defined_b_tree_order_257_test,
-        is_defined_b_tree_order_513_test,
-        is_defined_b_tree_order_1025_test,
-        is_defined_gb_tree_test,
-
-        iterate_next_b_tree_order_5_test,
-        iterate_next_b_tree_order_9_test,
-        iterate_next_b_tree_order_17_test,
-        iterate_next_b_tree_order_33_test,
-        iterate_next_b_tree_order_65_test,
-        iterate_next_b_tree_order_129_test,
-        iterate_next_b_tree_order_257_test,
-        iterate_next_b_tree_order_513_test,
-        iterate_next_b_tree_order_1025_test,
-        iterate_next_gb_tree_test,
-
-        keys_b_tree_order_5_test,
-        keys_b_tree_order_9_test,
-        keys_b_tree_order_17_test,
-        keys_b_tree_order_33_test,
-        keys_b_tree_order_65_test,
-        keys_b_tree_order_129_test,
-        keys_b_tree_order_257_test,
-        keys_b_tree_order_513_test,
-        keys_b_tree_order_1025_test,
-        keys_gb_tree_test,
-
-        largest_b_tree_order_5_test,
-        largest_b_tree_order_9_test,
-        largest_b_tree_order_17_test,
-        largest_b_tree_order_33_test,
-        largest_b_tree_order_65_test,
-        largest_b_tree_order_129_test,
-        largest_b_tree_order_257_test,
-        largest_b_tree_order_513_test,
-        largest_b_tree_order_1025_test,
-        largest_gb_tree_test,
-
-        lookup_b_tree_order_5_test,
-        lookup_b_tree_order_9_test,
-        lookup_b_tree_order_17_test,
-        lookup_b_tree_order_33_test,
-        lookup_b_tree_order_65_test,
-        lookup_b_tree_order_129_test,
-        lookup_b_tree_order_257_test,
-        lookup_b_tree_order_513_test,
-        lookup_b_tree_order_1025_test,
-        lookup_gb_tree_test,
-
-        map_b_tree_order_5_test,
-        map_b_tree_order_9_test,
-        map_b_tree_order_17_test,
-        map_b_tree_order_33_test,
-        map_b_tree_order_65_test,
-        map_b_tree_order_129_test,
-        map_b_tree_order_257_test,
-        map_b_tree_order_513_test,
-        map_b_tree_order_1025_test,
-        map_gb_tree_test,
-
-        smallest_b_tree_order_5_test,
-        smallest_b_tree_order_9_test,
-        smallest_b_tree_order_17_test,
-        smallest_b_tree_order_33_test,
-        smallest_b_tree_order_65_test,
-        smallest_b_tree_order_129_test,
-        smallest_b_tree_order_257_test,
-        smallest_b_tree_order_513_test,
-        smallest_b_tree_order_1025_test,
-        smallest_gb_tree_test,
-
-        to_list_b_tree_order_5_test,
-        to_list_b_tree_order_9_test,
-        to_list_b_tree_order_17_test,
-        to_list_b_tree_order_33_test,
-        to_list_b_tree_order_65_test,
-        to_list_b_tree_order_129_test,
-        to_list_b_tree_order_257_test,
-        to_list_b_tree_order_513_test,
-        to_list_b_tree_order_1025_test,
-        to_list_gb_tree_test,
-
-        update_b_tree_order_5_test,
-        update_b_tree_order_9_test,
-        update_b_tree_order_17_test,
-        update_b_tree_order_33_test,
-        update_b_tree_order_65_test,
-        update_b_tree_order_129_test,
-        update_b_tree_order_257_test,
-        update_b_tree_order_513_test,
-        update_b_tree_order_1025_test,
-        update_gb_tree_test,
-
-        values_b_tree_order_5_test,
-        values_b_tree_order_9_test,
-        values_b_tree_order_17_test,
-        values_b_tree_order_33_test,
-        values_b_tree_order_65_test,
-        values_b_tree_order_129_test,
-        values_b_tree_order_257_test,
-        values_b_tree_order_513_test,
-        values_b_tree_order_1025_test,
-        values_gb_tree_test
+%%        delete_gb_tree_test,
+%%        delete_b_tree_order_4_test,
+%%        delete_b_tree_order_5_test,
+%%        delete_b_tree_order_9_even_odd_test,
+%%        delete_b_tree_order_9_odd_even_test,
+%%        delete_b_tree_order_9_test,
+%%        delete_b_tree_order_17_test,
+%%        delete_b_tree_order_33_test,
+%%        delete_b_tree_order_65_test,
+%%        delete_b_tree_order_129_test,
+%%        delete_b_tree_order_257_test,
+%%        delete_b_tree_order_513_test,
+%%        delete_b_tree_order_1025_test,
+%%
+%%        enter_gb_tree_test,
+%%        enter_b_tree_order_4_test,
+%%        enter_b_tree_order_5_test,
+%%        enter_b_tree_order_9_test,
+%%        enter_b_tree_order_17_test,
+%%        enter_b_tree_order_33_test,
+%%        enter_b_tree_order_65_test,
+%%        enter_b_tree_order_129_test,
+%%        enter_b_tree_order_257_test,
+%%        enter_b_tree_order_513_test,
+%%        enter_b_tree_order_1025_test,
+%%
+%%        from_dict_gb_tree_test,
+%%        from_dict_b_tree_order_4_test,
+%%        from_dict_b_tree_order_5_test,
+%%        from_dict_b_tree_order_9_even_odd_test,
+%%        from_dict_b_tree_order_9_odd_even_test,
+%%        from_dict_b_tree_order_9_test,
+%%        from_dict_b_tree_order_17_test,
+%%        from_dict_b_tree_order_33_test,
+%%        from_dict_b_tree_order_65_test,
+%%        from_dict_b_tree_order_129_test,
+%%        from_dict_b_tree_order_257_test,
+%%        from_dict_b_tree_order_513_test,
+%%        from_dict_b_tree_order_1025_test,
+%%
+%%        get_gb_tree_test,
+%%        get_b_tree_order_4_test,
+%%        get_b_tree_order_5_test,
+%%        get_b_tree_order_9_test,
+%%        get_b_tree_order_17_test,
+%%        get_b_tree_order_33_test,
+%%        get_b_tree_order_65_test,
+%%        get_b_tree_order_129_test,
+%%        get_b_tree_order_257_test,
+%%        get_b_tree_order_513_test,
+%%        get_b_tree_order_1025_test,
+%%
+%%        insert_gb_tree_test,
+%%        insert_b_tree_order_4_test,
+%%        insert_b_tree_order_5_test,
+%%        insert_b_tree_order_5_till_test,
+%%        insert_b_tree_order_9_even_odd_test,
+%%        insert_b_tree_order_9_odd_even_test,
+%%        insert_b_tree_order_9_test,
+%%        insert_b_tree_order_17_test,
+%%        insert_b_tree_order_33_test,
+%%        insert_b_tree_order_65_test,
+%%        insert_b_tree_order_129_test,
+%%        insert_b_tree_order_257_test,
+%%        insert_b_tree_order_513_test,
+%%        insert_b_tree_order_1025_test,
+%%
+%%        is_defined_gb_tree_test,
+%%        is_defined_b_tree_order_4_test,
+%%        is_defined_b_tree_order_5_test,
+%%        is_defined_b_tree_order_9_test,
+%%        is_defined_b_tree_order_17_test,
+%%        is_defined_b_tree_order_33_test,
+%%        is_defined_b_tree_order_65_test,
+%%        is_defined_b_tree_order_129_test,
+%%        is_defined_b_tree_order_257_test,
+%%        is_defined_b_tree_order_513_test,
+%%        is_defined_b_tree_order_1025_test,
+%%
+%%        iterate_next_gb_tree_test,
+%%        iterate_next_b_tree_order_4_test,
+%%        iterate_next_b_tree_order_5_test,
+%%        iterate_next_b_tree_order_9_test,
+%%        iterate_next_b_tree_order_17_test,
+%%        iterate_next_b_tree_order_33_test,
+%%        iterate_next_b_tree_order_65_test,
+%%        iterate_next_b_tree_order_129_test,
+%%        iterate_next_b_tree_order_257_test,
+%%        iterate_next_b_tree_order_513_test,
+%%        iterate_next_b_tree_order_1025_test,
+%%
+%%        keys_gb_tree_test,
+%%        keys_b_tree_order_4_test,
+%%        keys_b_tree_order_5_test,
+%%        keys_b_tree_order_9_test,
+%%        keys_b_tree_order_17_test,
+%%        keys_b_tree_order_33_test,
+%%        keys_b_tree_order_65_test,
+%%        keys_b_tree_order_129_test,
+%%        keys_b_tree_order_257_test,
+%%        keys_b_tree_order_513_test,
+%%        keys_b_tree_order_1025_test,
+%%
+%%        largest_gb_tree_test,
+%%        largest_b_tree_order_4_test,
+%%        largest_b_tree_order_5_test,
+%%        largest_b_tree_order_9_test,
+%%        largest_b_tree_order_17_test,
+%%        largest_b_tree_order_33_test,
+%%        largest_b_tree_order_65_test,
+%%        largest_b_tree_order_129_test,
+%%        largest_b_tree_order_257_test,
+%%        largest_b_tree_order_513_test,
+%%        largest_b_tree_order_1025_test,
+%%
+%%        lookup_gb_tree_test,
+%%        lookup_b_tree_order_4_test,
+%%        lookup_b_tree_order_5_test,
+%%        lookup_b_tree_order_9_test,
+%%        lookup_b_tree_order_17_test,
+%%        lookup_b_tree_order_33_test,
+%%        lookup_b_tree_order_65_test,
+%%        lookup_b_tree_order_129_test,
+%%        lookup_b_tree_order_257_test,
+%%        lookup_b_tree_order_513_test,
+%%        lookup_b_tree_order_1025_test,
+%%
+%%        map_gb_tree_test,
+%%        map_b_tree_order_4_test,
+%%        map_b_tree_order_5_test,
+%%        map_b_tree_order_9_test,
+%%        map_b_tree_order_17_test,
+%%        map_b_tree_order_33_test,
+%%        map_b_tree_order_65_test,
+%%        map_b_tree_order_129_test,
+%%        map_b_tree_order_257_test,
+%%        map_b_tree_order_513_test,
+%%        map_b_tree_order_1025_test,
+%%
+%%        smallest_gb_tree_test,
+%%        smallest_b_tree_order_4_test,
+%%        smallest_b_tree_order_5_test,
+%%        smallest_b_tree_order_9_test,
+%%        smallest_b_tree_order_17_test,
+%%        smallest_b_tree_order_33_test,
+%%        smallest_b_tree_order_65_test,
+%%        smallest_b_tree_order_129_test,
+%%        smallest_b_tree_order_257_test,
+%%        smallest_b_tree_order_513_test,
+%%        smallest_b_tree_order_1025_test,
+%%
+%%        take_largest_gb_tree_test,
+%%        take_largest_b_tree_order_4_test,
+%%        take_largest_b_tree_order_5_test,
+%%        take_largest_b_tree_order_9_test,
+%%        take_largest_b_tree_order_17_test,
+%%        take_largest_b_tree_order_33_test,
+%%        take_largest_b_tree_order_65_test,
+%%        take_largest_b_tree_order_129_test,
+%%        take_largest_b_tree_order_257_test,
+%%        take_largest_b_tree_order_513_test,
+%%        take_largest_b_tree_order_1025_test,
+%%
+%%        take_smallest_gb_tree_test,
+%%        take_smallest_b_tree_order_4_test,
+%%        take_smallest_b_tree_order_5_test,
+%%        take_smallest_b_tree_order_9_test,
+%%        take_smallest_b_tree_order_17_test,
+%%        take_smallest_b_tree_order_33_test,
+%%        take_smallest_b_tree_order_65_test,
+%%        take_smallest_b_tree_order_129_test,
+%%        take_smallest_b_tree_order_257_test,
+%%        take_smallest_b_tree_order_513_test,
+%%        take_smallest_b_tree_order_1025_test,
+%%
+%%        to_list_gb_tree_test,
+%%        to_list_b_tree_order_4_test,
+%%        to_list_b_tree_order_5_test,
+%%        to_list_b_tree_order_9_test,
+%%        to_list_b_tree_order_17_test,
+%%        to_list_b_tree_order_33_test,
+%%        to_list_b_tree_order_65_test,
+%%        to_list_b_tree_order_129_test,
+%%        to_list_b_tree_order_257_test,
+%%        to_list_b_tree_order_513_test,
+%%        to_list_b_tree_order_1025_test,
+%%
+%%        update_gb_tree_test,
+%%        update_b_tree_order_4_test,
+%%        update_b_tree_order_5_test,
+%%        update_b_tree_order_9_test,
+%%        update_b_tree_order_17_test,
+%%        update_b_tree_order_33_test,
+%%        update_b_tree_order_65_test,
+%%        update_b_tree_order_129_test,
+%%        update_b_tree_order_257_test,
+%%        update_b_tree_order_513_test,
+%%        update_b_tree_order_1025_test,
+%%
+%%        values_gb_tree_test,
+%%        values_b_tree_order_4_test,
+%%        values_b_tree_order_5_test,
+%%        values_b_tree_order_9_test,
+%%        values_b_tree_order_17_test,
+%%        values_b_tree_order_33_test,
+%%        values_b_tree_order_65_test,
+%%        values_b_tree_order_129_test,
+%%        values_b_tree_order_257_test,
+%%        values_b_tree_order_513_test,
+%%        values_b_tree_order_1025_test
     ].
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 1025
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_1025_test(_Config) ->
+    ?assertEqual(b_trees:empty(1025), test_generator:delete_b_tree_from(1025, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 129
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_129_test(_Config) ->
+    ?assertEqual(b_trees:empty(129), test_generator:delete_b_tree_from(129, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 17
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_17_test(_Config) ->
+    ?assertEqual(b_trees:empty(17), test_generator:delete_b_tree_from(17, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 257
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_257_test(_Config) ->
+    ?assertEqual(b_trees:empty(257), test_generator:delete_b_tree_from(257, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 33
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_33_test(_Config) ->
+    ?assertEqual(b_trees:empty(33), test_generator:delete_b_tree_from(33, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 5
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_test(_Config) ->
+    ?assertEqual(b_trees:empty(4), test_generator:delete_b_tree_from(4, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 5
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_5_test(_Config) ->
+    ?assertEqual(b_trees:empty(5), test_generator:delete_b_tree_from(5, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 513
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_513_test(_Config) ->
+    ?assertEqual(b_trees:empty(513), test_generator:delete_b_tree_from(513, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 65
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_65_test(_Config) ->
+    ?assertEqual(b_trees:empty(65), test_generator:delete_b_tree_from(65, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 9 - even / odd
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_9_even_odd_test(_Config) ->
+    _BTree = test_generator:generate_b_tree_from_number(9, ?NUMBER_INSERTS, 4),
+    _BTree_Odd = test_generator:delete_b_tree_from_even(9, ?NUMBER_DELETES, 4, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_odd(9, ?NUMBER_DELETES, 4, _BTree_Odd),
+    ?assertEqual(b_trees:empty(9), _BTree_Empty),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 9 - odd / even
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_9_odd_even_test(_Config) ->
+    _BTree = test_generator:generate_b_tree_from_number(9, ?NUMBER_INSERTS, 4),
+    _BTree_Even = test_generator:delete_b_tree_from_odd(9, ?NUMBER_DELETES, 4, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_even(9, ?NUMBER_DELETES, 4, _BTree_Even),
+    ?assertEqual(b_trees:empty(9), _BTree_Empty),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 9
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_9_test(_Config) ->
+    ?assertEqual(b_trees:empty(9), test_generator:delete_b_tree_from(9, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete gb_tree
+%%--------------------------------------------------------------------
+
+delete_gb_tree_test(_Config) ->
+    ?assertEqual(gb_trees:empty(), test_generator:delete_gb_tree_from(?NUMBER_DELETES, 4)),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: enter b_tree order 1025
@@ -303,6 +474,19 @@ enter_b_tree_order_33_test(Config) ->
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
     ?assertEqual(?config(btree_33_new, Config), _BTreeUpdate),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 4
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_4_test(Config) ->
+    KeyValues = ?config(key_values_from, Config),
+    BTree = enter_b_tree(KeyValues, b_trees:empty(4)),
+    ?assertEqual(?config(btree_4, Config), BTree),
+    _KeyValuesUpdate = ?config(key_values_from_update, Config),
+    _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
+    ?assertEqual(?config(btree_4_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -426,6 +610,16 @@ from_dict_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_test(Config) ->
+    _BTree = ?config(btree_4, Config),
+    _KeyValues = ?config(key_values_from, Config),
+    ?assertEqual(_BTree, b_trees:from_dict(4, _KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: from_dict b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -546,6 +740,16 @@ get_b_tree_order_257_test(Config) ->
 
 get_b_tree_order_33_test(Config) ->
     BTree = ?config(btree_33, Config),
+    Keys = ?config(keys_rand, Config),
+    get_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: get b_tree order 4
+%%--------------------------------------------------------------------
+
+get_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
     Keys = ?config(keys_rand, Config),
     get_b_tree(Keys, BTree),
     ok.
@@ -696,6 +900,30 @@ insert_b_tree_order_65_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(65 div 2)))).
 
 %%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 9 - even / odd
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_9_even_odd_test(Config) ->
+    Keys_Even = ?config(keys_from_even, Config),
+    BTree_Even = test_generator:generate_b_tree_from_list(9, Keys_Even, 4),
+    Keys_Odd = ?config(keys_from_odd, Config),
+    BTree_Odd = test_generator:generate_b_tree_from_list(9, Keys_Odd, 4, BTree_Even),
+    ?assertEqual(?config(btree_9, _Config), BTree_Odd),
+    ?assert(b_trees:height(BTree_Odd) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 9 - odd / even
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_9_odd_even_test(Config) ->
+    Keys_Odd = ?config(keys_from_odd, Config),
+    BTree_Odd = test_generator:generate_b_tree_from_list(9, Keys_Odd, 4),
+    Keys_Even = ?config(keys_from_even, Config),
+    BTree_Even = test_generator:generate_b_tree_from_list(9, Keys_Even, 4, BTree_Odd),
+    ?assertEqual(?config(btree_9, _Config), BTree_Even),
+    ?assert(b_trees:height(BTree_Even) =< trunc((math:log((?NUMBER_INSERTS + 1) / 2) / math:log(9 div 2)))).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 9
 %%--------------------------------------------------------------------
 
@@ -763,6 +991,16 @@ is_defined_b_tree_order_257_test(Config) ->
 
 is_defined_b_tree_order_33_test(Config) ->
     BTree = ?config(btree_33, Config),
+    Keys = ?config(keys_rand, Config),
+    is_defined_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_defined b_tree order 4
+%%--------------------------------------------------------------------
+
+is_defined_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
     Keys = ?config(keys_rand, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
@@ -880,6 +1118,16 @@ iterate_next_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 4
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(KeyValues, Config), iterate_next_b_tree(_Iterator, ?NUMBER_INSERTS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: iterate & next b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -991,6 +1239,17 @@ keys_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: keys b_tree order 4
+%%--------------------------------------------------------------------
+
+keys_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
+    _Keys = b_trees:keys(BTree),
+    ?assertEqual(?config(keys_from, Config), _Keys),
+    ?assertEqual(?NUMBER_INSERTS, length(_Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: keys b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -1091,6 +1350,15 @@ largest_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: largest b_tree order 4
+%%--------------------------------------------------------------------
+
+largest_b_tree_order_4_test(Config) ->
+    _BTree = ?config(btree_4, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: largest b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -1186,6 +1454,16 @@ lookup_b_tree_order_257_test(Config) ->
 
 lookup_b_tree_order_33_test(Config) ->
     BTree = ?config(btree_33, Config),
+    Keys = ?config(keys_rand, Config),
+    lookup_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: lookup b_tree order 4
+%%--------------------------------------------------------------------
+
+lookup_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
     Keys = ?config(keys_rand, Config),
     lookup_b_tree(Keys, BTree),
     ok.
@@ -1300,6 +1578,16 @@ map_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 4
+%%--------------------------------------------------------------------
+
+map_b_tree_order_4_test(Config) ->
+    _BTree = ?config(btree_4, Config),
+    _BTreeNew = ?config(btree_4_new, Config),
+    ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: map b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -1393,6 +1681,15 @@ smallest_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: smallest b_tree order 4
+%%--------------------------------------------------------------------
+
+smallest_b_tree_order_4_test(Config) ->
+    _BTree = ?config(btree_4, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: smallest b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -1434,6 +1731,182 @@ smallest_b_tree_order_9_test(Config) ->
 
 smallest_gb_tree_test(_Config) ->
     ?assertEqual(?SMALLEST_KEY_VALUE, gb_trees:smallest(?config(gbtree, _Config))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 1025
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_1025_test(_Config) ->
+    ?assertEqual(b_trees:empty(1025), test_generator:take_largest_b_tree(1025, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 129
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_129_test(_Config) ->
+    ?assertEqual(b_trees:empty(129), test_generator:take_largest_b_tree(129, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 17
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_17_test(_Config) ->
+    ?assertEqual(b_trees:empty(17), test_generator:take_largest_b_tree(17, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 257
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_257_test(_Config) ->
+    ?assertEqual(b_trees:empty(257), test_generator:take_largest_b_tree(257, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 33
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_33_test(_Config) ->
+    ?assertEqual(b_trees:empty(33), test_generator:take_largest_b_tree(33, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 4
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_4_test(_Config) ->
+    ?assertEqual(b_trees:empty(4), test_generator:take_largest_b_tree(4, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 5
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_5_test(_Config) ->
+    ?assertEqual(b_trees:empty(5), test_generator:take_largest_b_tree(5, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 513
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_513_test(_Config) ->
+    ?assertEqual(b_trees:empty(513), test_generator:take_largest_b_tree(513, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 65
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_65_test(_Config) ->
+    ?assertEqual(b_trees:empty(65), test_generator:take_largest_b_tree(65, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 9
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_9_test(_Config) ->
+    ?assertEqual(b_trees:empty(9), test_generator:take_largest_b_tree(9, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest gb_tree
+%%--------------------------------------------------------------------
+
+take_largest_gb_tree_test(_Config) ->
+    ?assertEqual(gb_trees:empty(), test_generator:take_largest_gb_tree(?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 1025
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_1025_test(_Config) ->
+    ?assertEqual(b_trees:empty(1025), test_generator:take_smallest_b_tree(1025, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 129
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_129_test(_Config) ->
+    ?assertEqual(b_trees:empty(129), test_generator:take_smallest_b_tree(129, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 17
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_17_test(_Config) ->
+    ?assertEqual(b_trees:empty(17), test_generator:take_smallest_b_tree(17, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 257
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_257_test(_Config) ->
+    ?assertEqual(b_trees:empty(257), test_generator:take_smallest_b_tree(257, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 33
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_33_test(_Config) ->
+    ?assertEqual(b_trees:empty(33), test_generator:take_smallest_b_tree(33, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 4
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_4_test(_Config) ->
+    ?assertEqual(b_trees:empty(4), test_generator:take_smallest_b_tree(4, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 5
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_5_test(_Config) ->
+    ?assertEqual(b_trees:empty(5), test_generator:take_smallest_b_tree(5, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 513
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_513_test(_Config) ->
+    ?assertEqual(b_trees:empty(513), test_generator:take_smallest_b_tree(513, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 65
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_65_test(_Config) ->
+    ?assertEqual(b_trees:empty(65), test_generator:take_smallest_b_tree(65, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 9
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_9_test(_Config) ->
+    ?assertEqual(b_trees:empty(9), test_generator:take_smallest_b_tree(9, ?NUMBER_DELETES, 4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest gb_tree
+%%--------------------------------------------------------------------
+
+take_smallest_gb_tree_test(_Config) ->
+    ?assertEqual(gb_trees:empty(), test_generator:take_smallest_gb_tree(?NUMBER_DELETES, 4)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1486,6 +1959,17 @@ to_list_b_tree_order_257_test(Config) ->
 
 to_list_b_tree_order_33_test(Config) ->
     BTree = ?config(btree_33, Config),
+    _KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?config(key_values_from, Config), _KeyValues),
+    ?assertEqual(?NUMBER_INSERTS, length(_KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: to_list b_tree order 4
+%%--------------------------------------------------------------------
+
+to_list_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_INSERTS, length(_KeyValues)),
@@ -1602,6 +2086,16 @@ update_b_tree_order_33_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 4
+%%--------------------------------------------------------------------
+
+update_b_tree_order_4_test(Config) ->
+    _BTree = ?config(btree_4, Config),
+    _KeyValuesUpdate = ?config(key_values_from_update, Config),
+    ?assertEqual(?config(btree_4_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: update b_tree order 5
 %%--------------------------------------------------------------------
 
@@ -1702,6 +2196,16 @@ values_b_tree_order_257_test(Config) ->
 
 values_b_tree_order_33_test(Config) ->
     BTree = ?config(btree_33, Config),
+    _Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_INSERTS, length(_Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: values b_tree order 4
+%%--------------------------------------------------------------------
+
+values_b_tree_order_4_test(Config) ->
+    BTree = ?config(btree_4, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_INSERTS, length(_Keys)),
     ok.
