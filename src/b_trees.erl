@@ -1289,19 +1289,8 @@ lookup_1(Key, {KeyNo, _, KeyValues, ChildTrees}) ->
             {value, Value}
     end.
 
-direct_test() ->
-
-    ?debugFmt("wwe debugging direct_test ===> ~n BTree I: ~p~n", [b_trees:delete("k_30", ?B_TREE_04_33_MINUS_02_TILL_28)]),
-
-%%    ?debugFmt("wwe debugging direct_test ===> ~n BTree P: ~p~n", [?B_TREE_04_10_MINUS_02_04]),
-
-%%    ?assertEqual(?B_TREE_04_33_MINUS_02_TILL_22, b_trees:delete("k_22", ?B_TREE_04_33_MINUS_02_TILL_20)),
-
-    Number = 33,
-
-    _BTree = test_generator:generate_b_tree_from_number(4, Number, 2),
-    _BTree_Odd = test_generator:delete_b_tree_from_even(4, Number, 2, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_odd(4, Number, 2, _BTree_Odd),
-    ?assertEqual(b_trees:empty(4), _BTree_Empty),
-
-    ok.
+%%direct_test() ->
+%%
+%%    ?debugFmt("wwe debugging direct_test ===> ~n Result: ~p~n", [test_generator:generate_keys_rand(30, 2)]),
+%%
+%%    ok.

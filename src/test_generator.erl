@@ -29,12 +29,12 @@
     generate_key_values_from_even/2,
     generate_key_values_from_odd/2,
     generate_key_values_from_update/2,
-    generate_key_values_rand/3,
-    generate_key_values_rand_update/3,
+    generate_key_values_rand/2,
+    generate_key_values_rand_update/2,
     generate_keys_from/2,
     generate_keys_from_even/2,
     generate_keys_from_odd/2,
-    generate_keys_rand/3,
+    generate_keys_rand/2,
     generate_keys_till/2,
     take_largest_b_tree/3,
     take_largest_gb_tree/2,
@@ -42,7 +42,7 @@
     take_smallest_gb_tree/2
 ]).
 
-% -define(NODEBUG, true).
+-define(NODEBUG, true).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -154,16 +154,16 @@ generate_key_values_from_update(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1(Keys, "_new", Width).
 
--spec generate_key_values_rand(pos_integer(), pos_integer(), pos_integer()) -> [{any(), any()}].
+-spec generate_key_values_rand(pos_integer(), pos_integer()) -> [{any(), any()}].
 
-generate_key_values_rand(Range, Number, Width) when Number >= 0 ->
-    Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],
+generate_key_values_rand(Number, Width) when Number >= 0 ->
+    Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_key_values_1(Keys, [], Width).
 
--spec generate_key_values_rand_update(pos_integer(), pos_integer(), pos_integer()) -> [{any(), any()}].
+-spec generate_key_values_rand_update(pos_integer(), pos_integer()) -> [{any(), any()}].
 
-generate_key_values_rand_update(Range, Number, Width) when Number >= 0 ->
-    Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],
+generate_key_values_rand_update(Number, Width) when Number >= 0 ->
+    Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_key_values_1(Keys, "_new", Width).
 
 -spec generate_keys_from(pos_integer(), pos_integer()) -> [any()].
@@ -184,10 +184,10 @@ generate_keys_from_odd(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_keys_1_odd(Keys, Width).
 
--spec generate_keys_rand(pos_integer(), pos_integer(), pos_integer()) -> [any()].
+-spec generate_keys_rand(pos_integer(), pos_integer()) -> [any()].
 
-generate_keys_rand(Range, Number, Width) when Number >= 0 ->
-    Keys = [rand:uniform(Range) || _ <- lists:seq(1, Number)],
+generate_keys_rand(Number, Width) when Number >= 0 ->
+    Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_keys_1(Keys, Width).
 
 -spec generate_keys_till(pos_integer(), pos_integer()) -> [any()].
@@ -222,6 +222,13 @@ take_smallest_gb_tree(Number, Width) when Number > 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Helper functions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec compare(any(), any()) -> boolean().
+
+compare(A, B) ->
+    erlang:phash2(A) < erlang:phash2(B).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec delete_b_tree_1([non_neg_integer()], b_trees:b_tree()) -> b_trees:b_tree().
