@@ -20,11 +20,8 @@
     generate_b_tree_from_list/3,
     generate_b_tree_from_list_key_number/3,
     generate_b_tree_from_number/3,
-    generate_b_tree_from_number/4,
     generate_b_tree_from_number_update/3,
-    generate_b_tree_from_number_update/4,
     generate_b_tree_till_number/3,
-    generate_b_tree_till_number/4,
     generate_gb_tree_from_list/1,
     generate_gb_tree_from_number/2,
     generate_gb_tree_from_number_update/2,
@@ -45,34 +42,38 @@
     take_smallest_gb_tree/2
 ]).
 
+% -define(NODEBUG, true).
+
+-include_lib("eunit/include/eunit.hrl").
+
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-delete_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
+delete_b_tree_from(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number > 0 ->
     BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
     Keys = test_generator:generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
-delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
+delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Order rem 2 == 0, Number > 0 ->
     Keys = test_generator:generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 -spec delete_b_tree_from_even(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
-delete_b_tree_from_even(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
+delete_b_tree_from_even(Order, Number, Width, BTree) when Order > 3, Order rem 2 == 0, Number > 0 ->
     Keys = test_generator:generate_keys_from_even(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 -spec delete_b_tree_from_odd(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
-delete_b_tree_from_odd(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
+delete_b_tree_from_odd(Order, Number, Width, BTree) when Order > 3, Order rem 2 == 0, Number > 0 ->
     Keys = test_generator:generate_keys_from_odd(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 -spec delete_b_tree_till(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-delete_b_tree_till(Order, Number, Width) when Order > 3, Number > 0 ->
+delete_b_tree_till(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number > 0 ->
     BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
     Keys = test_generator:generate_keys_till(Number, Width),
     delete_b_tree_1(Keys, BTree).
@@ -86,39 +87,33 @@ delete_gb_tree_from(Number, Width) when Number > 0 ->
 
 -spec generate_b_tree_from_list(pos_integer(), [{any(), any()}]) -> b_trees:b_tree().
 
-generate_b_tree_from_list(Order, KeyValues) when Order > 3 ->
+generate_b_tree_from_list(Order, KeyValues) when Order > 3, Order rem 2 == 0 ->
     generate_b_tree_by_key_value_1(KeyValues, b_trees:empty(Order)).
 
 -spec generate_b_tree_from_list(pos_integer(), [{any(), any()}], b_trees:b_tree()) -> b_trees:b_tree().
 
-generate_b_tree_from_list(Order, KeyValues, BTree) when Order > 3 ->
+generate_b_tree_from_list(Order, KeyValues, BTree) when Order > 3, Order rem 2 == 0 ->
     generate_b_tree_by_key_value_1(KeyValues, BTree).
 
 -spec generate_b_tree_from_list_key_number(pos_integer(), [non_neg_integer()], pos_integer()) -> b_trees:b_tree().
 
-generate_b_tree_from_list_key_number(Order, Keys, Width) when Order > 3 ->
+generate_b_tree_from_list_key_number(Order, Keys, Width) when Order > 3, Order rem 2 == 0 ->
     generate_b_tree_by_key_number_1(Keys, [], Width, b_trees:empty(Order)).
 
 -spec generate_b_tree_from_number(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
+generate_b_tree_from_number(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order)).
-generate_b_tree_from_number(Order, b_star, Number, Width) when Order > 3, Number >= 0 ->
-    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order, b_star)).
 
 -spec generate_b_tree_from_number_update(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Number >= 0 ->
+generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order)).
-generate_b_tree_from_number_update(Order, b_star, Number, Width) when Order > 3, Number >= 0 ->
-    generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order, b_star)).
 
 -spec generate_b_tree_till_number(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-generate_b_tree_till_number(Order, Number, Width) when Order > 3, Number >= 0 ->
+generate_b_tree_till_number(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(Number, 1, -1), [], Width, b_trees:empty(Order)).
-generate_b_tree_till_number(Order, b_star, Number, Width) when Order > 3, Number >= 0 ->
-    generate_b_tree_by_key_1(lists:seq(Number, 1, -1), [], Width, b_trees:empty(Order, b_star)).
 
 -spec generate_gb_tree_from_list([{any(), any()}]) -> gb_trees:tree().
 
@@ -203,7 +198,7 @@ generate_keys_till(Number, Width) when Number >= 0 ->
 
 -spec take_largest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-take_largest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
+take_largest_b_tree(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number > 0 ->
     BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
     take_largest_b_tree_1(Number, BTree).
 
@@ -215,7 +210,7 @@ take_largest_gb_tree(Number, Width) when Number > 0 ->
 
 -spec take_smallest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
-take_smallest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
+take_smallest_b_tree(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number > 0 ->
     BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
     take_smallest_b_tree_1(Number, BTree).
 
