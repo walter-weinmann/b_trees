@@ -238,7 +238,7 @@ Types:
     Key = any()
     Value = any()
     
-Returns tuple {Key, Value, B-Tree2}, where Key is the largest key in B-Tree1, Value is the value associated with this key, and B-Tree2 is this tree with the corresponding key / value pair deleted. Assumes that B-Tree is not empty.
+Returns tuple {Key, Value, B-Tree2}, where Key is the largest key in B-Tree1, Value is the value associated with this key, and B-Tree2 is this tree with the corresponding key / value pair deleted. Assumes that B-Tree1 is not empty.
 
 ### take_smallest (B-Tree1) -> {Key, Value, B-Tree2} ###
 
@@ -248,7 +248,7 @@ Types:
     Key = any()
     Value = any()
     
-Returns tuple {Key, Value, B-Tree2}, where Key is the smallest key in B-Tree1, Value is the value associated with this key, and B-Tree2 is this tree with the corresponding key / value pair deleted. Assumes that B-Tree is not empty.
+Returns tuple {Key, Value, B-Tree2}, where Key is the smallest key in B-Tree1, Value is the value associated with this key, and B-Tree2 is this tree with the corresponding key / value pair deleted. Assumes that B-Tree1 is not empty.
 
 ### to_list (B-Tree) -> [{Key, Value}] ###
 
@@ -269,7 +269,7 @@ Types:
     B-Tree1 = B-Tree2 = b_tree()
 
 
-Updates Key to value Value in B-Tree1 and returns the new tree. Assumes that the key is present in the tree.
+Updates Key to value Value in B-Tree1 and returns the new B-Tree2. Assumes that the key is present in the tree.
 
 ### values (B-Tree) -> [Value] ###
 
