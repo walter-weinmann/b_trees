@@ -6,11 +6,11 @@ b_trees
 
 ## MODULE SUMMARY ##
 
-B-trees: balanced search trees of order m in which each non-leaf node has up to m children.
+B-Trees: balanced search trees of order `m` in which each non-leaf node has up to `m` children.
 
 ## DESCRIPTION ##
 
-A B-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The B-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the  B-tree is optimized for systems that read and write large blocks of data.
+A B-Tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The B-Tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the  B-tree is optimized for systems that read and write large blocks of data.
 
 This module considers two keys as different if and only if they do not compare equal (==).
 
