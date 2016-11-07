@@ -52,7 +52,7 @@
 %%   the key is present in the tree.
 %%
 %% - height(B): returns the height of the B-tree B as an integer. Assumes that
-%%   the B-tree B is nonempty.
+%%   the B-tree B is non-empty.
 %%
 %% - insert(K, V, B): inserts key K with value V into B-tree B; returns the new
 %%   B-tree. Assumes that the key K is *not* present in the B-tree B.
@@ -71,8 +71,9 @@
 %%
 %% - keys(B): returns an ordered list of all keys in B-tree B.
 %%
-%% - largest(B): returns {K, V}, where K is the largest key in B-tree B, and V
-%%   is the value associated with K in B. Assumes that the B-tree B is nonempty.
+%% - largest(B): returns tuple {K, V}, where K is the largest key in B-tree B,
+%%   and V is the value associated with K in B. Assumes that the B-tree B is
+%%   non-empty.
 %%
 %% - lookup(K, B): looks up key K in B-tree B; returns {value, V}, or `none' if
 %%   the key K is not present.
@@ -91,16 +92,17 @@
 %% - size(B): returns the number of nodes in the B-tree B as an integer.
 %%   Returns 0 (zero) if the B-tree B is empty.
 %%
-%% - smallest(B): returns {K, V}, where K is the smallest key in B-tree B, and V
-%%   is the value associated with K in B. Assumes that the B-tree B is nonempty.
+%% - smallest(B): returns tuple {K, V}, where K is the smallest key in B-tree B,
+%%   and V is the value associated with K in B. Assumes that the B-tree B is
+%%   non-empty.
 %%
 %% - take_largest(B): returns {K, V, B1}, where K is the largest key in B-tree
 %%   B, V is the value associated with K in B, and B1 is the tree B with key K
-%%   deleted. Assumes that the tree B is nonempty.
+%%   deleted. Assumes that the tree B is non-empty.
 %%
 %% - take_smallest(B): returns {K, V, B1}, where K is the smallest key in
 %%   B-tree B, V is the value associated with K in B, and B1 is the tree B with
-%%   key K deleted. Assumes that the tree B is nonempty.
+%%   key K deleted. Assumes that the tree B is non-empty.
 %%
 %% - to_list(B): returns an ordered list of {Key, Value} pairs for all keys in
 %%   B-tree B.
