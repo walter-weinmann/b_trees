@@ -30,7 +30,7 @@
 %%
 %% An efficient implementation of B-trees. The definition of B-trees and its
 %% components corresponds to Knuth's definitions in Volume 3 of "The Art of
-%% Computer Programming": The order O of a B-tree is an even number expressing
+%% Computer Programming": The order O of a B-tree is an integer expressing
 %% the maximum number of subtrees (sons) in a node and the height of a B-tree is
 %% its maximum level, i.e. the length of the longest path from the root node to
 %% a leaf node. The minimum order of a B-tree is 4.
@@ -692,7 +692,7 @@ delete_any(Key, BTree) ->
 
 -spec empty(pos_integer()) -> b_tree().
 
-empty(Order) when Order > 3, Order rem 2 == 0 ->
+empty(Order) when Order > 3 ->
     {Order div 2, Order - 1, 0, nil}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -711,7 +711,7 @@ enter(Key, Value, BTree) ->
 
 -spec from_dict(pos_integer(), key_values()) -> b_tree().
 
-from_dict(Order, KeyValues) when Order > 3, Order rem 2 == 0, length(KeyValues) > 0 ->
+from_dict(Order, KeyValues) when Order > 3, length(KeyValues) > 0 ->
     from_dict_1(KeyValues, empty(Order)).
 
 -spec from_dict_1(key_values(), b_tree()) -> b_tree().
