@@ -33,37 +33,37 @@ init_per_suite(Config) ->
         {key_values_from_even_odd, test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, 4) ++ test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, 4)},
         {key_values_from_odd_even, test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, 4) ++ test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, 4)},
         {key_values_from_update, test_generator:generate_key_values_from_update(?NUMBER_ACTIONS, 4)},
-        {key_values_rand, test_generator:generate_key_values_rand(?NUMBER_ACTIONS, 4)},
-        {key_values_rand_update, test_generator:generate_key_values_rand_update(?NUMBER_ACTIONS, 4)},
+        {key_values_random, test_generator:generate_key_values_random(?NUMBER_ACTIONS, 4)},
+        {key_values_random_update, test_generator:generate_key_values_random_update(?NUMBER_ACTIONS, 4)},
         {keys_from, test_generator:generate_keys_from(?NUMBER_ACTIONS, 4)},
         {keys_from_even_odd, test_generator:generate_keys_from_even(?NUMBER_ACTIONS, 4) ++ test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, 4)},
         {keys_from_odd_even, test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, 4) ++ test_generator:generate_keys_from_even(?NUMBER_ACTIONS, 4)},
-        {keys_rand, test_generator:generate_keys_rand(?NUMBER_ACTIONS, 4)},
+        {keys_random, test_generator:generate_keys_random(?NUMBER_ACTIONS, 4)},
 
-        {gbtree, test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, 4)},
-        {gbtree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_ACTIONS, 4)},
+        {gb_tree, test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, 4)},
+        {gb_tree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_ACTIONS, 4)},
 
-        {btree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4)},
-        {btree_4_new, test_generator:generate_b_tree_from_number_update(4, ?NUMBER_ACTIONS, 4)},
-        {btree_6, test_generator:generate_b_tree_from_number(6, ?NUMBER_ACTIONS, 4)},
-        {btree_6_new, test_generator:generate_b_tree_from_number_update(6, ?NUMBER_ACTIONS, 4)},
-        {btree_6_till, test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, 4)},
-        {btree_8, test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4)},
-        {btree_8_new, test_generator:generate_b_tree_from_number_update(8, ?NUMBER_ACTIONS, 4)},
-        {btree_16, test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, 4)},
-        {btree_16_new, test_generator:generate_b_tree_from_number_update(16, ?NUMBER_ACTIONS, 4)},
-        {btree_32, test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, 4)},
-        {btree_32_new, test_generator:generate_b_tree_from_number_update(32, ?NUMBER_ACTIONS, 4)},
-        {btree_64, test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, 4)},
-        {btree_64_new, test_generator:generate_b_tree_from_number_update(64, ?NUMBER_ACTIONS, 4)},
-        {btree_128, test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, 4)},
-        {btree_128_new, test_generator:generate_b_tree_from_number_update(128, ?NUMBER_ACTIONS, 4)},
-        {btree_256, test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, 4)},
-        {btree_256_new, test_generator:generate_b_tree_from_number_update(256, ?NUMBER_ACTIONS, 4)},
-        {btree_612, test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, 4)},
-        {btree_612_new, test_generator:generate_b_tree_from_number_update(512, ?NUMBER_ACTIONS, 4)},
-        {btree_1024, test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, 4)},
-        {btree_1024_new, test_generator:generate_b_tree_from_number_update(1024, ?NUMBER_ACTIONS, 4)}
+        {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4)},
+        {b_tree_4_new, test_generator:generate_b_tree_from_number_update(4, ?NUMBER_ACTIONS, 4)},
+        {b_tree_6, test_generator:generate_b_tree_from_number(6, ?NUMBER_ACTIONS, 4)},
+        {b_tree_6_new, test_generator:generate_b_tree_from_number_update(6, ?NUMBER_ACTIONS, 4)},
+        {b_tree_6_till, test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, 4)},
+        {b_tree_8, test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4)},
+        {b_tree_8_new, test_generator:generate_b_tree_from_number_update(8, ?NUMBER_ACTIONS, 4)},
+        {b_tree_16, test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, 4)},
+        {b_tree_16_new, test_generator:generate_b_tree_from_number_update(16, ?NUMBER_ACTIONS, 4)},
+        {b_tree_32, test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, 4)},
+        {b_tree_32_new, test_generator:generate_b_tree_from_number_update(32, ?NUMBER_ACTIONS, 4)},
+        {b_tree_64, test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, 4)},
+        {b_tree_64_new, test_generator:generate_b_tree_from_number_update(64, ?NUMBER_ACTIONS, 4)},
+        {b_tree_128, test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, 4)},
+        {b_tree_128_new, test_generator:generate_b_tree_from_number_update(128, ?NUMBER_ACTIONS, 4)},
+        {b_tree_256, test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, 4)},
+        {b_tree_256_new, test_generator:generate_b_tree_from_number_update(256, ?NUMBER_ACTIONS, 4)},
+        {b_tree_612, test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, 4)},
+        {b_tree_612_new, test_generator:generate_b_tree_from_number_update(512, ?NUMBER_ACTIONS, 4)},
+        {b_tree_1024, test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, 4)},
+        {b_tree_1024_new, test_generator:generate_b_tree_from_number_update(1024, ?NUMBER_ACTIONS, 4)}
         | Config
     ].
 
@@ -79,10 +79,12 @@ all() ->
         delete_gb_tree_test,
         delete_b_tree_order_4_even_odd_test,
         delete_b_tree_order_4_odd_even_test,
+        delete_b_tree_order_4_random_test,
         delete_b_tree_order_4_test,
         delete_b_tree_order_6_test,
         delete_b_tree_order_8_even_odd_test,
         delete_b_tree_order_8_odd_even_test,
+        delete_b_tree_order_8_random_test,
         delete_b_tree_order_8_test,
         delete_b_tree_order_16_test,
         delete_b_tree_order_32_test,
@@ -105,10 +107,14 @@ all() ->
         enter_b_tree_order_1024_test,
 
         from_dict_gb_tree_test,
+        from_dict_b_tree_order_4_even_odd_test,
+        from_dict_b_tree_order_4_odd_even_test,
+        from_dict_b_tree_order_4_random_test,
         from_dict_b_tree_order_4_test,
         from_dict_b_tree_order_6_test,
         from_dict_b_tree_order_8_even_odd_test,
         from_dict_b_tree_order_8_odd_even_test,
+        from_dict_b_tree_order_8_random_test,
         from_dict_b_tree_order_8_test,
         from_dict_b_tree_order_16_test,
         from_dict_b_tree_order_32_test,
@@ -131,11 +137,15 @@ all() ->
         get_b_tree_order_1024_test,
 
         insert_gb_tree_test,
+        insert_b_tree_order_4_even_odd_test,
+        insert_b_tree_order_4_odd_even_test,
+        insert_b_tree_order_4_random_test,
         insert_b_tree_order_4_test,
         insert_b_tree_order_6_test,
         insert_b_tree_order_6_till_test,
         insert_b_tree_order_8_even_odd_test,
         insert_b_tree_order_8_odd_even_test,
+        insert_b_tree_order_8_random_test,
         insert_b_tree_order_8_test,
         insert_b_tree_order_16_test,
         insert_b_tree_order_32_test,
@@ -266,8 +276,10 @@ all() ->
         to_list_b_tree_order_1024_test,
 
         update_gb_tree_test,
+        update_b_tree_order_4_random_test,
         update_b_tree_order_4_test,
         update_b_tree_order_6_test,
+        update_b_tree_order_8_random_test,
         update_b_tree_order_8_test,
         update_b_tree_order_16_test,
         update_b_tree_order_32_test,
@@ -353,6 +365,14 @@ delete_b_tree_order_4_odd_even_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - random
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_random_test(Config) ->
+    ?assertEqual(b_trees:empty(4), test_generator:delete_b_tree_list(?config(keys_random, Config), ?config(b_tree_4, Config))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -407,6 +427,14 @@ delete_b_tree_order_8_odd_even_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 8 - random
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_8_random_test(Config) ->
+    ?assertEqual(b_trees:empty(8), test_generator:delete_b_tree_list(?config(keys_random, Config), ?config(b_tree_8, Config))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 8
 %%--------------------------------------------------------------------
 
@@ -429,10 +457,10 @@ delete_gb_tree_test(_Config) ->
 enter_b_tree_order_1024_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(1024)),
-    ?assertEqual(?config(btree_1024, Config), BTree),
+    ?assertEqual(?config(b_tree_1024, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_1024_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_1024_new, Config), _BTreeUpdate),
     ok.
 
 enter_b_tree([], BTree) ->
@@ -447,10 +475,10 @@ enter_b_tree([{Key, Value} | Tail], BTree) ->
 enter_b_tree_order_128_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(128)),
-    ?assertEqual(?config(btree_128, Config), BTree),
+    ?assertEqual(?config(b_tree_128, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_128_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_128_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -460,10 +488,10 @@ enter_b_tree_order_128_test(Config) ->
 enter_b_tree_order_16_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(16)),
-    ?assertEqual(?config(btree_16, Config), BTree),
+    ?assertEqual(?config(b_tree_16, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_16_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_16_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -473,10 +501,10 @@ enter_b_tree_order_16_test(Config) ->
 enter_b_tree_order_256_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(256)),
-    ?assertEqual(?config(btree_256, Config), BTree),
+    ?assertEqual(?config(b_tree_256, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_256_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_256_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -486,10 +514,10 @@ enter_b_tree_order_256_test(Config) ->
 enter_b_tree_order_32_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(32)),
-    ?assertEqual(?config(btree_32, Config), BTree),
+    ?assertEqual(?config(b_tree_32, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_32_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_32_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -499,10 +527,10 @@ enter_b_tree_order_32_test(Config) ->
 enter_b_tree_order_4_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(4)),
-    ?assertEqual(?config(btree_4, Config), BTree),
+    ?assertEqual(?config(b_tree_4, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_4_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_4_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -512,10 +540,10 @@ enter_b_tree_order_4_test(Config) ->
 enter_b_tree_order_6_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(6)),
-    ?assertEqual(?config(btree_6, Config), BTree),
+    ?assertEqual(?config(b_tree_6, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_6_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_6_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -525,10 +553,10 @@ enter_b_tree_order_6_test(Config) ->
 enter_b_tree_order_612_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(512)),
-    ?assertEqual(?config(btree_612, Config), BTree),
+    ?assertEqual(?config(b_tree_612, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_612_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_612_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -538,10 +566,10 @@ enter_b_tree_order_612_test(Config) ->
 enter_b_tree_order_64_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(64)),
-    ?assertEqual(?config(btree_64, Config), BTree),
+    ?assertEqual(?config(b_tree_64, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_64_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_64_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -551,10 +579,10 @@ enter_b_tree_order_64_test(Config) ->
 enter_b_tree_order_8_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     BTree = enter_b_tree(KeyValues, b_trees:empty(8)),
-    ?assertEqual(?config(btree_8, Config), BTree),
+    ?assertEqual(?config(b_tree_8, Config), BTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _BTreeUpdate = enter_b_tree(_KeyValuesUpdate, BTree),
-    ?assertEqual(?config(btree_8_new, Config), _BTreeUpdate),
+    ?assertEqual(?config(b_tree_8_new, Config), _BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -564,10 +592,10 @@ enter_b_tree_order_8_test(Config) ->
 enter_gb_tree_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     GBTree = enter_gb_tree(KeyValues, gb_trees:empty()),
-    ?assertEqual(?config(gbtree, Config), GBTree),
+    ?assertEqual(?config(gb_tree, Config), GBTree),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     _GBTreeUpdate = enter_gb_tree(_KeyValuesUpdate, GBTree),
-    ?assertEqual(?config(gbtree_new, Config), _GBTreeUpdate),
+    ?assertEqual(?config(gb_tree_new, Config), _GBTreeUpdate),
     ok.
 
 enter_gb_tree([], GBTree) ->
@@ -580,7 +608,7 @@ enter_gb_tree([{Key, Value} | Tail], GBTree) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_1024_test(Config) ->
-    _BTree = ?config(btree_1024, Config),
+    _BTree = ?config(b_tree_1024, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(1024, _KeyValues)),
     ok.
@@ -590,7 +618,7 @@ from_dict_b_tree_order_1024_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_128_test(Config) ->
-    _BTree = ?config(btree_128, Config),
+    _BTree = ?config(b_tree_128, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(128, _KeyValues)),
     ok.
@@ -600,7 +628,7 @@ from_dict_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_16_test(Config) ->
-    _BTree = ?config(btree_16, Config),
+    _BTree = ?config(b_tree_16, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(16, _KeyValues)),
     ok.
@@ -610,7 +638,7 @@ from_dict_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_256_test(Config) ->
-    _BTree = ?config(btree_256, Config),
+    _BTree = ?config(b_tree_256, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(256, _KeyValues)),
     ok.
@@ -620,9 +648,39 @@ from_dict_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_32_test(Config) ->
-    _BTree = ?config(btree_32, Config),
+    _BTree = ?config(b_tree_32, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(32, _KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4 - even / odd
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_even_odd_test(Config) ->
+    _BTree = ?config(b_tree_4, Config),
+    _KeyValues = ?config(key_values_from_even_odd, Config),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4 - odd / even
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_odd_even_test(Config) ->
+    _BTree = ?config(b_tree_4, Config),
+    _KeyValues = ?config(key_values_from_odd_even, Config),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4 - random
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_random_test(Config) ->
+    _BTree = ?config(b_tree_4, Config),
+    _KeyValues = ?config(key_values_random, Config),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -630,7 +688,7 @@ from_dict_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_4_test(Config) ->
-    _BTree = ?config(btree_4, Config),
+    _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(4, _KeyValues)),
     ok.
@@ -640,7 +698,7 @@ from_dict_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_6_test(Config) ->
-    _BTree = ?config(btree_6, Config),
+    _BTree = ?config(b_tree_6, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(6, _KeyValues)),
     ok.
@@ -650,7 +708,7 @@ from_dict_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_612_test(Config) ->
-    _BTree = ?config(btree_612, Config),
+    _BTree = ?config(b_tree_612, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(512, _KeyValues)),
     ok.
@@ -660,7 +718,7 @@ from_dict_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_64_test(Config) ->
-    _BTree = ?config(btree_64, Config),
+    _BTree = ?config(b_tree_64, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(64, _KeyValues)),
     ok.
@@ -670,7 +728,7 @@ from_dict_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_8_even_odd_test(Config) ->
-    _BTree = ?config(btree_8, Config),
+    _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
     ok.
@@ -680,8 +738,18 @@ from_dict_b_tree_order_8_even_odd_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_8_odd_even_test(Config) ->
-    _BTree = ?config(btree_8, Config),
+    _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 8 - random
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_8_random_test(Config) ->
+    _BTree = ?config(b_tree_8, Config),
+    _KeyValues = ?config(key_values_random, Config),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
     ok.
 
@@ -690,7 +758,7 @@ from_dict_b_tree_order_8_odd_even_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_8_test(Config) ->
-    _BTree = ?config(btree_8, Config),
+    _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from, Config),
     ?assertEqual(_BTree, b_trees:from_dict(8, _KeyValues)),
     ok.
@@ -709,8 +777,8 @@ from_dict_gb_tree_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_1024, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -725,8 +793,8 @@ get_b_tree([Key | Tail], BTree) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_128, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -735,8 +803,8 @@ get_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_16, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -745,8 +813,8 @@ get_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_256, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -755,8 +823,8 @@ get_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_32, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -765,8 +833,8 @@ get_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_4, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -775,8 +843,8 @@ get_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_6, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -785,8 +853,8 @@ get_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_612, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -795,8 +863,8 @@ get_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_64, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -805,8 +873,8 @@ get_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_8, Config),
+    Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
 
@@ -815,8 +883,8 @@ get_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 get_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
-    Keys = ?config(keys_rand, Config),
+    GBTree = ?config(gb_tree, Config),
+    Keys = ?config(keys_random, Config),
     get_gb_tree(Keys, GBTree),
     ok.
 
@@ -832,7 +900,7 @@ get_gb_tree([Key | Tail], GBTree) ->
 
 insert_b_tree_order_1024_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_1024, _Config), _BTree),
+    ?assertEqual(?config(b_tree_1024, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -841,7 +909,7 @@ insert_b_tree_order_1024_test(_Config) ->
 
 insert_b_tree_order_128_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_128, _Config), _BTree),
+    ?assertEqual(?config(b_tree_128, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(128 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -850,7 +918,7 @@ insert_b_tree_order_128_test(_Config) ->
 
 insert_b_tree_order_16_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_16, _Config), _BTree),
+    ?assertEqual(?config(b_tree_16, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(16 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -859,7 +927,7 @@ insert_b_tree_order_16_test(_Config) ->
 
 insert_b_tree_order_256_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_256, _Config), _BTree),
+    ?assertEqual(?config(b_tree_256, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(256 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -868,8 +936,38 @@ insert_b_tree_order_256_test(_Config) ->
 
 insert_b_tree_order_32_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_32, _Config), _BTree),
+    ?assertEqual(?config(b_tree_32, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(32 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 4 - even / odd
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_even_odd_test(Config) ->
+    KeyValues = ?config(key_values_from_even_odd, Config),
+    _BTree = test_generator:generate_b_tree_list(4, KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 4 - odd / even
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_odd_even_test(Config) ->
+    KeyValues = ?config(key_values_from_odd_even, Config),
+    _BTree = test_generator:generate_b_tree_list(4, KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 4 - random
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_random_test(Config) ->
+    KeyValues = ?config(key_values_random, Config),
+    _BTree = test_generator:generate_b_tree_list(4, KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4
@@ -877,7 +975,7 @@ insert_b_tree_order_32_test(_Config) ->
 
 insert_b_tree_order_4_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_4, _Config), _BTree),
+    ?assertEqual(?config(b_tree_4, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -886,7 +984,7 @@ insert_b_tree_order_4_test(_Config) ->
 
 insert_b_tree_order_6_test(_Config) ->
     _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_6_till, _Config), _BTree),
+    ?assertEqual(?config(b_tree_6_till, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -903,7 +1001,7 @@ insert_b_tree_order_6_till_test(_Config) ->
 
 insert_b_tree_order_612_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_612, _Config), _BTree),
+    ?assertEqual(?config(b_tree_612, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(512 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -912,7 +1010,7 @@ insert_b_tree_order_612_test(_Config) ->
 
 insert_b_tree_order_64_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_64, _Config), _BTree),
+    ?assertEqual(?config(b_tree_64, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(64 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -921,7 +1019,7 @@ insert_b_tree_order_64_test(_Config) ->
 
 insert_b_tree_order_8_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
-    _BTree = test_generator:generate_b_tree_from_list(8, KeyValues),
+    _BTree = test_generator:generate_b_tree_list(8, KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
@@ -931,7 +1029,17 @@ insert_b_tree_order_8_even_odd_test(Config) ->
 
 insert_b_tree_order_8_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
-    _BTree = test_generator:generate_b_tree_from_list(8, KeyValues),
+    _BTree = test_generator:generate_b_tree_list(8, KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 8 - random
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_8_random_test(Config) ->
+    KeyValues = ?config(key_values_random, Config),
+    _BTree = test_generator:generate_b_tree_list(8, KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
@@ -941,7 +1049,7 @@ insert_b_tree_order_8_odd_even_test(Config) ->
 
 insert_b_tree_order_8_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4),
-    ?assertEqual(?config(btree_8, _Config), _BTree),
+    ?assertEqual(?config(b_tree_8, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -949,15 +1057,15 @@ insert_b_tree_order_8_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_gb_tree_test(_Config) ->
-    ?assertEqual(?config(gbtree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, 4)).
+    ?assertEqual(?config(gb_tree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, 4)).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: is_defined b_tree order 1024
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_1024, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -972,8 +1080,8 @@ is_defined_b_tree([Key | Tail], BTree) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_128, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -982,8 +1090,8 @@ is_defined_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_16, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -992,8 +1100,8 @@ is_defined_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_256, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1002,8 +1110,8 @@ is_defined_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_32, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1012,8 +1120,8 @@ is_defined_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_4, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1022,8 +1130,8 @@ is_defined_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_6, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1032,8 +1140,8 @@ is_defined_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_612, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1042,8 +1150,8 @@ is_defined_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_64, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1052,8 +1160,8 @@ is_defined_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_8, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
 
@@ -1062,8 +1170,8 @@ is_defined_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 is_defined_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
-    Keys = ?config(keys_rand, Config),
+    GBTree = ?config(gb_tree, Config),
+    Keys = ?config(keys_random, Config),
     is_defined_gb_tree(Keys, GBTree),
     ok.
 
@@ -1078,7 +1186,7 @@ is_defined_gb_tree([Key | Tail], GBTree) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
+    BTree = ?config(b_tree_1024, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1094,7 +1202,7 @@ iterate_next_b_tree(Iterator, Count, KeyValues) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
+    BTree = ?config(b_tree_128, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1104,7 +1212,7 @@ iterate_next_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
+    BTree = ?config(b_tree_16, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1114,7 +1222,7 @@ iterate_next_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
+    BTree = ?config(b_tree_256, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1124,7 +1232,7 @@ iterate_next_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
+    BTree = ?config(b_tree_32, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1134,7 +1242,7 @@ iterate_next_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
+    BTree = ?config(b_tree_4, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1144,7 +1252,7 @@ iterate_next_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
+    BTree = ?config(b_tree_6, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1154,7 +1262,7 @@ iterate_next_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
+    BTree = ?config(b_tree_612, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1164,7 +1272,7 @@ iterate_next_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
+    BTree = ?config(b_tree_64, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1174,7 +1282,7 @@ iterate_next_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
+    BTree = ?config(b_tree_8, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1184,7 +1292,7 @@ iterate_next_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 iterate_next_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
+    GBTree = ?config(gb_tree, Config),
     _Iterator = gb_trees:iterator(GBTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_gb_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1200,7 +1308,7 @@ iterate_next_gb_tree(Iterator, Count, KeyValues) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
+    BTree = ?config(b_tree_1024, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1211,7 +1319,7 @@ keys_b_tree_order_1024_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
+    BTree = ?config(b_tree_128, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1222,7 +1330,7 @@ keys_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
+    BTree = ?config(b_tree_16, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1233,7 +1341,7 @@ keys_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
+    BTree = ?config(b_tree_256, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1244,7 +1352,7 @@ keys_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
+    BTree = ?config(b_tree_32, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1255,7 +1363,7 @@ keys_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
+    BTree = ?config(b_tree_4, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1266,7 +1374,7 @@ keys_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
+    BTree = ?config(b_tree_6, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1277,7 +1385,7 @@ keys_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
+    BTree = ?config(b_tree_612, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1288,7 +1396,7 @@ keys_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
+    BTree = ?config(b_tree_64, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1299,18 +1407,18 @@ keys_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
+    BTree = ?config(b_tree_8, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: keys_rand gb_tree
+%% TEST CASES: keys_random gb_tree
 %%--------------------------------------------------------------------
 
 keys_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
+    GBTree = ?config(gb_tree, Config),
     _Keys = gb_trees:keys(GBTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1321,7 +1429,7 @@ keys_gb_tree_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_1024_test(Config) ->
-    _BTree = ?config(btree_1024, Config),
+    _BTree = ?config(b_tree_1024, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1330,7 +1438,7 @@ largest_b_tree_order_1024_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_128_test(Config) ->
-    _BTree = ?config(btree_128, Config),
+    _BTree = ?config(b_tree_128, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1339,7 +1447,7 @@ largest_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_16_test(Config) ->
-    _BTree = ?config(btree_16, Config),
+    _BTree = ?config(b_tree_16, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1348,7 +1456,7 @@ largest_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_256_test(Config) ->
-    _BTree = ?config(btree_256, Config),
+    _BTree = ?config(b_tree_256, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1357,7 +1465,7 @@ largest_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_32_test(Config) ->
-    _BTree = ?config(btree_32, Config),
+    _BTree = ?config(b_tree_32, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1366,7 +1474,7 @@ largest_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_4_test(Config) ->
-    _BTree = ?config(btree_4, Config),
+    _BTree = ?config(b_tree_4, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1375,7 +1483,7 @@ largest_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_6_test(Config) ->
-    _BTree = ?config(btree_6, Config),
+    _BTree = ?config(b_tree_6, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1384,7 +1492,7 @@ largest_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_612_test(Config) ->
-    _BTree = ?config(btree_612, Config),
+    _BTree = ?config(b_tree_612, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1393,7 +1501,7 @@ largest_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_64_test(Config) ->
-    _BTree = ?config(btree_64, Config),
+    _BTree = ?config(b_tree_64, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1402,7 +1510,7 @@ largest_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_8_test(Config) ->
-    _BTree = ?config(btree_8, Config),
+    _BTree = ?config(b_tree_8, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -1411,7 +1519,7 @@ largest_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 largest_gb_tree_test(_Config) ->
-    ?assertEqual(?LARGEST_KEY_VALUE, gb_trees:largest(?config(gbtree, _Config))),
+    ?assertEqual(?LARGEST_KEY_VALUE, gb_trees:largest(?config(gb_tree, _Config))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1419,8 +1527,8 @@ largest_gb_tree_test(_Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_1024, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1435,8 +1543,8 @@ lookup_b_tree([Key | Tail], BTree) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_128, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1445,8 +1553,8 @@ lookup_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_16, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1455,8 +1563,8 @@ lookup_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_256, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1465,8 +1573,8 @@ lookup_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_32, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1475,8 +1583,8 @@ lookup_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_4, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1485,8 +1593,8 @@ lookup_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_6, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1495,8 +1603,8 @@ lookup_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_612, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1505,8 +1613,8 @@ lookup_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_64, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1515,8 +1623,8 @@ lookup_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
-    Keys = ?config(keys_rand, Config),
+    BTree = ?config(b_tree_8, Config),
+    Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
 
@@ -1525,8 +1633,8 @@ lookup_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 lookup_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
-    Keys = ?config(keys_rand, Config),
+    GBTree = ?config(gb_tree, Config),
+    Keys = ?config(keys_random, Config),
     lookup_gb_tree(Keys, GBTree),
     ok.
 
@@ -1541,8 +1649,8 @@ lookup_gb_tree([Key | Tail], GBTree) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_1024_test(Config) ->
-    _BTree = ?config(btree_1024, Config),
-    _BTreeNew = ?config(btree_1024_new, Config),
+    _BTree = ?config(b_tree_1024, Config),
+    _BTreeNew = ?config(b_tree_1024_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1554,8 +1662,8 @@ map_value_to_new(_, Value) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_128_test(Config) ->
-    _BTree = ?config(btree_128, Config),
-    _BTreeNew = ?config(btree_128_new, Config),
+    _BTree = ?config(b_tree_128, Config),
+    _BTreeNew = ?config(b_tree_128_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1564,8 +1672,8 @@ map_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_16_test(Config) ->
-    _BTree = ?config(btree_16, Config),
-    _BTreeNew = ?config(btree_16_new, Config),
+    _BTree = ?config(b_tree_16, Config),
+    _BTreeNew = ?config(b_tree_16_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1574,8 +1682,8 @@ map_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_256_test(Config) ->
-    _BTree = ?config(btree_256, Config),
-    _BTreeNew = ?config(btree_256_new, Config),
+    _BTree = ?config(b_tree_256, Config),
+    _BTreeNew = ?config(b_tree_256_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1584,8 +1692,8 @@ map_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_32_test(Config) ->
-    _BTree = ?config(btree_32, Config),
-    _BTreeNew = ?config(btree_32_new, Config),
+    _BTree = ?config(b_tree_32, Config),
+    _BTreeNew = ?config(b_tree_32_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1594,8 +1702,8 @@ map_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_4_test(Config) ->
-    _BTree = ?config(btree_4, Config),
-    _BTreeNew = ?config(btree_4_new, Config),
+    _BTree = ?config(b_tree_4, Config),
+    _BTreeNew = ?config(b_tree_4_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1604,8 +1712,8 @@ map_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_6_test(Config) ->
-    _BTree = ?config(btree_6, Config),
-    _BTreeNew = ?config(btree_6_new, Config),
+    _BTree = ?config(b_tree_6, Config),
+    _BTreeNew = ?config(b_tree_6_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1614,8 +1722,8 @@ map_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_612_test(Config) ->
-    _BTree = ?config(btree_612, Config),
-    _BTreeNew = ?config(btree_612_new, Config),
+    _BTree = ?config(b_tree_612, Config),
+    _BTreeNew = ?config(b_tree_612_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1624,8 +1732,8 @@ map_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_64_test(Config) ->
-    _BTree = ?config(btree_64, Config),
-    _BTreeNew = ?config(btree_64_new, Config),
+    _BTree = ?config(b_tree_64, Config),
+    _BTreeNew = ?config(b_tree_64_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1634,8 +1742,8 @@ map_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_b_tree_order_8_test(Config) ->
-    _BTree = ?config(btree_8, Config),
-    _BTreeNew = ?config(btree_8_new, Config),
+    _BTree = ?config(b_tree_8, Config),
+    _BTreeNew = ?config(b_tree_8_new, Config),
     ?assertEqual(_BTreeNew, b_trees:map(fun map_value_to_new/2, _BTree)),
     ok.
 
@@ -1644,7 +1752,7 @@ map_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 map_gb_tree_test(_Config) ->
-    ?assertEqual(?config(gbtree_new, _Config), gb_trees:map(fun map_value_to_new/2, ?config(gbtree, _Config))),
+    ?assertEqual(?config(gb_tree_new, _Config), gb_trees:map(fun map_value_to_new/2, ?config(gb_tree, _Config))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1652,7 +1760,7 @@ map_gb_tree_test(_Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_1024_test(Config) ->
-    _BTree = ?config(btree_1024, Config),
+    _BTree = ?config(b_tree_1024, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1661,7 +1769,7 @@ smallest_b_tree_order_1024_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_128_test(Config) ->
-    _BTree = ?config(btree_128, Config),
+    _BTree = ?config(b_tree_128, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1670,7 +1778,7 @@ smallest_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_16_test(Config) ->
-    _BTree = ?config(btree_16, Config),
+    _BTree = ?config(b_tree_16, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1679,7 +1787,7 @@ smallest_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_256_test(Config) ->
-    _BTree = ?config(btree_256, Config),
+    _BTree = ?config(b_tree_256, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1688,7 +1796,7 @@ smallest_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_32_test(Config) ->
-    _BTree = ?config(btree_32, Config),
+    _BTree = ?config(b_tree_32, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1697,7 +1805,7 @@ smallest_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_4_test(Config) ->
-    _BTree = ?config(btree_4, Config),
+    _BTree = ?config(b_tree_4, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1706,7 +1814,7 @@ smallest_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_6_test(Config) ->
-    _BTree = ?config(btree_6, Config),
+    _BTree = ?config(b_tree_6, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1715,7 +1823,7 @@ smallest_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_612_test(Config) ->
-    _BTree = ?config(btree_612, Config),
+    _BTree = ?config(b_tree_612, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1724,7 +1832,7 @@ smallest_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_64_test(Config) ->
-    _BTree = ?config(btree_64, Config),
+    _BTree = ?config(b_tree_64, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1733,7 +1841,7 @@ smallest_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_8_test(Config) ->
-    _BTree = ?config(btree_8, Config),
+    _BTree = ?config(b_tree_8, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -1742,7 +1850,7 @@ smallest_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 smallest_gb_tree_test(_Config) ->
-    ?assertEqual(?SMALLEST_KEY_VALUE, gb_trees:smallest(?config(gbtree, _Config))),
+    ?assertEqual(?SMALLEST_KEY_VALUE, gb_trees:smallest(?config(gb_tree, _Config))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1926,7 +2034,7 @@ take_smallest_gb_tree_test(_Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
+    BTree = ?config(b_tree_1024, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -1937,7 +2045,7 @@ to_list_b_tree_order_1024_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
+    BTree = ?config(b_tree_128, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -1948,7 +2056,7 @@ to_list_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
+    BTree = ?config(b_tree_16, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -1959,7 +2067,7 @@ to_list_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
+    BTree = ?config(b_tree_256, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -1970,7 +2078,7 @@ to_list_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
+    BTree = ?config(b_tree_32, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -1981,7 +2089,7 @@ to_list_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
+    BTree = ?config(b_tree_4, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -1992,7 +2100,7 @@ to_list_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
+    BTree = ?config(b_tree_6, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2003,7 +2111,7 @@ to_list_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
+    BTree = ?config(b_tree_612, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2014,7 +2122,7 @@ to_list_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
+    BTree = ?config(b_tree_64, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2025,7 +2133,7 @@ to_list_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
+    BTree = ?config(b_tree_8, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2036,7 +2144,7 @@ to_list_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 to_list_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
+    GBTree = ?config(gb_tree, Config),
     _KeyValues = gb_trees:to_list(GBTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2047,9 +2155,9 @@ to_list_gb_tree_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_1024_test(Config) ->
-    _BTree = ?config(btree_1024, Config),
+    _BTree = ?config(b_tree_1024, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_1024_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_1024_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 update_b_tree([], BTree) ->
@@ -2062,9 +2170,9 @@ update_b_tree([{Key, Value} | Tail], BTree) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_128_test(Config) ->
-    _BTree = ?config(btree_128, Config),
+    _BTree = ?config(b_tree_128, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_128_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_128_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2072,9 +2180,9 @@ update_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_16_test(Config) ->
-    _BTree = ?config(btree_16, Config),
+    _BTree = ?config(b_tree_16, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_16_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_16_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2082,9 +2190,9 @@ update_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_256_test(Config) ->
-    _BTree = ?config(btree_256, Config),
+    _BTree = ?config(b_tree_256, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_256_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_256_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2092,9 +2200,19 @@ update_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_32_test(Config) ->
-    _BTree = ?config(btree_32, Config),
+    _BTree = ?config(b_tree_32, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_32_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_32_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 4 - random
+%%--------------------------------------------------------------------
+
+update_b_tree_order_4_random_test(Config) ->
+    _BTree = ?config(b_tree_4, Config),
+    _KeyValuesUpdate = ?config(key_values_random_update, Config),
+    ?assertEqual(?config(b_tree_4_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2102,9 +2220,9 @@ update_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_4_test(Config) ->
-    _BTree = ?config(btree_4, Config),
+    _BTree = ?config(b_tree_4, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_4_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_4_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2112,9 +2230,9 @@ update_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_6_test(Config) ->
-    _BTree = ?config(btree_6, Config),
+    _BTree = ?config(b_tree_6, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_6_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_6_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2122,9 +2240,9 @@ update_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_612_test(Config) ->
-    _BTree = ?config(btree_612, Config),
+    _BTree = ?config(b_tree_612, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_612_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_612_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2132,9 +2250,19 @@ update_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_64_test(Config) ->
-    _BTree = ?config(btree_64, Config),
+    _BTree = ?config(b_tree_64, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_64_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_64_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 8 - random
+%%--------------------------------------------------------------------
+
+update_b_tree_order_8_random_test(Config) ->
+    _BTree = ?config(b_tree_8, Config),
+    _KeyValuesUpdate = ?config(key_values_random_update, Config),
+    ?assertEqual(?config(b_tree_8_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2142,9 +2270,9 @@ update_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_b_tree_order_8_test(Config) ->
-    _BTree = ?config(btree_8, Config),
+    _BTree = ?config(b_tree_8, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(btree_8_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ?assertEqual(?config(b_tree_8_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2152,9 +2280,9 @@ update_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 update_gb_tree_test(Config) ->
-    _GBTree = ?config(gbtree, Config),
+    _GBTree = ?config(gb_tree, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
-    ?assertEqual(?config(gbtree_new, Config), update_gb_tree(_KeyValuesUpdate, _GBTree)),
+    ?assertEqual(?config(gb_tree_new, Config), update_gb_tree(_KeyValuesUpdate, _GBTree)),
     ok.
 
 update_gb_tree([], GBTree) ->
@@ -2167,7 +2295,7 @@ update_gb_tree([{Key, Value} | Tail], GBTree) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_1024_test(Config) ->
-    BTree = ?config(btree_1024, Config),
+    BTree = ?config(b_tree_1024, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2177,7 +2305,7 @@ values_b_tree_order_1024_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_128_test(Config) ->
-    BTree = ?config(btree_128, Config),
+    BTree = ?config(b_tree_128, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2187,7 +2315,7 @@ values_b_tree_order_128_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_16_test(Config) ->
-    BTree = ?config(btree_16, Config),
+    BTree = ?config(b_tree_16, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2197,7 +2325,7 @@ values_b_tree_order_16_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_256_test(Config) ->
-    BTree = ?config(btree_256, Config),
+    BTree = ?config(b_tree_256, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2207,7 +2335,7 @@ values_b_tree_order_256_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_32_test(Config) ->
-    BTree = ?config(btree_32, Config),
+    BTree = ?config(b_tree_32, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2217,7 +2345,7 @@ values_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_4_test(Config) ->
-    BTree = ?config(btree_4, Config),
+    BTree = ?config(b_tree_4, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2227,7 +2355,7 @@ values_b_tree_order_4_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_6_test(Config) ->
-    BTree = ?config(btree_6, Config),
+    BTree = ?config(b_tree_6, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2237,7 +2365,7 @@ values_b_tree_order_6_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_612_test(Config) ->
-    BTree = ?config(btree_612, Config),
+    BTree = ?config(b_tree_612, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2247,7 +2375,7 @@ values_b_tree_order_612_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_64_test(Config) ->
-    BTree = ?config(btree_64, Config),
+    BTree = ?config(b_tree_64, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2257,7 +2385,7 @@ values_b_tree_order_64_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_b_tree_order_8_test(Config) ->
-    BTree = ?config(btree_8, Config),
+    BTree = ?config(b_tree_8, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
@@ -2267,7 +2395,7 @@ values_b_tree_order_8_test(Config) ->
 %%--------------------------------------------------------------------
 
 values_gb_tree_test(Config) ->
-    GBTree = ?config(gbtree, Config),
+    GBTree = ?config(gb_tree, Config),
     _Keys = gb_trees:values(GBTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.

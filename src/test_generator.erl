@@ -14,37 +14,34 @@
     delete_b_tree_from/4,
     delete_b_tree_from_even/4,
     delete_b_tree_from_odd/4,
+    delete_b_tree_list/2,
     delete_b_tree_till/3,
     delete_gb_tree_from/2,
-    generate_b_tree_from_list/2,
-    generate_b_tree_from_list/3,
-    generate_b_tree_from_list_key_number/3,
     generate_b_tree_from_number/3,
     generate_b_tree_from_number_update/3,
+    generate_b_tree_list/2,
+    generate_b_tree_list/3,
+    generate_b_tree_list_key_number/3,
     generate_b_tree_till_number/3,
-    generate_gb_tree_from_list/1,
     generate_gb_tree_from_number/2,
     generate_gb_tree_from_number_update/2,
+    generate_gb_tree_list/1,
     generate_key_values_from/2,
     generate_key_values_from_even/2,
     generate_key_values_from_odd/2,
     generate_key_values_from_update/2,
-    generate_key_values_rand/2,
-    generate_key_values_rand_update/2,
+    generate_key_values_random/2,
+    generate_key_values_random_update/2,
     generate_keys_from/2,
     generate_keys_from_even/2,
     generate_keys_from_odd/2,
-    generate_keys_rand/2,
+    generate_keys_random/2,
     generate_keys_till/2,
     take_largest_b_tree/3,
     take_largest_gb_tree/2,
     take_smallest_b_tree/3,
     take_smallest_gb_tree/2
 ]).
-
--define(NODEBUG, true).
-
--include_lib("eunit/include/eunit.hrl").
 
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
@@ -71,6 +68,11 @@ delete_b_tree_from_odd(Order, Number, Width, BTree) when Order > 3, Order rem 2 
     Keys = test_generator:generate_keys_from_odd(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
+-spec delete_b_tree_list([any()], b_trees:b_tree()) -> b_trees:b_tree().
+
+delete_b_tree_list(Keys, BTree) ->
+    delete_b_tree_1(Keys, BTree).
+
 -spec delete_b_tree_till(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 delete_b_tree_till(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number > 0 ->
@@ -85,21 +87,6 @@ delete_gb_tree_from(Number, Width) when Number > 0 ->
     Keys = test_generator:generate_keys_from(Number, Width),
     delete_gb_tree_1(Keys, GBTree).
 
--spec generate_b_tree_from_list(pos_integer(), [{any(), any()}]) -> b_trees:b_tree().
-
-generate_b_tree_from_list(Order, KeyValues) when Order > 3, Order rem 2 == 0 ->
-    generate_b_tree_by_key_value_1(KeyValues, b_trees:empty(Order)).
-
--spec generate_b_tree_from_list(pos_integer(), [{any(), any()}], b_trees:b_tree()) -> b_trees:b_tree().
-
-generate_b_tree_from_list(Order, KeyValues, BTree) when Order > 3, Order rem 2 == 0 ->
-    generate_b_tree_by_key_value_1(KeyValues, BTree).
-
--spec generate_b_tree_from_list_key_number(pos_integer(), [non_neg_integer()], pos_integer()) -> b_trees:b_tree().
-
-generate_b_tree_from_list_key_number(Order, Keys, Width) when Order > 3, Order rem 2 == 0 ->
-    generate_b_tree_by_key_number_1(Keys, [], Width, b_trees:empty(Order)).
-
 -spec generate_b_tree_from_number(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 generate_b_tree_from_number(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number >= 0 ->
@@ -110,15 +97,25 @@ generate_b_tree_from_number(Order, Number, Width) when Order > 3, Order rem 2 ==
 generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order)).
 
+-spec generate_b_tree_list(pos_integer(), [{any(), any()}]) -> b_trees:b_tree().
+
+generate_b_tree_list(Order, KeyValues) when Order > 3, Order rem 2 == 0 ->
+    generate_b_tree_by_key_value_1(KeyValues, b_trees:empty(Order)).
+
+-spec generate_b_tree_list(pos_integer(), [{any(), any()}], b_trees:b_tree()) -> b_trees:b_tree().
+
+generate_b_tree_list(Order, KeyValues, BTree) when Order > 3, Order rem 2 == 0 ->
+    generate_b_tree_by_key_value_1(KeyValues, BTree).
+
+-spec generate_b_tree_list_key_number(pos_integer(), [non_neg_integer()], pos_integer()) -> b_trees:b_tree().
+
+generate_b_tree_list_key_number(Order, Keys, Width) when Order > 3, Order rem 2 == 0 ->
+    generate_b_tree_by_key_number_1(Keys, [], Width, b_trees:empty(Order)).
+
 -spec generate_b_tree_till_number(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 generate_b_tree_till_number(Order, Number, Width) when Order > 3, Order rem 2 == 0, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(Number, 1, -1), [], Width, b_trees:empty(Order)).
-
--spec generate_gb_tree_from_list([{any(), any()}]) -> gb_trees:tree().
-
-generate_gb_tree_from_list(KeyValues) ->
-    generate_gb_tree_by_key_value_1(KeyValues, gb_trees:empty()).
 
 -spec generate_gb_tree_from_number(pos_integer(), pos_integer()) -> gb_trees:tree().
 
@@ -129,6 +126,11 @@ generate_gb_tree_from_number(Number, Width) when Number >= 0 ->
 
 generate_gb_tree_from_number_update(Number, Width) when Number >= 0 ->
     generate_gb_tree_by_key_1(lists:seq(1, Number), "_new", Width, gb_trees:empty()).
+
+-spec generate_gb_tree_list([{any(), any()}]) -> gb_trees:tree().
+
+generate_gb_tree_list(KeyValues) ->
+    generate_gb_tree_by_key_value_1(KeyValues, gb_trees:empty()).
 
 -spec generate_key_values_from(pos_integer(), pos_integer()) -> [{any(), any()}].
 
@@ -154,15 +156,15 @@ generate_key_values_from_update(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1(Keys, "_new", Width).
 
--spec generate_key_values_rand(pos_integer(), pos_integer()) -> [{any(), any()}].
+-spec generate_key_values_random(pos_integer(), pos_integer()) -> [{any(), any()}].
 
-generate_key_values_rand(Number, Width) when Number >= 0 ->
+generate_key_values_random(Number, Width) when Number >= 0 ->
     Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_key_values_1(Keys, [], Width).
 
--spec generate_key_values_rand_update(pos_integer(), pos_integer()) -> [{any(), any()}].
+-spec generate_key_values_random_update(pos_integer(), pos_integer()) -> [{any(), any()}].
 
-generate_key_values_rand_update(Number, Width) when Number >= 0 ->
+generate_key_values_random_update(Number, Width) when Number >= 0 ->
     Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_key_values_1(Keys, "_new", Width).
 
@@ -184,9 +186,9 @@ generate_keys_from_odd(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_keys_1_odd(Keys, Width).
 
--spec generate_keys_rand(pos_integer(), pos_integer()) -> [any()].
+-spec generate_keys_random(pos_integer(), pos_integer()) -> [any()].
 
-generate_keys_rand(Number, Width) when Number >= 0 ->
+generate_keys_random(Number, Width) when Number >= 0 ->
     Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_keys_1(Keys, Width).
 

@@ -88,6 +88,12 @@ delete_any_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_test(_Config) ->
+    ?assertEqual(?B_TREE_04_10_MINUS_02, b_trees:delete("k_02", ?B_TREE_04_10)),
+
+    ?assertEqual(?B_TREE_04_17_MINUS_02, b_trees:delete("k_02", ?B_TREE_04_17)),
+    ?assertEqual(?B_TREE_04_17_MINUS_02_04, b_trees:delete("k_04", ?B_TREE_04_17_MINUS_02)),
+    ?assertEqual(?B_TREE_04_17_MINUS_02_TILL_12, b_trees:delete("k_12", ?B_TREE_04_17_MINUS_02_TILL_10)),
+
     ?assertEqual(?B_TREE_04_20_MINUS_02, b_trees:delete("k_02", ?B_TREE_04_20)),
     ?assertEqual(?B_TREE_04_20_MINUS_04, b_trees:delete("k_04", ?B_TREE_04_20)),
     ?assertEqual(?B_TREE_04_20_MINUS_06, b_trees:delete("k_06", ?B_TREE_04_20)),
@@ -97,6 +103,11 @@ delete_b_tree_order_4_test(_Config) ->
     ?assertEqual(?B_TREE_04_20_MINUS_14, b_trees:delete("k_14", ?B_TREE_04_20)),
     ?assertEqual(?B_TREE_04_20_MINUS_16, b_trees:delete("k_16", ?B_TREE_04_20)),
     ?assertEqual(?B_TREE_04_20_MINUS_18, b_trees:delete("k_18", ?B_TREE_04_20)),
+
+    ?assertEqual(?B_TREE_04_33_MINUS_02_TILL_18, b_trees:delete("k_18", ?B_TREE_04_33_MINUS_02_TILL_16)),
+    ?assertEqual(?B_TREE_04_33_MINUS_02_TILL_20, b_trees:delete("k_20", ?B_TREE_04_33_MINUS_02_TILL_18)),
+    ?assertEqual(?B_TREE_04_33_MINUS_02_TILL_22, b_trees:delete("k_22", ?B_TREE_04_33_MINUS_02_TILL_20)),
+    ?assertEqual(?B_TREE_04_33_MINUS_02_TILL_30, b_trees:delete("k_30", ?B_TREE_04_33_MINUS_02_TILL_28)),
 
     ?assertEqual(?B_TREE_04_64_MINUS_08, b_trees:delete("k_08", ?B_TREE_04_64)),
     ?assertEqual(?B_TREE_04_64_MINUS_16, b_trees:delete("k_16", ?B_TREE_04_64)),

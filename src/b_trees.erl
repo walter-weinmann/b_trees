@@ -258,9 +258,9 @@ delete_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, Key
     ?debugFmt("wwe debugging delete_1 ===> ~n KeyPos: ~p~n", [KeyPos]),
     Out = case ValueFound of
               none ->
-                  delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, KeyNoMax, KeyPos);
+                  delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, KeyPos);
               _ ->
-                  delete_1_2(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, KeyNoMax, KeyPos)
+                  delete_1_2(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, KeyPos)
           end,
     ?debugFmt("wwe debugging delete_1 ===> Start ~n Out: ~p~n", [Out]),
     Out.
@@ -269,128 +269,103 @@ delete_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, Key
 
 delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, _KeyNoMax, KeyPos) ->
     ?debugFmt("wwe debugging delete_1_2 ===> Start ~n Key: ~p~n Tree: ~p~n KeyPos: ~p~n", [_Key, _Tree, KeyPos]),
-    {KeyNoXCLeft, _SubtreeNoXCLeft, _KeyValuesXCLeft, _SubtreesXCLeft} = _TreeXCLeft = case KeyPos == 1 of
-                                                                                           true ->
-                                                                                               {0, 0, [], []};
-                                                                                           _ ->
-                                                                                               lists:nth(KeyPos - 1, Subtrees)
-                                                                                       end,
+    {_KeyNoXCLeft, _SubtreeNoXCLeft, _KeyValuesXCLeft, _SubtreesXCLeft} = _TreeXCLeft = case KeyPos == 1 of
+                                                                                            true ->
+                                                                                                {0, 0, [], []};
+                                                                                            _ ->
+                                                                                                lists:nth(KeyPos - 1, Subtrees)
+                                                                                        end,
     {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesXC} = _TreeXC = lists:nth(KeyPos, Subtrees),
     ?debugFmt("wwe debugging delete_1_2 ===> ~n KeyPos: ~p~n SubtreeNo: ~p~n", [KeyPos, SubtreeNo]),
-    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = _TreeXCRight = case KeyPos == SubtreeNo of
-                                                                                             true ->
-                                                                                                 {0, 0, [], []};
-                                                                                             _ ->
-                                                                                                 ?debugFmt("wwe debugging delete_1_2 ===> ~n KeyPos: ~p~n Subtrees: ~p~n", [KeyPos, Subtrees]),
-                                                                                                 lists:nth(KeyPos + 1, Subtrees)
-                                                                                         end,
+    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = _TreeXCRight = lists:nth(KeyPos + 1, Subtrees),
     ?debugFmt("wwe debugging delete_1_2 ===> ~n TreeXCLeft: ~p~n TreeX: ~p~n TreeXCRight: ~p~n", [_TreeXCLeft, _TreeXC, _TreeXCRight]),
     Out = case KeyNoXC >= SubtreeNoMin of
               true ->
                   % CLRS: case 2a
                   ?debugFmt("wwe debugging delete_1_2 ===> ~n CLRS: case 2a ~n", []),
-                  case KeyNoXCLeft == 0 of
-                      true ->
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n CLRS: case 2a right ~n", []),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner KeyValues: ~p~n", [KeyValuesXC]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 1: ~p~n", [_SubtreesXCLeft]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 2: ~p~n", [SubtreesXC]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 3: ~p~n", [SubtreesXCRight]),
-                          {
-                              KeyNo,
-                              SubtreeNo,
-                                  lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                  lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                                  [
-                                      {
-                                          KeyNoXC - 1, case SubtreeNoXC == 0 of
-                                                           true ->
-                                                               0;
-                                                           _ ->
-                                                               SubtreeNoXC - 1
-                                                       end, lists:sublist(KeyValuesXC, 1, KeyNoXC - 1), case SubtreeNoXC == 0 of
-                                                                                                            true ->
-                                                                                                                [];
-                                                                                                            _ ->
-                                                                                                                lists:sublist(SubtreesXC, 1, KeyNoXC)
-                                                                                                        end
-                                      },
-                                      {
-                                          KeyNoXCRight,
-                                          SubtreeNoXCRight,
-                                          KeyValuesXCRight,
-                                          case SubtreeNoXC == 0 of
-                                              true ->
-                                                  [];
-                                              _ ->
-                                                  [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight))] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                          end
-                                      }
-                                  ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                          };
-                      _ ->
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n CLRS: case 2a left  ~n", []),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner KeyValues: ~p~n", [KeyValuesXC]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 1: ~p~n", [_SubtreesXCLeft]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 2: ~p~n", [SubtreesXC]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 3: ~p~n", [SubtreesXCRight]),
-                          {
-                              KeyNo,
-                              SubtreeNo,
-                                  lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                  lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                                  [
-                                      {
-                                          KeyNoXC - 1, case SubtreeNoXC == 0 of
-                                                           true ->
-                                                               0;
-                                                           _ ->
-                                                               SubtreeNoXC - 1
-                                                       end, lists:sublist(KeyValuesXC, 1, KeyNoXC - 1), case SubtreeNoXC == 0 of
-                                                                                                            true ->
-                                                                                                                [];
-                                                                                                            _ ->
-                                                                                                                lists:sublist(SubtreesXC, 1, KeyNoXC)
-                                                                                                        end
-                                      },
-                                      {
-                                          KeyNoXCRight,
-                                          SubtreeNoXCRight,
-                                          KeyValuesXCRight,
-                                          case SubtreeNoXC == 0 of
-                                              true ->
-                                                  [];
-                                              _ ->
-                                                  [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight))] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                          end
-                                      }
-                                  ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                          }
-                  end;
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner KeyValues: ~p~n", [KeyValuesXC]),
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 1: ~p~n", [_SubtreesXCLeft]),
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 2: ~p~n", [SubtreesXC]),
+                  ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 3: ~p~n", [SubtreesXCRight]),
+                  {
+                      KeyNo,
+                      SubtreeNo,
+                          lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                          lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                          [
+                              {
+                                  KeyNoXC - 1, case SubtreeNoXC == 0 of
+                                                   true ->
+                                                       0;
+                                                   _ ->
+                                                       SubtreeNoXC - 1
+                                               end, lists:sublist(KeyValuesXC, 1, KeyNoXC - 1), case SubtreeNoXC == 0 of
+                                                                                                    true ->
+                                                                                                        [];
+                                                                                                    _ ->
+                                                                                                        lists:sublist(SubtreesXC, 1, KeyNoXC)
+                                                                                                end
+                              },
+                              {
+                                  KeyNoXCRight,
+                                  SubtreeNoXCRight,
+                                  KeyValuesXCRight,
+                                  case SubtreeNoXC == 0 of
+                                      true ->
+                                          [];
+                                      _ ->
+                                          [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight))] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                  end
+                              }
+                          ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                  };
               _ ->
-                  {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = _NextRightTree = case KeyPos == SubtreeNo of
-                                                                                                             true ->
-                                                                                                                 {0, 0, [], []};
-                                                                                                             _ ->
-                                                                                                                 lists:nth(KeyPos + 1, Subtrees)
-                                                                                                         end,
-                  ?debugFmt("wwe debugging delete_1_2 ===> ~n NextRightTree: ~p~n ", [_NextRightTree]),
                   case KeyNoXCRight >= SubtreeNoMin of
                       % CLRS: case 2b
                       true ->
                           ?debugFmt("wwe debugging delete_1_2 ===> ~n CLRS: case 2b ~n", []),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)]]),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos)]),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Outer Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner KeyValues: ~p~n", [lists:sublist(KeyValuesXCRight, 2, KeyNoXCRight)]),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Combine Part 1: ~p~n", [case SubtreeNoXC == 0 of
+                                                                                                                     true ->
+                                                                                                                         [];
+                                                                                                                     _ ->
+                                                                                                                         lists:nth(SubtreeNoXC, SubtreesXC)
+                                                                                                                 end]),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Combine Part 2: ~p~n", [case SubtreeNoXCRight == 0 of
+                                                                                                                     true ->
+                                                                                                                         [];
+                                                                                                                     _ ->
+                                                                                                                         lists:nth(1, SubtreesXCRight)
+                                                                                                                 end]),
+                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Inner Subtrees Part 3: ~p~n", [case SubtreeNoXCRight == 0 of
+                                                                                                             true ->
+                                                                                                                 [];
+                                                                                                             _ ->
+                                                                                                                 lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                                                                                         end]),
                           {
                               KeyNo,
                               SubtreeNo,
-                                  lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)],
-                                  lists:sublist(Subtrees, 1, KeyPos) ++
+                                  lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                                  lists:sublist(Subtrees, 1, KeyPos - 1) ++
                                   [
+                                      {
+                                          KeyNoXC,
+                                          SubtreeNoXC,
+                                          KeyValuesXC,
+                                          case SubtreeNoXC == 0 of
+                                              true ->
+                                                  [];
+                                              _ ->
+                                                  lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight))]
+                                          end
+                                      },
                                       {
                                           KeyNoXCRight - 1, case SubtreeNoXCRight == 0 of
                                                                 true ->
@@ -401,7 +376,7 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, 
                                                                                                                        true ->
                                                                                                                            [];
                                                                                                                        _ ->
-                                                                                                                           [combine(lists:nth(1, SubtreesXCRight), lists:nth(2, SubtreesXCRight))] ++ lists:sublist(SubtreesXCRight, 3, SubtreeNoXCRight)
+                                                                                                                           lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
                                                                                                                    end
                                       }
                                   ] ++
@@ -509,14 +484,38 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, K
                       KeyNoXCLeft >= SubtreeNoMin ->
                           % CLRS: case 3a - left
                           ?debugFmt("wwe debugging delete_1_3 ===> ~n CLRS: case 3a - left  ~n", []),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 2) ++ [lists:nth(KeyNoXCLeft, KeyValuesXCLeft)] ++ lists:sublist(KeyValues, KeyPos, KeyNo)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 2)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Nxt KeyValues: ~p~n", [lists:sublist(KeyValuesXCLeft, 1, KeyNoXCLeft - 1)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Nxt Subtreest: ~p~n", [lists:sublist(SubtreesXCLeft, 1, KeyNoXCLeft)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Del KeyValues: ~p~n", [[lists:nth(KeyPos - 1, KeyValues)] ++ lists:sublist(KeyValuesXC, 1, KeyNoXC)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Del SubtreesXCLeft: ~p~n", [lists:nth(SubtreeNoXCLeft, SubtreesXCLeft)]),
-                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Del SubtreesXC: ~p~n", [SubtreesXC]),
+
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues 1: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 2)]),
+
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues 2.1: ~p~n", [KeyNoXCLeft]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues 2.2: ~p~n", [KeyValuesXCLeft]),
+
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues 2: ~p~n", [[lists:nth(KeyNoXCLeft, KeyValuesXCLeft)]]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues 3: ~p~n", [lists:sublist(KeyValues, KeyPos, KeyNo)]),
+
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 2) ++ [lists:nth(KeyNoXCLeft, KeyValuesXCLeft)] ++ lists:sublist(KeyValues, KeyPos, KeyNo)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 1: ~p~n", [case SubtreeNo == 0 of
+                                                                                                       true ->
+                                                                                                           [];
+                                                                                                       _ ->
+                                                                                                           lists:sublist(Subtrees, 1, KeyPos - 2)
+                                                                                                   end]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 3: ~p~n", [case SubtreeNo == 0 of
+                                                                                                       true ->
+                                                                                                           [];
+                                                                                                       _ ->
+                                                                                                           lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                                                                                                   end]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Nxt KeyValues: ~p~n", [lists:sublist(KeyValuesXCLeft, 1, KeyNoXCLeft - 1)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Nxt Subtreest: ~p~n", [lists:sublist(SubtreesXCLeft, 1, KeyNoXCLeft)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Del KeyValues: ~p~n", [[lists:nth(KeyPos - 1, KeyValues)] ++ lists:sublist(KeyValuesXC, 1, KeyNoXC)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Del SubtreesXCLeft: ~p~n", [case SubtreeNoXCLeft == 0 of
+                                                                                                      true ->
+                                                                                                          [];
+                                                                                                      _ ->
+                                                                                                          lists:nth(SubtreeNoXCLeft, SubtreesXCLeft)
+                                                                                                  end]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Del SubtreesXC: ~p~n", [SubtreesXC]),
                           {
                               KeyNo,
                               SubtreeNo,
@@ -550,12 +549,24 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, K
                       KeyNoXCRight >= SubtreeNoMin ->
                           % CLRS: case 3a - right
                           ?debugFmt("wwe debugging delete_1_3 ===> ~n CLRS: case 3a - right ~n", []),
-%%                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
-%%                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
-%%                          ?debugFmt("wwe debugging delete_1_2 ===> ~n New Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
-%%                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Del KeyValues: ~p~n", [lists:sublist(KeyValuesXC, 1, KeyNoXC) ++ [lists:nth(KeyPos, KeyValues)]]),
-%%                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Nxt SubtreesXC: ~p~n", [SubtreesXC]),
-%%                          ?debugFmt("wwe debugging delete_1_2 ===> ~n Nxt SubtreesXCRight: ~p~n", [SubtreesXCRight]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Del KeyValues: ~p~n", [lists:sublist(KeyValuesXC, 1, KeyNoXC) ++ [lists:nth(KeyPos, KeyValues)]]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Del SubtreesXC: ~p~n", [SubtreesXC]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Del SubtreesXCRight: ~p~n", [case SubtreeNoXCRight == 0 of
+                                                                                                       true ->
+                                                                                                           [];
+                                                                                                       _ ->
+                                                                                                           lists:nth(1, SubtreesXCRight)
+                                                                                                   end]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Nxt KeyValues: ~p~n", [lists:sublist(KeyValuesXCRight, 2, KeyNoXCRight)]),
+                          ?debugFmt("wwe debugging delete_1_3 ===> ~n Nxt Subtreest: ~p~n", [case SubtreeNoXCRight == 0 of
+                                                                                                 true ->
+                                                                                                     [];
+                                                                                                 _ ->
+                                                                                                     lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                                                                             end]),
                           {
                               KeyNo,
                               SubtreeNo,
@@ -604,12 +615,7 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, K
                                   ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner Subtrees Part 3: ~p~n", [SubtreesXC]),
                                   {
                                       KeyNo - 1,
-                                      case SubtreeNo == 0 of
-                                          true ->
-                                              0;
-                                          _ ->
-                                              SubtreeNo - 1
-                                      end,
+                                      SubtreeNo - 1,
                                           lists:sublist(KeyValues, 1, KeyPos - 2) ++ lists:sublist(KeyValues, KeyPos, KeyNo),
                                           lists:sublist(Subtrees, 1, KeyPos - 2) ++
                                           [
@@ -627,25 +633,20 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, K
                           ?debugFmt("wwe debugging delete_1_3 ===> ~n CLRS: case 3b right ~n", []),
                           case KeyNo == 1 of
                               true ->
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues: ~p~n", [KeyValuesXC ++ KeyValues ++ KeyValuesXCRight]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 1: ~p~n", [SubtreesXC]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 3: ~p~n", [SubtreesXCRight]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues: ~p~n", [KeyValuesXC ++ KeyValues ++ KeyValuesXCRight]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 1: ~p~n", [SubtreesXC]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 3: ~p~n", [SubtreesXCRight]),
                                   delete_1(Key, {KeyNoXC + KeyNoXCRight + 1, SubtreeNoXC + SubtreeNoXCRight, KeyValuesXC ++ KeyValues ++ KeyValuesXCRight, SubtreesXC ++ SubtreesXCRight}, SubtreeNoMin, KeyNoMax);
                               _ ->
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Outer KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Outer Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Outer Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner KeyValues: ~p~n", [KeyValuesXC ++ [lists:nth(KeyPos, KeyValues)] ++ KeyValuesXCRight]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner Subtrees Part 1: ~p~n", [SubtreesXC]),
-%%                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner Subtrees Part 3: ~p~n", [SubtreesXCRight]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Outer KeyValues: ~p~n", [lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo)]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Outer Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Outer Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner KeyValues: ~p~n", [KeyValuesXC ++ [lists:nth(KeyPos, KeyValues)] ++ KeyValuesXCRight]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner Subtrees Part 1: ~p~n", [SubtreesXC]),
+                                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Inner Subtrees Part 3: ~p~n", [SubtreesXCRight]),
                                   {
                                       KeyNo - 1,
-                                      case SubtreeNo == 0 of
-                                          true ->
-                                              0;
-                                          _ ->
-                                              SubtreeNo - 1
-                                      end,
+                                      SubtreeNo - 1,
                                           lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
                                           lists:sublist(Subtrees, 1, KeyPos - 1) ++
                                           [
@@ -662,9 +663,9 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, K
               _ ->
                   % CLRS: case 3 else
                   ?debugFmt("wwe debugging delete_1_3 ===> ~n CLRS: case 3 else ~n", []),
-%%                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues: ~p~n", [KeyValues]),
-%%                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
-%%                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)]),
+                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New KeyValues: ~p~n", [KeyValues]),
+                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 1: ~p~n", [lists:sublist(Subtrees, 1, KeyPos - 1)]),
+                  ?debugFmt("wwe debugging delete_1_3 ===> ~n New Subtrees Part 3: ~p~n", [lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)]),
                   {
                       KeyNo,
                       SubtreeNo,
@@ -1291,6 +1292,18 @@ lookup_1(Key, {KeyNo, _, KeyValues, ChildTrees}) ->
 
 %%direct_test() ->
 %%
-%%    ?debugFmt("wwe debugging direct_test ===> ~n Result: ~p~n", [test_generator:generate_keys_rand(30, 2)]),
+%%%%    ?assertEqual(?B_TREE_04_64_MINUS_32, b_trees:delete("k_32", ?B_TREE_04_64)),
+%%
+%%%%    ?debugFmt("wwe debugging direct_test ===> ~n Result: ~p~n", [b_trees:delete("k_22", ?B_TREE_WWE)]),
+%%
+%%%%    ?assertEqual(?B_TREE_04_32_MINUS_07_01_05, b_trees:delete("k_05", ?B_TREE_04_32_MINUS_07_01)),
+%%
+%%%%    Number = 64,
+%%%%
+%%%%    _Keys = test_generator:generate_keys_random(Number, 2),
+%%%%
+%%%%    _Btree = test_generator:generate_b_tree_from_number(4, Number, 2),
+%%%%
+%%%%    ?assertEqual(b_trees:empty(4), test_generator:delete_b_tree_list(_Keys, _Btree)),
 %%
 %%    ok.
