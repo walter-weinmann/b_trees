@@ -37,8 +37,9 @@
 %% - delete_any(K, T): removes key K from B-tree B if the key is present in the
 %%   tree, otherwise does nothing; returns new tree.
 %%
-%% - empty(O): returns empty B-tree of order O. Order is defined as the maximum
-%%   number of children nodes a non-leaf node may hold. The minimum value is 4.
+%% - empty(O): returns a new empty B-tree of order O. Order is defined as the
+%%   maximum number of children nodes a non-leaf node may hold. The minimum
+%%   value is 4.
 %%
 %% - enter(K, V, B): inserts key K with value V into B-tree B if the key is not
 %%   present in the tree, otherwise updates key K to value V in B. Returns the
@@ -142,7 +143,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {BTreeType, MinimumSubtrees, MaximumKeys, NumberKeyValues, Tree},
+%% - {MinimumSubtrees, MaximumKeys, NumberKeyValues, Tree},
 %%   where `Tree' is composed of :
 %%   - {KeyNo, SubtreeNo, [{Key, Value}], [Tree]}.
 
@@ -150,9 +151,9 @@
 %% Some types.
 
 -export_type([b_tree/0]).
-
 -type b_tree() :: {pos_integer(), pos_integer(), non_neg_integer(), tree()}.
 
+-export_type([iterator/0]).
 -type iterator() :: [{key_values(), subtrees()}].
 
 -type key() :: any().

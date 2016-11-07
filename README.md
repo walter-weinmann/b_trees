@@ -6,72 +6,80 @@ b_trees
 
 ## MODULE SUMMARY ##
 
-B trees.
+B-trees: balanced search trees of order m in which each non-leaf node has up to m children.
 
 ## DESCRIPTION ##
 
-This module provides Prof. Arne Andersson's General Balanced Trees. These have no storage overhead compared to unbalanced binary trees, and their performance is better than AVL trees.
+A B-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The B-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the  B-tree is optimized for systems that read and write large blocks of data.
 
 This module considers two keys as different if and only if they do not compare equal (==).
 
 ### Data Structure ###
 
-    {Size, Tree}
+    {MinimumSubtrees, MaximumKeys, NumberKeyValues, Tree}
 
-Tree is composed of nodes of the form {Key, Value, Smaller, Bigger} and the "empty tree" node nil.
+Tree is composed of nodes of the form 
 
-There is no attempt to balance trees after deletions. As deletions do not increase the height of a tree, this should be OK.
+    {KeyNumber, SubtreeNumber, [{Key, Value}], [Tree]} 
 
-The original balance condition h(T) <= ceil(c * log(|T|)) has been changed to the similar (but not quite equivalent) condition 2 ^ h(T) <= |T| ^ c. This should also be OK.
+and the "empty tree" node 
+
+    nil
+
+Since the trees are always balanced, there is no need for a balance operation.
+
 
 ## DATA TYPES ##
 
-    tree(Key, Value)
+    b_tree() = {pos_integer(), pos_integer(), non_neg_integer(), tree()}
 
 A general balanced tree.
 
-    tree() = tree(term(), term())
-    iter(Key, Value)
+    iterator() = [{key_values(), subtrees()}]
 
 A general balanced tree iterator.
 
-    iter() = iter(term(), term())
 
 ## EXPORTS ##
 
-balance(Tree1) -> Tree2
+### delete(Key, B-Tree1) -> B-Tree2 ###
 
 Types:
 
-Tree1 = Tree2 = tree(Key, Value)
-Rebalances Tree1. Notice that this is rarely necessary, but can be motivated when many nodes have been deleted from the tree without further insertions. Rebalancing can then be forced to minimize lookup times, as deletion does not rebalance the tree.
+    Key = any()
+    B-Tree1 = B-Tree2 = b_tree()
 
-delete(Key, Tree1) -> Tree2
+Removes the node with key Key from B-Tree1 and returns the new B-Tree2. Assumes that the key is present in B-Tree1, crashes otherwise.
 
-Types:
-
-Tree1 = Tree2 = tree(Key, Value)
-Removes the node with key Key from Tree1 and returns the new tree. Assumes that the key is present in the tree, crashes otherwise.
-
-delete_any(Key, Tree1) -> Tree2
+### delete_any (Key, B-Tree1) -> B-Tree2 ###
 
 Types:
 
-Tree1 = Tree2 = tree(Key, Value)
-Removes the node with key Key from Tree1 if the key is present in the tree, otherwise does nothing. Returns the new tree.
+    Key = any()
+    B-Tree1 = B-Tree2 = b_tree()
 
-empty() -> tree()
+Removes the node with key Key from B-Tree1 if the key is present in B-Tree1, otherwise does nothing. Returns the new B-Tree2.
 
-Returns a new empty tree.
-
-enter(Key, Value, Tree1) -> Tree2
+### empty (Order) -> B-Tree ###
 
 Types:
 
-Tree1 = Tree2 = tree(Key, Value)
-Inserts Key with value Value into Tree1 if the key is not present in the tree, otherwise updates Key to value Value in Tree1. Returns the new tree.
+    Order = pos_integer()
+    B-Tree = b_tree()
 
-from_orddict(List) -> Tree
+Returns a new empty b-tree. Order is defined as the maximum number of children nodes a non-leaf node may hold. The minimum value is 4.
+
+### enter (Key, Value, B-Tree1) -> B-Tree2 ###
+
+Types:
+
+    Key = any()
+    Value = any()
+    B-Tree1 = B-Tree2 = b_tree()
+
+Inserts key Key with value Value into B-Tree1 if the key is not present in B-Tree1, otherwise updates key Key to value Value in B-Tree1. Returns the new B-Tree2.
+
+### from_orddict (Order, List) -> B-Tree ###
 
 Types:
 
@@ -209,7 +217,7 @@ Types:
 Tree = tree(Key :: term(), Value)
 Returns the values in Tree as an ordered list, sorted by their corresponding keys. Duplicates are not removed.
 
-### See Also ###
+## See Also ##
 
-dict(3), gb_sets(3)
+[gb_trees](http://erlang.org/doc/man/gb_trees.html)
 
