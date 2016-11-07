@@ -1,12 +1,15 @@
 <center> <h1> b_trees </h1> </center>
 
+[![Build Status](https://travis-ci.org/walter-weinmann/b_trees.svg?branch=master)](https://travis-ci.org/walter-weinmann/b_trees)
+
+
 ## MODULE ##
 
 b_trees
 
 ## MODULE SUMMARY ##
 
-B-Trees: balanced search trees of order `m` in which each non-leaf node has up to `m` children.
+B-Trees: balanced n-ary search trees of order `n` in which each non-leaf node has up to `n` children.
 
 ## DESCRIPTION ##
 
