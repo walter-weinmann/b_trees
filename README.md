@@ -285,5 +285,4 @@ Returns the values in B-Tree as an ordered list, sorted by their corresponding k
 
 ## See Also ##
 
-[gb_trees](http://erlang.org/doc/man/gb_trees.html)
-
+Additional documentation for **b_trees** is available here: [Wiki](https://github.com/walter-weinmann/b_trees/wiki).
