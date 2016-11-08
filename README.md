@@ -5,11 +5,11 @@
 
 ## MODULE ##
 
-b_trees
+**b_trees**
 
 ## MODULE SUMMARY ##
 
-B-Trees: balanced n-ary search trees of order `n` in which each non-leaf node has up to `n` children.
+A module for balanced n-ary search trees of order `n` in which each non-leaf node has up to `n` children.
 
 ## DESCRIPTION ##
 
