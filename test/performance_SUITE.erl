@@ -17,6 +17,7 @@
 -define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
 -define(NUMBER_ACTIONS, 2000).
 -define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
+-define(WIDTH, 4).
 
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE
@@ -29,45 +30,45 @@ suite() ->
 
 init_per_suite(Config) ->
     [
-        {key_values_from, test_generator:generate_key_values_from(?NUMBER_ACTIONS, 4)},
-        {key_values_from_even_odd, test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, 4) ++ test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, 4)},
-        {key_values_from_odd_even, test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, 4) ++ test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, 4)},
-        {key_values_from_update, test_generator:generate_key_values_from_update(?NUMBER_ACTIONS, 4)},
-        {key_values_random, test_generator:generate_key_values_random(?NUMBER_ACTIONS, 4)},
-        {key_values_random_update, test_generator:generate_key_values_random_update(?NUMBER_ACTIONS, 4)},
-        {keys_from, test_generator:generate_keys_from(?NUMBER_ACTIONS, 4)},
-        {keys_from_even_odd, test_generator:generate_keys_from_even(?NUMBER_ACTIONS, 4) ++ test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, 4)},
-        {keys_from_odd_even, test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, 4) ++ test_generator:generate_keys_from_even(?NUMBER_ACTIONS, 4)},
-        {keys_random, test_generator:generate_keys_random(?NUMBER_ACTIONS, 4)},
+        {key_values_from, test_generator:generate_key_values_from(?NUMBER_ACTIONS, ?WIDTH)},
+        {key_values_from_even_odd, test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, ?WIDTH)},
+        {key_values_from_odd_even, test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, ?WIDTH)},
+        {key_values_from_update, test_generator:generate_key_values_from_update(?NUMBER_ACTIONS, ?WIDTH)},
+        {key_values_random, test_generator:generate_key_values_random(?NUMBER_ACTIONS, ?WIDTH)},
+        {key_values_random_update, test_generator:generate_key_values_random_update(?NUMBER_ACTIONS, ?WIDTH)},
+        {keys_from, test_generator:generate_keys_from(?NUMBER_ACTIONS, ?WIDTH)},
+        {keys_from_even_odd, test_generator:generate_keys_from_even(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, ?WIDTH)},
+        {keys_from_odd_even, test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_keys_from_even(?NUMBER_ACTIONS, ?WIDTH)},
+        {keys_random, test_generator:generate_keys_random(?NUMBER_ACTIONS, ?WIDTH)},
 
-        {gb_tree, test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, 4)},
-        {gb_tree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_ACTIONS, 4)},
+        {gb_tree, test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, ?WIDTH)},
+        {gb_tree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_ACTIONS, ?WIDTH)},
 
-        {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4)},
-        {b_tree_4_new, test_generator:generate_b_tree_from_number_update(4, ?NUMBER_ACTIONS, 4)},
-        {b_tree_4_till, test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, 4)},
-        {b_tree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, 4)},
-        {b_tree_5_new, test_generator:generate_b_tree_from_number_update(5, ?NUMBER_ACTIONS, 4)},
-        {b_tree_5_till, test_generator:generate_b_tree_till_number(5, ?NUMBER_ACTIONS, 4)},
-        {b_tree_6, test_generator:generate_b_tree_from_number(6, ?NUMBER_ACTIONS, 4)},
-        {b_tree_6_new, test_generator:generate_b_tree_from_number_update(6, ?NUMBER_ACTIONS, 4)},
-        {b_tree_6_till, test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, 4)},
-        {b_tree_8, test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4)},
-        {b_tree_8_new, test_generator:generate_b_tree_from_number_update(8, ?NUMBER_ACTIONS, 4)},
-        {b_tree_16, test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, 4)},
-        {b_tree_16_new, test_generator:generate_b_tree_from_number_update(16, ?NUMBER_ACTIONS, 4)},
-        {b_tree_32, test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, 4)},
-        {b_tree_32_new, test_generator:generate_b_tree_from_number_update(32, ?NUMBER_ACTIONS, 4)},
-        {b_tree_64, test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, 4)},
-        {b_tree_64_new, test_generator:generate_b_tree_from_number_update(64, ?NUMBER_ACTIONS, 4)},
-        {b_tree_128, test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, 4)},
-        {b_tree_128_new, test_generator:generate_b_tree_from_number_update(128, ?NUMBER_ACTIONS, 4)},
-        {b_tree_256, test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, 4)},
-        {b_tree_256_new, test_generator:generate_b_tree_from_number_update(256, ?NUMBER_ACTIONS, 4)},
-        {b_tree_612, test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, 4)},
-        {b_tree_612_new, test_generator:generate_b_tree_from_number_update(512, ?NUMBER_ACTIONS, 4)},
-        {b_tree_1024, test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, 4)},
-        {b_tree_1024_new, test_generator:generate_b_tree_from_number_update(1024, ?NUMBER_ACTIONS, 4)}
+        {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_4_new, test_generator:generate_b_tree_from_number_update(4, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_4_till, test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_5_new, test_generator:generate_b_tree_from_number_update(5, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_5_till, test_generator:generate_b_tree_till_number(5, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_6, test_generator:generate_b_tree_from_number(6, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_6_new, test_generator:generate_b_tree_from_number_update(6, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_6_till, test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_8, test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_8_new, test_generator:generate_b_tree_from_number_update(8, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_16, test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_16_new, test_generator:generate_b_tree_from_number_update(16, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_32, test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_32_new, test_generator:generate_b_tree_from_number_update(32, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_64, test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_64_new, test_generator:generate_b_tree_from_number_update(64, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_128, test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_128_new, test_generator:generate_b_tree_from_number_update(128, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_256, test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_256_new, test_generator:generate_b_tree_from_number_update(256, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_612, test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_612_new, test_generator:generate_b_tree_from_number_update(512, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_1024, test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_1024_new, test_generator:generate_b_tree_from_number_update(1024, ?NUMBER_ACTIONS, ?WIDTH)}
         | Config
     ].
 
@@ -340,7 +341,7 @@ all() ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_1024_test(_Config) ->
-    ?assertEqual(b_trees:empty(1024), test_generator:delete_b_tree_from(1024, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(1024), test_generator:delete_b_tree_from(1024, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -348,7 +349,7 @@ delete_b_tree_order_1024_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_128_test(_Config) ->
-    ?assertEqual(b_trees:empty(128), test_generator:delete_b_tree_from(128, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(128), test_generator:delete_b_tree_from(128, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -356,7 +357,7 @@ delete_b_tree_order_128_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_16_test(_Config) ->
-    ?assertEqual(b_trees:empty(16), test_generator:delete_b_tree_from(16, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(16), test_generator:delete_b_tree_from(16, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -364,7 +365,7 @@ delete_b_tree_order_16_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_256_test(_Config) ->
-    ?assertEqual(b_trees:empty(256), test_generator:delete_b_tree_from(256, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(256), test_generator:delete_b_tree_from(256, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -372,7 +373,7 @@ delete_b_tree_order_256_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_32_test(_Config) ->
-    ?assertEqual(b_trees:empty(32), test_generator:delete_b_tree_from(32, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(32), test_generator:delete_b_tree_from(32, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -380,9 +381,9 @@ delete_b_tree_order_32_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_even_odd_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4),
-    _BTree_Odd = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, 4, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, 4, _BTree_Odd),
+    _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH),
+    _BTree_Odd = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Odd),
     ?assertEqual(b_trees:empty(4), _BTree_Empty),
     ok.
 
@@ -391,9 +392,9 @@ delete_b_tree_order_4_even_odd_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_odd_even_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4),
-    _BTree_Even = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, 4, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, 4, _BTree_Even),
+    _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH),
+    _BTree_Even = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Even),
     ?assertEqual(b_trees:empty(4), _BTree_Empty),
     ok.
 
@@ -410,7 +411,7 @@ delete_b_tree_order_4_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_test(_Config) ->
-    ?assertEqual(b_trees:empty(4), test_generator:delete_b_tree_from(4, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(4), test_generator:delete_b_tree_from(4, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -418,9 +419,9 @@ delete_b_tree_order_4_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_5_even_odd_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, 4),
-    _BTree_Odd = test_generator:delete_b_tree_from_even(5, ?NUMBER_ACTIONS, 4, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_odd(5, ?NUMBER_ACTIONS, 4, _BTree_Odd),
+    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH),
+    _BTree_Odd = test_generator:delete_b_tree_from_even(5, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_odd(5, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Odd),
     ?assertEqual(b_trees:empty(5), _BTree_Empty),
     ok.
 
@@ -429,9 +430,9 @@ delete_b_tree_order_5_even_odd_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_5_odd_even_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, 4),
-    _BTree_Even = test_generator:delete_b_tree_from_odd(5, ?NUMBER_ACTIONS, 4, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_even(5, ?NUMBER_ACTIONS, 4, _BTree_Even),
+    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH),
+    _BTree_Even = test_generator:delete_b_tree_from_odd(5, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_even(5, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Even),
     ?assertEqual(b_trees:empty(5), _BTree_Empty),
     ok.
 
@@ -448,7 +449,7 @@ delete_b_tree_order_5_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_5_test(_Config) ->
-    ?assertEqual(b_trees:empty(5), test_generator:delete_b_tree_from(5, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(5), test_generator:delete_b_tree_from(5, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -456,7 +457,7 @@ delete_b_tree_order_5_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_6_test(_Config) ->
-    ?assertEqual(b_trees:empty(6), test_generator:delete_b_tree_from(6, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(6), test_generator:delete_b_tree_from(6, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -464,7 +465,7 @@ delete_b_tree_order_6_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_612_test(_Config) ->
-    ?assertEqual(b_trees:empty(512), test_generator:delete_b_tree_from(512, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(512), test_generator:delete_b_tree_from(512, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -472,7 +473,7 @@ delete_b_tree_order_612_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_64_test(_Config) ->
-    ?assertEqual(b_trees:empty(64), test_generator:delete_b_tree_from(64, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(64), test_generator:delete_b_tree_from(64, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -480,9 +481,9 @@ delete_b_tree_order_64_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_8_even_odd_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4),
-    _BTree_Odd = test_generator:delete_b_tree_from_even(8, ?NUMBER_ACTIONS, 4, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_odd(8, ?NUMBER_ACTIONS, 4, _BTree_Odd),
+    _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, ?WIDTH),
+    _BTree_Odd = test_generator:delete_b_tree_from_even(8, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_odd(8, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Odd),
     ?assertEqual(b_trees:empty(8), _BTree_Empty),
     ok.
 
@@ -491,9 +492,9 @@ delete_b_tree_order_8_even_odd_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_8_odd_even_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4),
-    _BTree_Even = test_generator:delete_b_tree_from_odd(8, ?NUMBER_ACTIONS, 4, _BTree),
-    _BTree_Empty = test_generator:delete_b_tree_from_even(8, ?NUMBER_ACTIONS, 4, _BTree_Even),
+    _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, ?WIDTH),
+    _BTree_Even = test_generator:delete_b_tree_from_odd(8, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
+    _BTree_Empty = test_generator:delete_b_tree_from_even(8, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Even),
     ?assertEqual(b_trees:empty(8), _BTree_Empty),
     ok.
 
@@ -510,7 +511,7 @@ delete_b_tree_order_8_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_8_test(_Config) ->
-    ?assertEqual(b_trees:empty(8), test_generator:delete_b_tree_from(8, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(8), test_generator:delete_b_tree_from(8, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -518,7 +519,7 @@ delete_b_tree_order_8_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_gb_tree_test(_Config) ->
-    ?assertEqual(gb_trees:empty(), test_generator:delete_gb_tree_from(?NUMBER_ACTIONS, 4)),
+    ?assertEqual(gb_trees:empty(), test_generator:delete_gb_tree_from(?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1033,7 +1034,7 @@ get_gb_tree([Key | Tail], GBTree) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_1024_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_1024, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))).
 
@@ -1042,7 +1043,7 @@ insert_b_tree_order_1024_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_128_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_128, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(128 div 2)))).
 
@@ -1051,7 +1052,7 @@ insert_b_tree_order_128_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_16_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_16, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(16 div 2)))).
 
@@ -1060,7 +1061,7 @@ insert_b_tree_order_16_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_256_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_256, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(256 div 2)))).
 
@@ -1069,7 +1070,7 @@ insert_b_tree_order_256_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_32_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_32, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(32 div 2)))).
 
@@ -1108,7 +1109,7 @@ insert_b_tree_order_4_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_4, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
@@ -1117,7 +1118,7 @@ insert_b_tree_order_4_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_till_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, ?WIDTH),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -1155,7 +1156,7 @@ insert_b_tree_order_5_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_5_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_5, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
 
@@ -1164,7 +1165,7 @@ insert_b_tree_order_5_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_5_till_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_till_number(5, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_till_number(5, ?NUMBER_ACTIONS, ?WIDTH),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -1172,7 +1173,7 @@ insert_b_tree_order_5_till_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_6_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_6_till, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))).
 
@@ -1181,7 +1182,7 @@ insert_b_tree_order_6_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_6_till_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, ?WIDTH),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))).
 
 %%--------------------------------------------------------------------
@@ -1189,7 +1190,7 @@ insert_b_tree_order_6_till_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_612_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_612, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(512 div 2)))).
 
@@ -1198,7 +1199,7 @@ insert_b_tree_order_612_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_64_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_64, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(64 div 2)))).
 
@@ -1237,7 +1238,7 @@ insert_b_tree_order_8_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_8_test(_Config) ->
-    _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, 4),
+    _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_8, _Config), _BTree),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
@@ -1246,7 +1247,7 @@ insert_b_tree_order_8_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_gb_tree_test(_Config) ->
-    ?assertEqual(?config(gb_tree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, 4)).
+    ?assertEqual(?config(gb_tree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, ?WIDTH)).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: is_defined b_tree order 1024
@@ -2116,7 +2117,7 @@ smallest_gb_tree_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_1024_test(_Config) ->
-    ?assertEqual(b_trees:empty(1024), test_generator:take_largest_b_tree(1024, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(1024), test_generator:take_largest_b_tree(1024, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2124,7 +2125,7 @@ take_largest_b_tree_order_1024_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_128_test(_Config) ->
-    ?assertEqual(b_trees:empty(128), test_generator:take_largest_b_tree(128, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(128), test_generator:take_largest_b_tree(128, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2132,7 +2133,7 @@ take_largest_b_tree_order_128_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_16_test(_Config) ->
-    ?assertEqual(b_trees:empty(16), test_generator:take_largest_b_tree(16, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(16), test_generator:take_largest_b_tree(16, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2140,7 +2141,7 @@ take_largest_b_tree_order_16_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_256_test(_Config) ->
-    ?assertEqual(b_trees:empty(256), test_generator:take_largest_b_tree(256, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(256), test_generator:take_largest_b_tree(256, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2148,7 +2149,7 @@ take_largest_b_tree_order_256_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_32_test(_Config) ->
-    ?assertEqual(b_trees:empty(32), test_generator:take_largest_b_tree(32, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(32), test_generator:take_largest_b_tree(32, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2156,7 +2157,7 @@ take_largest_b_tree_order_32_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_4_test(_Config) ->
-    ?assertEqual(b_trees:empty(4), test_generator:take_largest_b_tree(4, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(4), test_generator:take_largest_b_tree(4, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2164,7 +2165,7 @@ take_largest_b_tree_order_4_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_5_test(_Config) ->
-    ?assertEqual(b_trees:empty(5), test_generator:take_largest_b_tree(5, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(5), test_generator:take_largest_b_tree(5, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2172,7 +2173,7 @@ take_largest_b_tree_order_5_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_6_test(_Config) ->
-    ?assertEqual(b_trees:empty(6), test_generator:take_largest_b_tree(6, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(6), test_generator:take_largest_b_tree(6, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2180,7 +2181,7 @@ take_largest_b_tree_order_6_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_612_test(_Config) ->
-    ?assertEqual(b_trees:empty(512), test_generator:take_largest_b_tree(512, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(512), test_generator:take_largest_b_tree(512, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2188,7 +2189,7 @@ take_largest_b_tree_order_612_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_64_test(_Config) ->
-    ?assertEqual(b_trees:empty(64), test_generator:take_largest_b_tree(64, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(64), test_generator:take_largest_b_tree(64, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2196,7 +2197,7 @@ take_largest_b_tree_order_64_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_8_test(_Config) ->
-    ?assertEqual(b_trees:empty(8), test_generator:take_largest_b_tree(8, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(8), test_generator:take_largest_b_tree(8, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2204,7 +2205,7 @@ take_largest_b_tree_order_8_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_gb_tree_test(_Config) ->
-    ?assertEqual(gb_trees:empty(), test_generator:take_largest_gb_tree(?NUMBER_ACTIONS, 4)),
+    ?assertEqual(gb_trees:empty(), test_generator:take_largest_gb_tree(?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2212,7 +2213,7 @@ take_largest_gb_tree_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_1024_test(_Config) ->
-    ?assertEqual(b_trees:empty(1024), test_generator:take_smallest_b_tree(1024, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(1024), test_generator:take_smallest_b_tree(1024, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2220,7 +2221,7 @@ take_smallest_b_tree_order_1024_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_128_test(_Config) ->
-    ?assertEqual(b_trees:empty(128), test_generator:take_smallest_b_tree(128, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(128), test_generator:take_smallest_b_tree(128, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2228,7 +2229,7 @@ take_smallest_b_tree_order_128_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_16_test(_Config) ->
-    ?assertEqual(b_trees:empty(16), test_generator:take_smallest_b_tree(16, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(16), test_generator:take_smallest_b_tree(16, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2236,7 +2237,7 @@ take_smallest_b_tree_order_16_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_256_test(_Config) ->
-    ?assertEqual(b_trees:empty(256), test_generator:take_smallest_b_tree(256, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(256), test_generator:take_smallest_b_tree(256, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2244,7 +2245,7 @@ take_smallest_b_tree_order_256_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_32_test(_Config) ->
-    ?assertEqual(b_trees:empty(32), test_generator:take_smallest_b_tree(32, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(32), test_generator:take_smallest_b_tree(32, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2252,7 +2253,7 @@ take_smallest_b_tree_order_32_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_4_test(_Config) ->
-    ?assertEqual(b_trees:empty(4), test_generator:take_smallest_b_tree(4, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(4), test_generator:take_smallest_b_tree(4, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2260,7 +2261,7 @@ take_smallest_b_tree_order_4_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_5_test(_Config) ->
-    ?assertEqual(b_trees:empty(5), test_generator:take_smallest_b_tree(5, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(5), test_generator:take_smallest_b_tree(5, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2268,7 +2269,7 @@ take_smallest_b_tree_order_5_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_6_test(_Config) ->
-    ?assertEqual(b_trees:empty(6), test_generator:take_smallest_b_tree(6, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(6), test_generator:take_smallest_b_tree(6, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2276,7 +2277,7 @@ take_smallest_b_tree_order_6_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_612_test(_Config) ->
-    ?assertEqual(b_trees:empty(512), test_generator:take_smallest_b_tree(512, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(512), test_generator:take_smallest_b_tree(512, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2284,7 +2285,7 @@ take_smallest_b_tree_order_612_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_64_test(_Config) ->
-    ?assertEqual(b_trees:empty(64), test_generator:take_smallest_b_tree(64, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(64), test_generator:take_smallest_b_tree(64, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2292,7 +2293,7 @@ take_smallest_b_tree_order_64_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_8_test(_Config) ->
-    ?assertEqual(b_trees:empty(8), test_generator:take_smallest_b_tree(8, ?NUMBER_ACTIONS, 4)),
+    ?assertEqual(b_trees:empty(8), test_generator:take_smallest_b_tree(8, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2300,7 +2301,7 @@ take_smallest_b_tree_order_8_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_gb_tree_test(_Config) ->
-    ?assertEqual(gb_trees:empty(), test_generator:take_smallest_gb_tree(?NUMBER_ACTIONS, 4)),
+    ?assertEqual(gb_trees:empty(), test_generator:take_smallest_gb_tree(?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
