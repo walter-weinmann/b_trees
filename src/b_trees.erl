@@ -69,6 +69,11 @@
 %%   The main advantage of the iterator approach is that it does not require the
 %%   complete list of all elements to be built in memory at one time.
 %%
+%% - iterator_from(K, B): Returns an iterator that can be used for traversing the
+%%   entries of B-Tree B; see next/1. The difference as compared to the iterator
+%%   returned by iterator/1 is that the first key greater than or equal to Key K
+%%   is returned.
+%%
 %% - keys(B): returns an ordered list of all keys in B-tree B.
 %%
 %% - largest(B): returns tuple {K, V}, where K is the largest key in B-tree B,
@@ -128,6 +133,7 @@
     is_defined/2,
     is_empty/1,
     iterator/1,
+    iterator_from/2,
     keys/1,
     largest/1,
     lookup/2,
@@ -821,6 +827,27 @@ iterator_1({KeyValues, Subtrees}, Iterator) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec iterator_from(key(), b_tree()) -> iterator().
+
+iterator_from(_Key, {_, _, 0, nil}) ->
+    [];
+iterator_from(Key, {_, _, _, Tree}) ->
+    iterator_from_1(Key, Tree, []).
+
+-spec iterator_from_1(key(), tree(), iterator()) -> iterator().
+
+% The most left key / value.
+iterator_from_1(Key, {KeyNo, 0, KeyValues, []} = _Next, Iterator) ->
+    {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
+    [{lists:sublist(KeyValues, Pos, KeyNo), []} | Iterator];
+% The most left subtree.
+iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Next, Iterator) ->
+    {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo),
+    {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1} = _NextIterator = lists:nth(Pos, Subtrees),
+    iterator_from_1(Key, {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1}, [{lists:sublist(KeyValues, Pos, KeyNo), lists:sublist(Subtrees, Pos, SubtreeNo)} | Iterator]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec keys(b_tree()) -> keys().
 
 keys({_, _, 0, nil}) ->
@@ -910,7 +937,7 @@ next([{[], _}, {[], _} = Iterator | TailIterator]) ->
 % End of leaf node.
 next([{[], _}, {[{Key, Value} | TailKeyValues], [_ | TailSubtrees]} | TailIterator]) ->
     {Key, Value, iterator_1({TailKeyValues, TailSubtrees}, TailIterator)};
-% Processing a leaf node..
+% Processing a leaf node.
 next([{[{Key, Value} | KeyValues], []} | Iterator]) ->
     {Key, Value, [{KeyValues, []} | Iterator]};
 % End of iterator.

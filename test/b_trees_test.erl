@@ -624,6 +624,190 @@ is_empty_test() ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_00_test() ->
+    BTree_04_00 = b_trees:empty(4),
+    _Iterator_04_00_00 = b_trees:iterator_from("k_01", BTree_04_00),
+    ?assertEqual(none, b_trees:next(_Iterator_04_00_00)),
+
+    BTree_04_01 = test_generator:generate_b_tree_from_number(4, 1, 2),
+    Iterator_04_01_00 = b_trees:iterator_from("k_00", BTree_04_01),
+    {_Key_04_01_01, _Value_04_01_01, _Iterator_04_01_01} = b_trees:next(Iterator_04_01_00),
+    ?assertEqual({"k_01", "v_01"}, {_Key_04_01_01, _Value_04_01_01}),
+    ?assertEqual(none, b_trees:next(_Iterator_04_01_01)),
+
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_01 = b_trees:iterator_from("k_00", BTree_04_16),
+    {_Key_04_16_01, _Value_04_16_01, Iterator_04_16_02} = b_trees:next(Iterator_04_16_01),
+    ?assertEqual({"k_01", "v_01"}, {_Key_04_16_01, _Value_04_16_01}),
+    {_Key_04_16_02, _Value_04_16_02, _Iterator_04_16_03} = b_trees:next(Iterator_04_16_02),
+    ?assertEqual({"k_02", "v_02"}, {_Key_04_16_02, _Value_04_16_02}),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_01_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_01 = b_trees:iterator_from("k_01", BTree_04_16),
+    {_Key_04_16_01, _Value_04_16_01, Iterator_04_16_02} = b_trees:next(Iterator_04_16_01),
+    ?assertEqual({"k_01", "v_01"}, {_Key_04_16_01, _Value_04_16_01}),
+    {_Key_04_16_02, _Value_04_16_02, _Iterator_04_16_03} = b_trees:next(Iterator_04_16_02),
+    ?assertEqual({"k_02", "v_02"}, {_Key_04_16_02, _Value_04_16_02}),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_02_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_02 = b_trees:iterator_from("k_02", BTree_04_16),
+    {_Key_04_16_02, _Value_04_16_02, Iterator_04_16_03} = b_trees:next(Iterator_04_16_02),
+    ?assertEqual({"k_02", "v_02"}, {_Key_04_16_02, _Value_04_16_02}),
+    {_Key_04_16_03, _Value_04_16_03, _Iterator_04_16_04} = b_trees:next(Iterator_04_16_03),
+    ?assertEqual({"k_03", "v_03"}, {_Key_04_16_03, _Value_04_16_03}),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_03_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_03 = b_trees:iterator_from("k_03", BTree_04_16),
+    {_Key_04_16_03, _Value_04_16_03, Iterator_04_16_04} = b_trees:next(Iterator_04_16_03),
+    ?assertEqual({"k_03", "v_03"}, {_Key_04_16_03, _Value_04_16_03}),
+    {_Key_04_16_04, _Value_04_16_04, _Iterator_04_16_05} = b_trees:next(Iterator_04_16_04),
+    ?assertEqual({"k_04", "v_04"}, {_Key_04_16_04, _Value_04_16_04}),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_04_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_04 = b_trees:iterator_from("k_04", BTree_04_16),
+    {_Key_04_16_04, _Value_04_16_04, Iterator_04_16_05} = b_trees:next(Iterator_04_16_04),
+    ?assertEqual({"k_04", "v_04"}, {_Key_04_16_04, _Value_04_16_04}),
+    {_Key_04_16_05, _Value_04_16_05, _Iterator_04_16_06} = b_trees:next(Iterator_04_16_05),
+    ?assertEqual({"k_05", "v_05"}, {_Key_04_16_05, _Value_04_16_05}),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_04_16_test() ->
+    Number = 16,
+
+    BTree = test_generator:generate_b_tree_from_number(4, Number, 2),
+    KeyValues = test_generator:generate_key_values_from(Number, 2),
+
+    ?assertEqual(lists:sublist(KeyValues, 1, Number), iterate_next_b_tree(b_trees:iterator_from("k_00", BTree), Number - 0, [])),
+    ?assertEqual(lists:sublist(KeyValues, 2, Number), iterate_next_b_tree(b_trees:iterator_from("k_02", BTree), Number - 1, [])),
+    ?assertEqual(lists:sublist(KeyValues, 3, Number), iterate_next_b_tree(b_trees:iterator_from("k_03", BTree), Number - 2, [])),
+    ?assertEqual(lists:sublist(KeyValues, 4, Number), iterate_next_b_tree(b_trees:iterator_from("k_04", BTree), Number - 3, [])),
+    ?assertEqual(lists:sublist(KeyValues, 5, Number), iterate_next_b_tree(b_trees:iterator_from("k_05", BTree), Number - 4, [])),
+    ?assertEqual(lists:sublist(KeyValues, 6, Number), iterate_next_b_tree(b_trees:iterator_from("k_06", BTree), Number - 5, [])),
+    ?assertEqual(lists:sublist(KeyValues, 7, Number), iterate_next_b_tree(b_trees:iterator_from("k_07", BTree), Number - 6, [])),
+    ?assertEqual(lists:sublist(KeyValues, 8, Number), iterate_next_b_tree(b_trees:iterator_from("k_08", BTree), Number - 7, [])),
+    ?assertEqual(lists:sublist(KeyValues, 9, Number), iterate_next_b_tree(b_trees:iterator_from("k_09", BTree), Number - 8, [])),
+    ?assertEqual(lists:sublist(KeyValues, 10, Number), iterate_next_b_tree(b_trees:iterator_from("k_10", BTree), Number - 9, [])),
+    ?assertEqual(lists:sublist(KeyValues, 11, Number), iterate_next_b_tree(b_trees:iterator_from("k_11", BTree), Number - 10, [])),
+    ?assertEqual(lists:sublist(KeyValues, 12, Number), iterate_next_b_tree(b_trees:iterator_from("k_12", BTree), Number - 11, [])),
+    ?assertEqual(lists:sublist(KeyValues, 13, Number), iterate_next_b_tree(b_trees:iterator_from("k_13", BTree), Number - 12, [])),
+    ?assertEqual(lists:sublist(KeyValues, 14, Number), iterate_next_b_tree(b_trees:iterator_from("k_14", BTree), Number - 13, [])),
+    ?assertEqual(lists:sublist(KeyValues, 15, Number), iterate_next_b_tree(b_trees:iterator_from("k_15", BTree), Number - 14, [])),
+    ?assertEqual(lists:sublist(KeyValues, 16, Number), iterate_next_b_tree(b_trees:iterator_from("k_16", BTree), Number - 15, [])),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_06_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_06 = b_trees:iterator_from("k_06", BTree_04_16),
+    {_Key_04_16_06, _Value_04_16_06, Iterator_04_16_07} = b_trees:next(Iterator_04_16_06),
+    ?assertEqual({"k_06", "v_06"}, {_Key_04_16_06, _Value_04_16_06}),
+    {_Key_04_16_07, _Value_04_16_07, _Iterator_04_16_08} = b_trees:next(Iterator_04_16_07),
+    ?assertEqual({"k_07", "v_07"}, {_Key_04_16_07, _Value_04_16_07}),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_08_256_test() ->
+    Number = 256,
+
+    BTree = test_generator:generate_b_tree_from_number(4, Number, 3),
+    KeyValues = test_generator:generate_key_values_from(Number, 3),
+
+    ?assertEqual(lists:sublist(KeyValues, 1, Number), iterate_next_b_tree(b_trees:iterator_from("k_000", BTree), Number - 0, [])),
+    ?assertEqual(lists:sublist(KeyValues, 2, Number), iterate_next_b_tree(b_trees:iterator_from("k_002", BTree), Number - 1, [])),
+    ?assertEqual(lists:sublist(KeyValues, 3, Number), iterate_next_b_tree(b_trees:iterator_from("k_003", BTree), Number - 2, [])),
+    ?assertEqual(lists:sublist(KeyValues, 4, Number), iterate_next_b_tree(b_trees:iterator_from("k_004", BTree), Number - 3, [])),
+    ?assertEqual(lists:sublist(KeyValues, 5, Number), iterate_next_b_tree(b_trees:iterator_from("k_005", BTree), Number - 4, [])),
+    ?assertEqual(lists:sublist(KeyValues, 7, Number), iterate_next_b_tree(b_trees:iterator_from("k_007", BTree), Number - 6, [])),
+    ?assertEqual(lists:sublist(KeyValues, 8, Number), iterate_next_b_tree(b_trees:iterator_from("k_008", BTree), Number - 7, [])),
+    ?assertEqual(lists:sublist(KeyValues, 11, Number), iterate_next_b_tree(b_trees:iterator_from("k_011", BTree), Number - 10, [])),
+    ?assertEqual(lists:sublist(KeyValues, 13, Number), iterate_next_b_tree(b_trees:iterator_from("k_013", BTree), Number - 12, [])),
+    ?assertEqual(lists:sublist(KeyValues, 16, Number), iterate_next_b_tree(b_trees:iterator_from("k_016", BTree), Number - 15, [])),
+    ?assertEqual(lists:sublist(KeyValues, 17, Number), iterate_next_b_tree(b_trees:iterator_from("k_017", BTree), Number - 16, [])),
+    ?assertEqual(lists:sublist(KeyValues, 19, Number), iterate_next_b_tree(b_trees:iterator_from("k_019", BTree), Number - 18, [])),
+    ?assertEqual(lists:sublist(KeyValues, 23, Number), iterate_next_b_tree(b_trees:iterator_from("k_023", BTree), Number - 22, [])),
+    ?assertEqual(lists:sublist(KeyValues, 29, Number), iterate_next_b_tree(b_trees:iterator_from("k_029", BTree), Number - 28, [])),
+    ?assertEqual(lists:sublist(KeyValues, 31, Number), iterate_next_b_tree(b_trees:iterator_from("k_031", BTree), Number - 30, [])),
+    ?assertEqual(lists:sublist(KeyValues, 32, Number), iterate_next_b_tree(b_trees:iterator_from("k_032", BTree), Number - 31, [])),
+    ?assertEqual(lists:sublist(KeyValues, 37, Number), iterate_next_b_tree(b_trees:iterator_from("k_037", BTree), Number - 36, [])),
+    ?assertEqual(lists:sublist(KeyValues, 41, Number), iterate_next_b_tree(b_trees:iterator_from("k_041", BTree), Number - 40, [])),
+    ?assertEqual(lists:sublist(KeyValues, 43, Number), iterate_next_b_tree(b_trees:iterator_from("k_043", BTree), Number - 42, [])),
+    ?assertEqual(lists:sublist(KeyValues, 47, Number), iterate_next_b_tree(b_trees:iterator_from("k_047", BTree), Number - 46, [])),
+    ?assertEqual(lists:sublist(KeyValues, 49, Number), iterate_next_b_tree(b_trees:iterator_from("k_049", BTree), Number - 48, [])),
+    ?assertEqual(lists:sublist(KeyValues, 64, Number), iterate_next_b_tree(b_trees:iterator_from("k_064", BTree), Number - 63, [])),
+    ?assertEqual(lists:sublist(KeyValues, 128, Number), iterate_next_b_tree(b_trees:iterator_from("k_128", BTree), Number - 127, [])),
+    ?assertEqual(lists:sublist(KeyValues, 256, Number), iterate_next_b_tree(b_trees:iterator_from("k_256", BTree), Number - 255, [])),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_16_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_16 = b_trees:iterator_from("k_16", BTree_04_16),
+    {_Key_04_16_16, _Value_04_16_16, Iterator_04_16_17} = b_trees:next(Iterator_04_16_16),
+    ?assertEqual({"k_16", "v_16"}, {_Key_04_16_16, _Value_04_16_16}),
+    none = b_trees:next(Iterator_04_16_17),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next
+%%--------------------------------------------------------------------
+
+iterator_from_next_17_test() ->
+    BTree_04_16 = test_generator:generate_b_tree_from_number(4, 16, 2),
+    Iterator_04_16_17 = b_trees:iterator_from("k_17", BTree_04_16),
+    none = b_trees:next(Iterator_04_16_17),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: iterator & next
 %%--------------------------------------------------------------------
 
@@ -1051,3 +1235,13 @@ values_test() ->
     ?assertEqual(16, length(b_trees:values(?B_TREE_06_16))),
 
     ok.
+
+%%--------------------------------------------------------------------
+%% Helper functions.
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree(_, 0, KeyValues) ->
+    KeyValues;
+iterate_next_b_tree(Iterator, Count, KeyValues) ->
+    {Key, Value, IteratorNew} = b_trees:next(Iterator),
+    iterate_next_b_tree(IteratorNew, Count - 1, KeyValues ++ [{Key, Value}]).
