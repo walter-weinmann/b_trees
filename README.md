@@ -243,23 +243,23 @@ Types:
     
 Returns tuple {Key, Value}, where Key is the smallest key in B-Tree, and Value is the value associated with this key. Assumes that B-Tree is not empty.
 
-### sort_ascending (Key_1, Key_2) -> equal | greater | less ###
+### sort_ascending (Key1, Key2) -> equal | greater | less ###
 
 Types:
 
-    Key_1 = Key_2  = any()
+    Key1 = Key2  = any()
     equal = greater = less = atom()
     
-Returns **greater** if Key_1 > Key_2, **less** if Key_1 < Key_2 and **equal** elsewise.
+Returns **greater** if Key1 > Key2, **less** if Key1 < Key2 and **equal** else-wise.
 
-### sort_dscending (Key_1, Key_2) -> equal | greater | less ###
+### sort_descending (Key1, Key2) -> equal | greater | less ###
 
 Types:
 
-    Key_1 = Key_2  = any()
+    Key1 = Key2  = any()
     equal = greater = less = atom()
     
-Returns **less** if Key_1 > Key_2, **greater** if Key_1 < Key_2 and **equal** elsewise.
+Returns **less** if Key1 > Key2, **greater** if Key1 < Key2 and **equal** else-wise.
 
 ### take_largest (B-Tree1) -> {Key, Value, B-Tree2} ###
 
