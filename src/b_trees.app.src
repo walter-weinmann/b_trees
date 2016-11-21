@@ -1,9 +1,18 @@
 {
     application, b_trees,
     [
-        {applications, [kernel, stdlib]},
-        {description, "B-trees & B*-trees in Erlang"},
-        {modules, [b_trees]},
+        {applications,
+            [
+                kernel,
+                stdlib
+            ]
+        },
+        {description, "B-trees in Erlang"},
+        {modules,
+            [
+                b_trees
+            ]
+        },
         {vsn, "1.0.0"}
     ]
 }.
