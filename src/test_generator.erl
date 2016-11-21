@@ -9,7 +9,10 @@
 
 -module(test_generator).
 
+-include_lib("eunit/include/eunit.hrl").
+
 -export([
+    check_equal/2,
     delete_b_tree_from/3,
     delete_b_tree_from/4,
     delete_b_tree_from_even/4,
@@ -37,6 +40,9 @@
     generate_keys_from_odd/2,
     generate_keys_random/2,
     generate_keys_till/2,
+    iterate_next_b_tree/3,
+    map_value_to_new/2,
+    prepare_template/1,
     take_largest_b_tree/3,
     take_largest_gb_tree/2,
     take_smallest_b_tree/3,
@@ -223,7 +229,42 @@ take_smallest_gb_tree(Number, Width) when Number > 0 ->
     take_smallest_gb_tree_1(Number, GBTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Helper functions.
+%% Eunit & Common Test helper functions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec check_equal(any(), any()) -> boolean().
+
+check_equal(Value_1, Value_2) when is_tuple(Value_2), tuple_size(Value_2) == 5 ->
+    ?assertEqual(Value_1, setelement(4, Value_2, sort_function));
+check_equal(Value_1, Value_2) ->
+    ?assertEqual(Value_1, Value_2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec iterate_next_b_tree(b_trees:iterator(), non_neg_integer(), b_trees:key_values()) -> b_trees:key_values().
+
+iterate_next_b_tree(_, 0, KeyValues) ->
+    KeyValues;
+iterate_next_b_tree(Iterator, Count, KeyValues) ->
+    {Key, Value, IteratorNew} = b_trees:next(Iterator),
+    iterate_next_b_tree(IteratorNew, Count - 1, KeyValues ++ [{Key, Value}]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec map_value_to_new(b_trees:key(), b_trees:value()) -> b_trees:key_value().
+
+map_value_to_new(_, Value) ->
+    Value ++ "_new".
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec prepare_template(b_trees:b_tree()) -> b_trees:b_tree().
+
+prepare_template(BTree) ->
+    setelement(4, BTree, fun b_trees:sort_ascending/2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Generator helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec compare(any(), any()) -> boolean().

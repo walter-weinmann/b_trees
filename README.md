@@ -19,7 +19,7 @@ This module considers two keys as different if and only if they do not compare e
 
 ### Data Structure ###
 
-    {MinimumSubtrees, MaximumKeys, NumberKeyValues, Tree}
+    {MinimumSubtrees, MaximumKeys, NumberKeyValues, SortFunction, Tree}
 
 Tree is composed of nodes of the form 
 
@@ -34,7 +34,7 @@ Since the trees are always balanced, there is no need for a balance operation.
 
 ## DATA TYPES ##
 
-    b_tree() = {pos_integer(), pos_integer(), non_neg_integer(), tree()}
+    b_tree() = {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), tree()}
 
 A general balanced tree.
 
@@ -70,7 +70,17 @@ Types:
     Order = pos_integer()
     B-Tree = b_tree()
 
-Returns a new empty b-tree. Order is defined as the maximum number of children nodes a non-leaf node may hold. The minimum value is 4.
+Returns a new empty b-tree. Order is defined as the maximum number of children nodes a non-leaf node may hold. The minimum value is 4. The sort order of the key values is ascending.
+
+### empty (Order, Function) -> B-Tree ###
+
+Types:
+
+    Order = pos_integer()
+    Function = fun((Key1, Key2) -> equal | greater | less)
+    B-Tree = b_tree()
+
+Returns a new empty b-tree. Order is defined as the maximum number of children nodes a non-leaf node may hold. The minimum value is 4. The sort order of the key values is defined by the given function, which takes two key values and returns one of the atoms **equal**, **greater** or **less**.
 
 ### enter (Key, Value, B-Tree1) -> B-Tree2 ###
 
@@ -232,6 +242,24 @@ Types:
     Value = any()
     
 Returns tuple {Key, Value}, where Key is the smallest key in B-Tree, and Value is the value associated with this key. Assumes that B-Tree is not empty.
+
+### sort_ascending (Key_1, Key_2) -> equal | greater | less ###
+
+Types:
+
+    Key_1 = Key_2  = any()
+    equal = greater = less = atom()
+    
+Returns **greater** if Key_1 > Key_2, **less** if Key_1 < Key_2 and **equal** elsewise.
+
+### sort_dscending (Key_1, Key_2) -> equal | greater | less ###
+
+Types:
+
+    Key_1 = Key_2  = any()
+    equal = greater = less = atom()
+    
+Returns **less** if Key_1 > Key_2, **greater** if Key_1 < Key_2 and **equal** elsewise.
 
 ### take_largest (B-Tree1) -> {Key, Value, B-Tree2} ###
 
