@@ -51,7 +51,12 @@
 %%   new tree.
 %%
 %% - from_dict(O, L): turns a list L of {Key, Value} pairs into a B-tree of
-%%   order O. The list must not contain duplicate keys.
+%%   order O. The list must not contain duplicate keys. The sort order of the
+%%   key values is ascending.
+%%
+%% - from_dict(O, L, F): turns a list L of {Key, Value} pairs into a B-tree of
+%%   order O. The list must not contain duplicate keys. The sort order of the
+%%   key values is defined in function F(K, K) -> equal | greater | less.
 %%
 %% - get(K, B): retrieves the value stored with key K in B-tree B. Assumes that
 %%   the key is present in the tree.
@@ -139,6 +144,7 @@
     empty/2,
     enter/3,
     from_dict/2,
+    from_dict/3,
     get/2,
     height/1,
     insert/3,
@@ -184,8 +190,10 @@
 -type key_value() :: {key(), value()}.
 -type key_values() :: [key_value()].
 
+-export_type([map_function/0]).
 -type map_function() :: fun((key(), value()) -> value()).
 
+-export_type([sort_function/0]).
 -type sort_function() :: fun((key(), key()) -> sort_result()).
 
 -type sort_result() :: less | equal | greater.
@@ -206,10 +214,10 @@
 -spec delete(key(), b_tree()) -> b_tree().
 
 % Empty tree.
-delete(Key, {_, _, 0, _, nil} = _BTree) ->
+delete(Key, {_, _, 0, _, nil}) ->
     erlang:error({key_not_found, Key});
 % Root node is leaf node.
-delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, {KeyNo, 0, KeyValues, []}} = _BTree) ->
+delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, {KeyNo, 0, KeyValues, []}}) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -227,19 +235,19 @@ delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, {KeyNo, 0, K
                                                                                 }
                                                                         end}
     end;
-delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, Tree} = _BTree) ->
+delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, Tree}) ->
     {SubtreeNoMin, KeyNoMax, NumberKeyValues - 1, SortFunction, delete_1(Key, Tree, SubtreeNoMin, KeyNoMax, SortFunction)}.
 
 -spec combine(tree(), tree()) -> tree().
 
-combine({LeftKeyNo, 0, LeftKeyValues, []} = _LeftTree, {RightKeyNo, 0, RightKeyValues, []} = _RightTree) ->
+combine({LeftKeyNo, 0, LeftKeyValues, []}, {RightKeyNo, 0, RightKeyValues, []}) ->
     {
         LeftKeyNo + RightKeyNo,
         0,
             LeftKeyValues ++ RightKeyValues,
         []
     };
-combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtrees} = _LeftTree, {RightKeyNo, RightSubtreeNo, RightKeyValues, RightSubtrees} = _RightTree) ->
+combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtrees}, {RightKeyNo, RightSubtreeNo, RightKeyValues, RightSubtrees}) ->
     {
         LeftKeyNo + RightKeyNo,
         LeftSubtreeNo + RightSubtreeNo - 1,
@@ -250,7 +258,7 @@ combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtrees} = _LeftTree, {Ri
 -spec delete_1(key(), tree(), pos_integer(), pos_integer(), sort_function()) -> tree().
 
 % Leaf node.
-delete_1(Key, {KeyNo, 0, KeyValues, []} = _Tree, _, _, SortFunction) ->
+delete_1(Key, {KeyNo, 0, KeyValues, []}, _, _, SortFunction) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -264,7 +272,7 @@ delete_1(Key, {KeyNo, 0, KeyValues, []} = _Tree, _, _, SortFunction) ->
                 []
             }
     end;
-delete_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, KeyNoMax, SortFunction) ->
+delete_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, SortFunction) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -275,15 +283,9 @@ delete_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, Key
 
 -spec delete_1_2(key(), tree(), pos_integer(), pos_integer(), pos_integer()) -> tree().
 
-delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, _KeyNoMax, KeyPos) ->
-    {_KeyNoXCLeft, _SubtreeNoXCLeft, _KeyValuesXCLeft, _SubtreesXCLeft} = _TreeXCLeft = case KeyPos == 1 of
-                                                                                            true ->
-                                                                                                {0, 0, [], []};
-                                                                                            _ ->
-                                                                                                lists:nth(KeyPos - 1, Subtrees)
-                                                                                        end,
-    {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesXC} = _TreeXC = lists:nth(KeyPos, Subtrees),
-    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = _TreeXCRight = lists:nth(KeyPos + 1, Subtrees),
+delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos) ->
+    {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesXC} = lists:nth(KeyPos, Subtrees),
+    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = lists:nth(KeyPos + 1, Subtrees),
     case KeyNoXC >= SubtreeNoMin of
         true ->
             % CLRS: case 2a
@@ -419,20 +421,20 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, 
 
 -spec delete_1_3(key(), tree(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> tree().
 
-delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction) ->
-    {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesXCLeft} = _TreeXCLeft = case KeyPos == 1 of
-                                                                                        true ->
-                                                                                            {0, 0, [], []};
-                                                                                        _ ->
-                                                                                            lists:nth(KeyPos - 1, Subtrees)
-                                                                                    end,
+delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction) ->
+    {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesXCLeft} = case KeyPos == 1 of
+                                                                          true ->
+                                                                              {0, 0, [], []};
+                                                                          _ ->
+                                                                              lists:nth(KeyPos - 1, Subtrees)
+                                                                      end,
     {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesXC} = TreeXC = lists:nth(KeyPos, Subtrees),
-    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = _TreeXCRight = case KeyPos == SubtreeNo of
-                                                                                             true ->
-                                                                                                 {0, 0, [], []};
-                                                                                             _ ->
-                                                                                                 lists:nth(KeyPos + 1, Subtrees)
-                                                                                         end,
+    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = case KeyPos == SubtreeNo of
+                                                                              true ->
+                                                                                  {0, 0, [], []};
+                                                                              _ ->
+                                                                                  lists:nth(KeyPos + 1, Subtrees)
+                                                                          end,
     case KeyNoXC < SubtreeNoMin of
         true ->
             if
@@ -568,10 +570,13 @@ delete_any(Key, BTree) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec empty(pos_integer()) -> b_tree().
--spec empty(pos_integer(), sort_function()) -> b_tree().
 
 empty(Order) when Order > 3 ->
     empty(Order, fun sort_ascending/2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec empty(pos_integer(), sort_function()) -> b_tree().
 
 empty(Order, Function) when Order > 3, is_function(Function, 2) ->
     {Order div 2, Order - 1, 0, Function, nil}.
@@ -601,6 +606,13 @@ from_dict_1([], BTree) ->
     BTree;
 from_dict_1([{Key, Value} | Tail], BTree) ->
     from_dict_1(Tail, insert(Key, Value, BTree)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec from_dict(pos_integer(), key_values(), sort_function()) -> b_tree().
+
+from_dict(Order, KeyValues, Function) when Order > 3, length(KeyValues) > 0, is_function(Function, 2) ->
+    from_dict_1(KeyValues, empty(Order, Function)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -851,7 +863,7 @@ iterator_1({KeyValues, Subtrees}, Iterator) ->
 
 -spec iterator_from(key(), b_tree()) -> iterator().
 
-iterator_from(_Key, {_, _, 0, _, nil}) ->
+iterator_from(_, {_, _, 0, _, nil}) ->
     [];
 iterator_from(Key, {_, _, _, SortFunction, Tree}) ->
     iterator_from_1(Key, Tree, [], SortFunction).
@@ -859,13 +871,13 @@ iterator_from(Key, {_, _, _, SortFunction, Tree}) ->
 -spec iterator_from_1(key(), tree(), iterator(), sort_function()) -> iterator().
 
 % The most left key / value.
-iterator_from_1(Key, {KeyNo, 0, KeyValues, []} = _Next, Iterator, SortFunction) ->
+iterator_from_1(Key, {KeyNo, 0, KeyValues, []}, Iterator, SortFunction) ->
     {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     [{lists:sublist(KeyValues, Pos, KeyNo), []} | Iterator];
 % The most left subtree.
-iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Next, Iterator, SortFunction) ->
+iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, Iterator, SortFunction) ->
     {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
-    {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1} = _NextIterator = lists:nth(Pos, Subtrees),
+    {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1} = lists:nth(Pos, Subtrees),
     iterator_from_1(Key, {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1}, [{lists:sublist(KeyValues, Pos, KeyNo), lists:sublist(Subtrees, Pos, SubtreeNo)} | Iterator], SortFunction).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
