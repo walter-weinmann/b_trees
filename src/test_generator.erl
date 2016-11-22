@@ -21,6 +21,7 @@
     delete_b_tree_till/3,
     delete_gb_tree_from/2,
     generate_b_tree_from_number/3,
+    generate_b_tree_from_number/4,
     generate_b_tree_from_number_update/3,
     generate_b_tree_list/2,
     generate_b_tree_list/3,
@@ -35,6 +36,7 @@
     generate_key_values_from_update/2,
     generate_key_values_random/2,
     generate_key_values_random_update/2,
+    generate_key_values_till/2,
     generate_keys_from/2,
     generate_keys_from_even/2,
     generate_keys_from_odd/2,
@@ -42,12 +44,17 @@
     generate_keys_till/2,
     iterate_next_b_tree/3,
     map_value_to_new/2,
-    prepare_template/1,
+    prepare_template_asc/1,
+    prepare_template_desc/1,
     take_largest_b_tree/3,
+    take_largest_b_tree/4,
     take_largest_gb_tree/2,
     take_smallest_b_tree/3,
+    take_smallest_b_tree/4,
     take_smallest_gb_tree/2
 ]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
@@ -56,11 +63,15 @@ delete_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
     Keys = test_generator:generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
     Keys = test_generator:generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec delete_b_tree_from_even(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
@@ -68,16 +79,22 @@ delete_b_tree_from_even(Order, Number, Width, BTree) when Order > 3, Number > 0 
     Keys = test_generator:generate_keys_from_even(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec delete_b_tree_from_odd(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_from_odd(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
     Keys = test_generator:generate_keys_from_odd(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec delete_b_tree_list([any()], b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_list(Keys, BTree) ->
     delete_b_tree_1(Keys, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec delete_b_tree_till(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
@@ -86,6 +103,8 @@ delete_b_tree_till(Order, Number, Width) when Order > 3, Number > 0 ->
     Keys = test_generator:generate_keys_till(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec delete_gb_tree_from(pos_integer(), pos_integer()) -> gb_trees:tree().
 
 delete_gb_tree_from(Number, Width) when Number > 0 ->
@@ -93,50 +112,77 @@ delete_gb_tree_from(Number, Width) when Number > 0 ->
     Keys = test_generator:generate_keys_from(Number, Width),
     delete_gb_tree_1(Keys, GBTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_b_tree_from_number(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_b_tree_from_number(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
+
+generate_b_tree_from_number(Order, Number, Width, Function) when Order > 3, Number >= 0, is_function(Function, 2) ->
+    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order, Function)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_b_tree_from_number_update(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order)).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_b_tree_list(pos_integer(), [{any(), any()}]) -> b_trees:b_tree().
 
 generate_b_tree_list(Order, KeyValues) when Order > 3 ->
     generate_b_tree_by_key_value_1(KeyValues, b_trees:empty(Order)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_b_tree_list(pos_integer(), [{any(), any()}], b_trees:b_tree()) -> b_trees:b_tree().
 
 generate_b_tree_list(Order, KeyValues, BTree) when Order > 3 ->
     generate_b_tree_by_key_value_1(KeyValues, BTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_b_tree_list_key_number(pos_integer(), [non_neg_integer()], pos_integer()) -> b_trees:b_tree().
 
 generate_b_tree_list_key_number(Order, Keys, Width) when Order > 3 ->
     generate_b_tree_by_key_number_1(Keys, [], Width, b_trees:empty(Order)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_b_tree_till_number(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 generate_b_tree_till_number(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(Number, 1, -1), [], Width, b_trees:empty(Order)).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_gb_tree_from_number(pos_integer(), pos_integer()) -> gb_trees:tree().
 
 generate_gb_tree_from_number(Number, Width) when Number >= 0 ->
     generate_gb_tree_by_key_1(lists:seq(1, Number), [], Width, gb_trees:empty()).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_gb_tree_from_number_update(pos_integer(), pos_integer()) -> gb_trees:tree().
 
 generate_gb_tree_from_number_update(Number, Width) when Number >= 0 ->
     generate_gb_tree_by_key_1(lists:seq(1, Number), "_new", Width, gb_trees:empty()).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_gb_tree_list([{any(), any()}]) -> gb_trees:tree().
 
 generate_gb_tree_list(KeyValues) ->
     generate_gb_tree_by_key_value_1(KeyValues, gb_trees:empty()).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_key_values_from(pos_integer(), pos_integer()) -> [{any(), any()}].
 
@@ -144,11 +190,15 @@ generate_key_values_from(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1(Keys, [], Width).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_key_values_from_even(pos_integer(), pos_integer()) -> [{any(), any()}].
 
 generate_key_values_from_even(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1_even(Keys, [], Width).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_key_values_from_odd(pos_integer(), pos_integer()) -> [{any(), any()}].
 
@@ -156,11 +206,15 @@ generate_key_values_from_odd(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1_odd(Keys, [], Width).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_key_values_from_update(pos_integer(), pos_integer()) -> [{any(), any()}].
 
 generate_key_values_from_update(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_key_values_1(Keys, "_new", Width).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_key_values_random(pos_integer(), pos_integer()) -> [{any(), any()}].
 
@@ -168,11 +222,23 @@ generate_key_values_random(Number, Width) when Number >= 0 ->
     Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_key_values_1(Keys, [], Width).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_key_values_random_update(pos_integer(), pos_integer()) -> [{any(), any()}].
 
 generate_key_values_random_update(Number, Width) when Number >= 0 ->
     Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_key_values_1(Keys, "_new", Width).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_key_values_till(pos_integer(), pos_integer()) -> [{any(), any()}].
+
+generate_key_values_till(Number, Width) when Number >= 0 ->
+    Keys = lists:seq(Number, 1, -1),
+    generate_key_values_1(Keys, [], Width).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_keys_from(pos_integer(), pos_integer()) -> [any()].
 
@@ -180,11 +246,15 @@ generate_keys_from(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_keys_1(Keys, Width).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_keys_from_even(pos_integer(), pos_integer()) -> [any()].
 
 generate_keys_from_even(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_keys_1_even(Keys, Width).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_keys_from_odd(pos_integer(), pos_integer()) -> [any()].
 
@@ -192,11 +262,15 @@ generate_keys_from_odd(Number, Width) when Number >= 0 ->
     Keys = lists:seq(1, Number),
     generate_keys_1_odd(Keys, Width).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_keys_random(pos_integer(), pos_integer()) -> [any()].
 
 generate_keys_random(Number, Width) when Number >= 0 ->
     Keys = lists:sort(fun compare/2, lists:seq(1, Number)),
     generate_keys_1(Keys, Width).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec generate_keys_till(pos_integer(), pos_integer()) -> [any()].
 
@@ -204,11 +278,23 @@ generate_keys_till(Number, Width) when Number >= 0 ->
     Keys = lists:seq(Number, 1, -1),
     generate_keys_1(Keys, Width).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec take_largest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 take_largest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
     BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
     take_largest_b_tree_1(Number, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_largest_b_tree(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
+
+take_largest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, is_function(Function, 2) ->
+    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width, Function),
+    take_largest_b_tree_1(Number, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec take_largest_gb_tree(pos_integer(), pos_integer()) -> gb_trees:tree().
 
@@ -216,11 +302,23 @@ take_largest_gb_tree(Number, Width) when Number > 0 ->
     GBTree = test_generator:generate_gb_tree_from_number(Number, Width),
     take_largest_gb_tree_1(Number, GBTree).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec take_smallest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 take_smallest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
     BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
     take_smallest_b_tree_1(Number, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_smallest_b_tree(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
+
+take_smallest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, is_function(Function, 2) ->
+    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width, Function),
+    take_smallest_b_tree_1(Number, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec take_smallest_gb_tree(pos_integer(), pos_integer()) -> gb_trees:tree().
 
@@ -258,10 +356,17 @@ map_value_to_new(_, Value) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec prepare_template(b_trees:b_tree()) -> b_trees:b_tree().
+-spec prepare_template_asc(b_trees:b_tree()) -> b_trees:b_tree().
 
-prepare_template(BTree) ->
+prepare_template_asc(BTree) ->
     setelement(4, BTree, fun b_trees:sort_ascending/2).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec prepare_template_desc(b_trees:b_tree()) -> b_trees:b_tree().
+
+prepare_template_desc(BTree) ->
+    setelement(4, BTree, fun b_trees:sort_descending/2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Generator helper functions.

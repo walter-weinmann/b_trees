@@ -92,7 +92,7 @@ Types:
 
 Inserts key Key with value Value into B-Tree1 if the key is not present in the B-Tree, otherwise updates key Key to value Value in B-Tree1. Returns the new B-Tree2.
 
-### from_orddict (Order, List) -> B-Tree ###
+### from_dict (Order, List) -> B-Tree ###
 
 Types:
 
@@ -100,7 +100,18 @@ Types:
     List = [{Key, Value}]
     B-Tree = b_tree()
 
-Turns an ordered list List of key-value tuples into a B-Tree of order Order. The list must not contain duplicate keys.
+Turns an ordered list List of key-value tuples into a B-Tree of order Order. The list must not contain duplicate keys. The sort order of the key values is ascending.
+
+### from_dict (Order, List, Function) -> B-Tree ###
+
+Types:
+
+    Order = pos_integer()
+    List = [{Key, Value}]
+    Function = fun((Key1, Key2) -> equal | greater | less)
+    B-Tree = b_tree()
+
+Turns an ordered list List of key-value tuples into a B-Tree of order Order. The list must not contain duplicate keys. The sort order of the key values is defined by the given function, which takes two key values and returns one of the atoms **equal**, **greater** or **less**.
 
 ### get (Key, B-Tree) -> Value ###
 
