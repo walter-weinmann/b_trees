@@ -22,9 +22,11 @@
     delete_gb_tree_from/2,
     generate_b_tree_from_number/3,
     generate_b_tree_from_number/4,
+    generate_b_tree_from_number_ets/3,
+    generate_b_tree_from_number_ets/4,
     generate_b_tree_from_number_update/3,
-    generate_b_tree_list/2,
-    generate_b_tree_list/3,
+    generate_b_tree_list_and_btree/2,
+    generate_b_tree_list_and_order/2,
     generate_b_tree_list_key_number/3,
     generate_b_tree_till_number/3,
     generate_gb_tree_from_number/2,
@@ -44,6 +46,7 @@
     generate_keys_till/2,
     iterate_next_b_tree/3,
     map_value_to_new/2,
+    persistance_by_ets/3,
     prepare_template_asc/1,
     prepare_template_desc/1,
     take_largest_b_tree/3,
@@ -121,10 +124,28 @@ generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec generate_b_tree_from_number_ets(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_ets(Order, Number, Width) when Order > 3, Number >= 0 ->
+    B_TREE = b_trees:set_parameter(b_trees:empty(Order), state, {ets:new(b_trees, [ordered_set, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
+
+    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_b_tree_from_number(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
 
 generate_b_tree_from_number(Order, Number, Width, Function) when Order > 3, Number >= 0, is_function(Function, 2) ->
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order, Function)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_b_tree_from_number_ets(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_ets(Order, Number, Width, Function) when Order > 3, Number >= 0, is_function(Function, 2) ->
+    B_TREE = b_trees:set_parameter(b_trees:empty(Order, Function), state, {ets:new(b_trees, [ordered_set, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
+
+    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -135,17 +156,17 @@ generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Number 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec generate_b_tree_list(pos_integer(), [{any(), any()}]) -> b_trees:b_tree().
+-spec generate_b_tree_list_and_btree([{any(), any()}], b_trees:b_tree()) -> b_trees:b_tree().
 
-generate_b_tree_list(Order, KeyValues) when Order > 3 ->
-    generate_b_tree_by_key_value_1(KeyValues, b_trees:empty(Order)).
+generate_b_tree_list_and_btree(KeyValues, BTree) ->
+    generate_b_tree_by_key_value_1(KeyValues, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec generate_b_tree_list(pos_integer(), [{any(), any()}], b_trees:b_tree()) -> b_trees:b_tree().
+-spec generate_b_tree_list_and_order([{any(), any()}], pos_integer()) -> b_trees:b_tree().
 
-generate_b_tree_list(Order, KeyValues, BTree) when Order > 3 ->
-    generate_b_tree_by_key_value_1(KeyValues, BTree).
+generate_b_tree_list_and_order(KeyValues, Order) when Order > 3 ->
+    generate_b_tree_by_key_value_1(KeyValues, b_trees:empty(Order)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -327,12 +348,12 @@ take_smallest_gb_tree(Number, Width) when Number > 0 ->
     take_smallest_gb_tree_1(Number, GBTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Eunit & Common Test helper functions.
+%% Eunit & Common Test Helper Functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec check_equal(any(), any()) -> boolean().
+-spec check_equal(any(), any()) -> atom().
 
-check_equal(Value_1, Value_2) when is_tuple(Value_2), tuple_size(Value_2) == 5 ->
+check_equal(Value_1, Value_2) when is_tuple(Value_2), tuple_size(Value_2) == 6 ->
     ?assertEqual(Value_1, setelement(4, Value_2, sort_function));
 check_equal(Value_1, Value_2) ->
     ?assertEqual(Value_1, Value_2).
@@ -353,6 +374,25 @@ iterate_next_b_tree(Iterator, Count, KeyValues) ->
 
 map_value_to_new(_, Value) ->
     Value ++ "_new".
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+persistance_by_ets(_, delete, []) ->
+    ok;
+persistance_by_ets(StateTarget, delete, SubtreesKey) ->
+    ets:delete(StateTarget, SubtreesKey),
+    ok;
+persistance_by_ets(_, insert, []) ->
+    [];
+persistance_by_ets(StateTarget, insert, Subtrees) ->
+    SubtreesKey = erlang:phash2(Subtrees),
+    true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
+    SubtreesKey;
+persistance_by_ets(_, lookup, []) ->
+    [];
+persistance_by_ets(StateTarget, lookup, SubtreesKey) ->
+    [{SubtreesKey, Subtrees}] = ets:lookup(StateTarget, SubtreesKey),
+    Subtrees.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

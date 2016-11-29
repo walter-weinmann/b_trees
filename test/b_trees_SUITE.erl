@@ -71,6 +71,7 @@ all() ->
         map_b_tree_test,
         map_error_test,
         number_key_values_test,
+        set_parameter_test,
         size_test,
         smallest_test,
         take_largest_test,
@@ -1294,6 +1295,18 @@ number_key_values_test(_Config) ->
     ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
 
     ?assertEqual(19, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_18_19))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: set_parameter
+%%--------------------------------------------------------------------
+
+set_parameter_test(_Config) ->
+    BTree_06_00 = b_trees:empty(6),
+    BTree_06_00_DESC = b_trees:set_parameter(BTree_06_00, sort_function, fun b_trees:sort_descending/2),
+    KeyValues = test_generator:generate_key_values_from(32, 2),
+    test_generator:check_equal(?B_TREE_06_32_DESC, test_generator:generate_b_tree_list_and_btree(KeyValues, BTree_06_00_DESC)),
 
     ok.
 
