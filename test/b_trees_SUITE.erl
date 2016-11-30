@@ -37,21 +37,31 @@ end_per_suite(_Config) ->
 
 all() ->
     [
+        delete_any_persistance_by_ets_test,
         delete_any_test,
         delete_b_tree_order_4_test,
         delete_b_tree_order_6_test,
+        delete_b_tree_persistance_by_ets_test,
         delete_clrs_test,
         delete_error_test,
         empty_b_tree_test,
         enter_b_tree_order_4_test,
+        enter_persistance_by_ets_test,
         from_dict_b_tree_test,
+        from_dict_persistance_by_ets_test,
+        get_persistance_by_ets_test,
         get_test,
+        height_persistance_by_ets_test,
         height_test,
+        insert_b_tree_order_4_test,
         insert_b_tree_order_6_test,
         insert_b_tree_order_8_test,
+        insert_b_tree_persistance_by_ets_test,
         insert_clrs_test,
         insert_error_test,
+        is_defined_persistance_by_ets_test,
         is_defined_test,
+        is_empty_persistance_by_ets_test,
         is_empty_test,
         iterator_from_next_00_test,
         iterator_from_next_01_test,
@@ -64,23 +74,85 @@ all() ->
         iterator_from_next_08_256_test,
         iterator_from_next_16_test,
         iterator_from_next_17_test,
+        iterator_next_from_persistance_by_ets_test,
+        iterator_next_persistance_by_ets_test,
         iterator_next_test,
+        keys_persistance_by_ets_test,
         keys_test,
+        largest_persistance_by_ets_test,
         largest_test,
+        lookup_persistance_by_ets_test,
         lookup_test,
+        map_b_tree_persistance_by_ets_test,
         map_b_tree_test,
         map_error_test,
+        number_key_values_persistance_by_ets_test,
         number_key_values_test,
         set_parameter_test,
+        size_persistance_by_ets_test,
         size_test,
+        smallest_persistance_by_ets_test,
         smallest_test,
+        take_largest_persistance_by_ets_test,
         take_largest_test,
+        take_smallest_persistance_by_ets_test,
         take_smallest_test,
+        to_list_persistance_by_ets_test,
         to_list_test,
         update_b_tree_test,
         update_error_test,
+        update_persistance_by_ets_test,
+        values_persistance_by_ets_test,
         values_test
     ].
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete_any - persistance by ets
+%%--------------------------------------------------------------------
+
+delete_any_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    B_TREE_04_32_32 = b_trees:delete_any("k_00", B_TREE_04_32_32),
+    B_TREE_04_32_01 = b_trees:delete_any("k_01", B_TREE_04_32_32),
+    B_TREE_04_32_02 = b_trees:delete_any("k_02", B_TREE_04_32_01),
+    B_TREE_04_32_03 = b_trees:delete_any("k_03", B_TREE_04_32_02),
+    B_TREE_04_32_04 = b_trees:delete_any("k_04", B_TREE_04_32_03),
+    B_TREE_04_32_05 = b_trees:delete_any("k_05", B_TREE_04_32_04),
+    B_TREE_04_32_06 = b_trees:delete_any("k_06", B_TREE_04_32_05),
+    B_TREE_04_32_07 = b_trees:delete_any("k_07", B_TREE_04_32_06),
+    B_TREE_04_32_08 = b_trees:delete_any("k_08", B_TREE_04_32_07),
+    B_TREE_04_32_09 = b_trees:delete_any("k_09", B_TREE_04_32_08),
+    B_TREE_04_32_10 = b_trees:delete_any("k_10", B_TREE_04_32_09),
+    B_TREE_04_32_11 = b_trees:delete_any("k_11", B_TREE_04_32_10),
+    B_TREE_04_32_12 = b_trees:delete_any("k_12", B_TREE_04_32_11),
+    B_TREE_04_32_13 = b_trees:delete_any("k_13", B_TREE_04_32_12),
+    B_TREE_04_32_14 = b_trees:delete_any("k_14", B_TREE_04_32_13),
+    B_TREE_04_32_15 = b_trees:delete_any("k_15", B_TREE_04_32_14),
+    B_TREE_04_32_16 = b_trees:delete_any("k_16", B_TREE_04_32_15),
+    B_TREE_04_32_17 = b_trees:delete_any("k_17", B_TREE_04_32_16),
+    B_TREE_04_32_18 = b_trees:delete_any("k_18", B_TREE_04_32_17),
+    B_TREE_04_32_19 = b_trees:delete_any("k_19", B_TREE_04_32_18),
+    B_TREE_04_32_20 = b_trees:delete_any("k_20", B_TREE_04_32_19),
+    B_TREE_04_32_21 = b_trees:delete_any("k_21", B_TREE_04_32_20),
+    B_TREE_04_32_22 = b_trees:delete_any("k_22", B_TREE_04_32_21),
+    B_TREE_04_32_23 = b_trees:delete_any("k_23", B_TREE_04_32_22),
+    B_TREE_04_32_24 = b_trees:delete_any("k_24", B_TREE_04_32_23),
+    B_TREE_04_32_25 = b_trees:delete_any("k_25", B_TREE_04_32_24),
+    B_TREE_04_32_26 = b_trees:delete_any("k_26", B_TREE_04_32_25),
+    B_TREE_04_32_27 = b_trees:delete_any("k_27", B_TREE_04_32_26),
+    B_TREE_04_32_28 = b_trees:delete_any("k_28", B_TREE_04_32_27),
+    B_TREE_04_32_29 = b_trees:delete_any("k_29", B_TREE_04_32_28),
+    B_TREE_04_32_30 = b_trees:delete_any("k_30", B_TREE_04_32_29),
+    B_TREE_04_32_31 = b_trees:delete_any("k_31", B_TREE_04_32_30),
+    B_TREE_04_32_31 = b_trees:delete_any("k_33", B_TREE_04_32_31),
+    B_TREE_04_32_00 = b_trees:delete_any("k_32", B_TREE_04_32_31),
+
+    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+
+    ets:delete(StateTarget),
+
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: delete_any
@@ -172,6 +244,52 @@ delete_b_tree_order_6_test(_Config) ->
     test_generator:check_equal(?B_TREE_06_00, test_generator:delete_b_tree_till(6, 100, 4)),
 
     test_generator:check_equal(?B_TREE_06_00, test_generator:delete_b_tree_from(6, 32, 2, test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete - persistance by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    B_TREE_04_32_01 = b_trees:delete("k_01", B_TREE_04_32_32),
+    B_TREE_04_32_02 = b_trees:delete("k_02", B_TREE_04_32_01),
+    B_TREE_04_32_03 = b_trees:delete("k_03", B_TREE_04_32_02),
+    B_TREE_04_32_04 = b_trees:delete("k_04", B_TREE_04_32_03),
+    B_TREE_04_32_05 = b_trees:delete("k_05", B_TREE_04_32_04),
+    B_TREE_04_32_06 = b_trees:delete("k_06", B_TREE_04_32_05),
+    B_TREE_04_32_07 = b_trees:delete("k_07", B_TREE_04_32_06),
+    B_TREE_04_32_08 = b_trees:delete("k_08", B_TREE_04_32_07),
+    B_TREE_04_32_09 = b_trees:delete("k_09", B_TREE_04_32_08),
+    B_TREE_04_32_10 = b_trees:delete("k_10", B_TREE_04_32_09),
+    B_TREE_04_32_11 = b_trees:delete("k_11", B_TREE_04_32_10),
+    B_TREE_04_32_12 = b_trees:delete("k_12", B_TREE_04_32_11),
+    B_TREE_04_32_13 = b_trees:delete("k_13", B_TREE_04_32_12),
+    B_TREE_04_32_14 = b_trees:delete("k_14", B_TREE_04_32_13),
+    B_TREE_04_32_15 = b_trees:delete("k_15", B_TREE_04_32_14),
+    B_TREE_04_32_16 = b_trees:delete("k_16", B_TREE_04_32_15),
+    B_TREE_04_32_17 = b_trees:delete("k_17", B_TREE_04_32_16),
+    B_TREE_04_32_18 = b_trees:delete("k_18", B_TREE_04_32_17),
+    B_TREE_04_32_19 = b_trees:delete("k_19", B_TREE_04_32_18),
+    B_TREE_04_32_20 = b_trees:delete("k_20", B_TREE_04_32_19),
+    B_TREE_04_32_21 = b_trees:delete("k_21", B_TREE_04_32_20),
+    B_TREE_04_32_22 = b_trees:delete("k_22", B_TREE_04_32_21),
+    B_TREE_04_32_23 = b_trees:delete("k_23", B_TREE_04_32_22),
+    B_TREE_04_32_24 = b_trees:delete("k_24", B_TREE_04_32_23),
+    B_TREE_04_32_25 = b_trees:delete("k_25", B_TREE_04_32_24),
+    B_TREE_04_32_26 = b_trees:delete("k_26", B_TREE_04_32_25),
+    B_TREE_04_32_27 = b_trees:delete("k_27", B_TREE_04_32_26),
+    B_TREE_04_32_28 = b_trees:delete("k_28", B_TREE_04_32_27),
+    B_TREE_04_32_29 = b_trees:delete("k_29", B_TREE_04_32_28),
+    B_TREE_04_32_30 = b_trees:delete("k_30", B_TREE_04_32_29),
+    B_TREE_04_32_31 = b_trees:delete("k_31", B_TREE_04_32_30),
+    B_TREE_04_32_00 = b_trees:delete("k_32", B_TREE_04_32_31),
+
+    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+
+    ets:delete(StateTarget),
 
     ok.
 
@@ -298,6 +416,59 @@ enter_b_tree_order_4_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: enter - persistance by ets
+%%--------------------------------------------------------------------
+
+enter_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_30 = test_generator:generate_b_tree_from_number_ets(4, 30, 2),
+
+    B_TREE_04_32_31 = b_trees:enter("k_31", "v_31", B_TREE_04_32_30),
+    B_TREE_04_32_32 = b_trees:enter("k_32", "v_32", B_TREE_04_32_31),
+
+    B_TREE_04_32_01_NEW = b_trees:enter("k_01", "v_01_new", B_TREE_04_32_32),
+    B_TREE_04_32_02_NEW = b_trees:enter("k_02", "v_02_new", B_TREE_04_32_01_NEW),
+    B_TREE_04_32_03_NEW = b_trees:enter("k_03", "v_03_new", B_TREE_04_32_02_NEW),
+    B_TREE_04_32_04_NEW = b_trees:enter("k_04", "v_04_new", B_TREE_04_32_03_NEW),
+    B_TREE_04_32_05_NEW = b_trees:enter("k_05", "v_05_new", B_TREE_04_32_04_NEW),
+    B_TREE_04_32_06_NEW = b_trees:enter("k_06", "v_06_new", B_TREE_04_32_05_NEW),
+    B_TREE_04_32_07_NEW = b_trees:enter("k_07", "v_07_new", B_TREE_04_32_06_NEW),
+    B_TREE_04_32_08_NEW = b_trees:enter("k_08", "v_08_new", B_TREE_04_32_07_NEW),
+    B_TREE_04_32_09_NEW = b_trees:enter("k_09", "v_09_new", B_TREE_04_32_08_NEW),
+    B_TREE_04_32_10_NEW = b_trees:enter("k_10", "v_10_new", B_TREE_04_32_09_NEW),
+    B_TREE_04_32_11_NEW = b_trees:enter("k_11", "v_11_new", B_TREE_04_32_10_NEW),
+    B_TREE_04_32_12_NEW = b_trees:enter("k_12", "v_12_new", B_TREE_04_32_11_NEW),
+    B_TREE_04_32_13_NEW = b_trees:enter("k_13", "v_13_new", B_TREE_04_32_12_NEW),
+    B_TREE_04_32_14_NEW = b_trees:enter("k_14", "v_14_new", B_TREE_04_32_13_NEW),
+    B_TREE_04_32_15_NEW = b_trees:enter("k_15", "v_15_new", B_TREE_04_32_14_NEW),
+    B_TREE_04_32_16_NEW = b_trees:enter("k_16", "v_16_new", B_TREE_04_32_15_NEW),
+    B_TREE_04_32_17_NEW = b_trees:enter("k_17", "v_17_new", B_TREE_04_32_16_NEW),
+    B_TREE_04_32_18_NEW = b_trees:enter("k_18", "v_18_new", B_TREE_04_32_17_NEW),
+    B_TREE_04_32_19_NEW = b_trees:enter("k_19", "v_19_new", B_TREE_04_32_18_NEW),
+    B_TREE_04_32_20_NEW = b_trees:enter("k_20", "v_20_new", B_TREE_04_32_19_NEW),
+    B_TREE_04_32_21_NEW = b_trees:enter("k_21", "v_21_new", B_TREE_04_32_20_NEW),
+    B_TREE_04_32_22_NEW = b_trees:enter("k_22", "v_22_new", B_TREE_04_32_21_NEW),
+    B_TREE_04_32_23_NEW = b_trees:enter("k_23", "v_23_new", B_TREE_04_32_22_NEW),
+    B_TREE_04_32_24_NEW = b_trees:enter("k_24", "v_24_new", B_TREE_04_32_23_NEW),
+    B_TREE_04_32_25_NEW = b_trees:enter("k_25", "v_25_new", B_TREE_04_32_24_NEW),
+    B_TREE_04_32_26_NEW = b_trees:enter("k_26", "v_26_new", B_TREE_04_32_25_NEW),
+    B_TREE_04_32_27_NEW = b_trees:enter("k_27", "v_27_new", B_TREE_04_32_26_NEW),
+    B_TREE_04_32_28_NEW = b_trees:enter("k_28", "v_28_new", B_TREE_04_32_27_NEW),
+    B_TREE_04_32_29_NEW = b_trees:enter("k_29", "v_29_new", B_TREE_04_32_28_NEW),
+    B_TREE_04_32_30_NEW = b_trees:enter("k_30", "v_30_new", B_TREE_04_32_29_NEW),
+    B_TREE_04_32_31_NEW = b_trees:enter("k_31", "v_31_new", B_TREE_04_32_30_NEW),
+    B_TREE_04_32_32_NEW = b_trees:enter("k_32", "v_32_new", B_TREE_04_32_31_NEW),
+
+    B_TREE_04_32_MAPPED_VALUES = b_trees:to_list(B_TREE_04_32_32_NEW),
+
+    ?assertEqual(B_TREE_04_32_MAPPED_VALUES, test_generator:generate_key_values_from_update(32, 2)),
+
+    ?assertEqual(11, length(ets:tab2list(StateTarget))),
+
+    ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: from_dict - b-tree
 %%--------------------------------------------------------------------
 
@@ -310,6 +481,65 @@ from_dict_b_tree_test(_Config) ->
     test_generator:check_equal(?B_TREE_18_19, b_trees:from_dict(b_trees:empty(18), test_generator:generate_key_values_from(19, 2))),
 
     test_generator:check_equal(?B_TREE_06_32_DESC, b_trees:from_dict(b_trees:empty(6, fun b_trees:sort_descending/2), test_generator:generate_key_values_from(32, 2))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict - persistance by ets
+%%--------------------------------------------------------------------
+
+from_dict_persistance_by_ets_test(_Config) ->
+    StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
+
+    B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+
+    ?assertEqual(32, b_trees:number_key_values(b_trees:from_dict(B_TREE_06_00, test_generator:generate_key_values_from(32, 2)))),
+
+    ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: get - persistance by ets
+%%--------------------------------------------------------------------
+
+get_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertException(error, {key_not_found, "k_00"}, b_trees:get("k_00", B_TREE_06_32)),
+    ?assertEqual("v_01", b_trees:get("k_01", B_TREE_06_32)),
+    ?assertEqual("v_02", b_trees:get("k_02", B_TREE_06_32)),
+    ?assertEqual("v_03", b_trees:get("k_03", B_TREE_06_32)),
+    ?assertEqual("v_04", b_trees:get("k_04", B_TREE_06_32)),
+    ?assertEqual("v_05", b_trees:get("k_05", B_TREE_06_32)),
+    ?assertEqual("v_06", b_trees:get("k_06", B_TREE_06_32)),
+    ?assertEqual("v_07", b_trees:get("k_07", B_TREE_06_32)),
+    ?assertEqual("v_08", b_trees:get("k_08", B_TREE_06_32)),
+    ?assertEqual("v_09", b_trees:get("k_09", B_TREE_06_32)),
+    ?assertEqual("v_10", b_trees:get("k_10", B_TREE_06_32)),
+    ?assertEqual("v_11", b_trees:get("k_11", B_TREE_06_32)),
+    ?assertEqual("v_12", b_trees:get("k_12", B_TREE_06_32)),
+    ?assertEqual("v_13", b_trees:get("k_13", B_TREE_06_32)),
+    ?assertEqual("v_14", b_trees:get("k_14", B_TREE_06_32)),
+    ?assertEqual("v_15", b_trees:get("k_15", B_TREE_06_32)),
+    ?assertEqual("v_16", b_trees:get("k_16", B_TREE_06_32)),
+    ?assertEqual("v_17", b_trees:get("k_17", B_TREE_06_32)),
+    ?assertEqual("v_18", b_trees:get("k_18", B_TREE_06_32)),
+    ?assertEqual("v_19", b_trees:get("k_19", B_TREE_06_32)),
+    ?assertEqual("v_20", b_trees:get("k_20", B_TREE_06_32)),
+    ?assertEqual("v_21", b_trees:get("k_21", B_TREE_06_32)),
+    ?assertEqual("v_22", b_trees:get("k_22", B_TREE_06_32)),
+    ?assertEqual("v_23", b_trees:get("k_23", B_TREE_06_32)),
+    ?assertEqual("v_24", b_trees:get("k_24", B_TREE_06_32)),
+    ?assertEqual("v_25", b_trees:get("k_25", B_TREE_06_32)),
+    ?assertEqual("v_26", b_trees:get("k_26", B_TREE_06_32)),
+    ?assertEqual("v_27", b_trees:get("k_27", B_TREE_06_32)),
+    ?assertEqual("v_28", b_trees:get("k_28", B_TREE_06_32)),
+    ?assertEqual("v_29", b_trees:get("k_29", B_TREE_06_32)),
+    ?assertEqual("v_30", b_trees:get("k_30", B_TREE_06_32)),
+    ?assertEqual("v_31", b_trees:get("k_31", B_TREE_06_32)),
+    ?assertEqual("v_32", b_trees:get("k_32", B_TREE_06_32)),
+    ?assertException(error, {key_not_found, "k_33"}, b_trees:get("k_33", B_TREE_06_32)),
 
     ok.
 
@@ -441,6 +671,17 @@ get_test(_Config) ->
     ?assertEqual("v_31", b_trees:get("k_31", test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
     ?assertEqual("v_32", b_trees:get("k_32", test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
     ?assertException(error, {key_not_found, "k_33"}, b_trees:get("k_33", test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: height - persistance by ets
+%%--------------------------------------------------------------------
+
+height_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual(2, b_trees:height(test_generator:prepare_template_desc(B_TREE_06_32))),
 
     ok.
 
@@ -600,6 +841,59 @@ insert_b_tree_order_8_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: insert - persistance by ets
+%%--------------------------------------------------------------------
+
+insert_b_tree_persistance_by_ets_test(_Config) ->
+    StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
+    ets:delete_all_objects(StateTarget),
+
+    B_TREE_04_00 = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+
+    B_TREE_04_01 = b_trees:insert("k_01", "v_01", B_TREE_04_00),
+    B_TREE_04_02 = b_trees:insert("k_02", "v_02", B_TREE_04_01),
+    B_TREE_04_03 = b_trees:insert("k_03", "v_03", B_TREE_04_02),
+    B_TREE_04_04 = b_trees:insert("k_04", "v_04", B_TREE_04_03),
+    B_TREE_04_05 = b_trees:insert("k_05", "v_05", B_TREE_04_04),
+    B_TREE_04_06 = b_trees:insert("k_06", "v_06", B_TREE_04_05),
+    B_TREE_04_07 = b_trees:insert("k_07", "v_07", B_TREE_04_06),
+    B_TREE_04_08 = b_trees:insert("k_08", "v_08", B_TREE_04_07),
+    B_TREE_04_09 = b_trees:insert("k_09", "v_09", B_TREE_04_08),
+    B_TREE_04_10 = b_trees:insert("k_10", "v_10", B_TREE_04_09),
+    B_TREE_04_11 = b_trees:insert("k_11", "v_11", B_TREE_04_10),
+    B_TREE_04_12 = b_trees:insert("k_12", "v_12", B_TREE_04_11),
+    B_TREE_04_13 = b_trees:insert("k_13", "v_13", B_TREE_04_12),
+    B_TREE_04_14 = b_trees:insert("k_14", "v_14", B_TREE_04_13),
+    B_TREE_04_15 = b_trees:insert("k_15", "v_15", B_TREE_04_14),
+    B_TREE_04_16 = b_trees:insert("k_16", "v_16", B_TREE_04_15),
+    B_TREE_04_17 = b_trees:insert("k_17", "v_17", B_TREE_04_16),
+    B_TREE_04_18 = b_trees:insert("k_18", "v_18", B_TREE_04_17),
+    B_TREE_04_19 = b_trees:insert("k_19", "v_19", B_TREE_04_18),
+    B_TREE_04_20 = b_trees:insert("k_20", "v_20", B_TREE_04_19),
+    B_TREE_04_21 = b_trees:insert("k_21", "v_21", B_TREE_04_20),
+    B_TREE_04_22 = b_trees:insert("k_22", "v_22", B_TREE_04_21),
+    B_TREE_04_23 = b_trees:insert("k_23", "v_23", B_TREE_04_22),
+    B_TREE_04_24 = b_trees:insert("k_24", "v_24", B_TREE_04_23),
+    B_TREE_04_25 = b_trees:insert("k_25", "v_25", B_TREE_04_24),
+    B_TREE_04_26 = b_trees:insert("k_26", "v_26", B_TREE_04_25),
+    B_TREE_04_27 = b_trees:insert("k_27", "v_27", B_TREE_04_26),
+    B_TREE_04_28 = b_trees:insert("k_28", "v_28", B_TREE_04_27),
+    B_TREE_04_29 = b_trees:insert("k_29", "v_29", B_TREE_04_28),
+    B_TREE_04_30 = b_trees:insert("k_30", "v_30", B_TREE_04_29),
+    B_TREE_04_31 = b_trees:insert("k_31", "v_31", B_TREE_04_30),
+    b_trees:insert("k_32", "v_32", B_TREE_04_31),
+
+    ?assertEqual(11, length(ets:tab2list(StateTarget))),
+
+    ets:delete_all_objects(StateTarget),
+
+    test_generator:generate_b_tree_from_number_ets(4, 99, 2),
+
+    ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: insert - Examples based on
 %%                      CLRS Introduction to Algorithms
 %%--------------------------------------------------------------------
@@ -629,6 +923,50 @@ insert_error_test(_Config) ->
     ?assertException(error, {key_exists, "k_03"}, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(6, 5, 2))),
     ?assertException(error, {key_exists, "k_04"}, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(6, 5, 2))),
     ?assertException(error, {key_exists, "k_05"}, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(6, 5, 2))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_defined - persistance by ets
+%%--------------------------------------------------------------------
+
+is_defined_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertNot(b_trees:is_defined("k_00", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_01", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_02", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_03", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_04", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_05", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_06", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_07", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_08", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_09", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_10", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_11", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_12", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_13", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_14", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_15", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_16", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_17", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_18", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_19", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_20", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_21", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_22", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_23", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_24", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_25", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_26", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_27", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_28", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_29", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_30", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_31", B_TREE_06_32)),
+    ?assert(b_trees:is_defined("k_32", B_TREE_06_32)),
+    ?assertNot(b_trees:is_defined("k_33", B_TREE_06_32)),
 
     ok.
 
@@ -760,6 +1098,21 @@ is_defined_test(_Config) ->
     ?assert(b_trees:is_defined("k_31", test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
     ?assert(b_trees:is_defined("k_32", test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
     ?assertNot(b_trees:is_defined("k_33", test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_empty - persistance by ets
+%%--------------------------------------------------------------------
+
+is_empty_persistance_by_ets_test(_Config) ->
+    StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
+
+    B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+
+    ?assertEqual(true, b_trees:is_empty(test_generator:prepare_template_asc(B_TREE_06_00))),
+
+    ets:delete(StateTarget),
 
     ok.
 
@@ -1003,6 +1356,130 @@ iterator_from_next_17_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: iterator_from & next - persistance by ets
+%%--------------------------------------------------------------------
+
+iterator_next_from_persistance_by_ets_test(_Config) ->
+    B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    Iterator_04_32_15 = b_trees:iterator_from("k_16", B_TREE_04_32),
+    {_Key_04_32_16, _Value_05_30_16, Iterator_04_32_16} = b_trees:next(Iterator_04_32_15),
+    ?assertEqual({"k_16", "v_16"}, {_Key_04_32_16, _Value_05_30_16}),
+    {_Key_04_32_17, _Value_05_30_17, Iterator_04_32_17} = b_trees:next(Iterator_04_32_16),
+    ?assertEqual({"k_17", "v_17"}, {_Key_04_32_17, _Value_05_30_17}),
+    {_Key_04_32_18, _Value_05_30_18, Iterator_04_32_18} = b_trees:next(Iterator_04_32_17),
+    ?assertEqual({"k_18", "v_18"}, {_Key_04_32_18, _Value_05_30_18}),
+    {_Key_04_32_19, _Value_05_30_19, Iterator_04_32_19} = b_trees:next(Iterator_04_32_18),
+    ?assertEqual({"k_19", "v_19"}, {_Key_04_32_19, _Value_05_30_19}),
+    {_Key_04_32_20, _Value_05_30_20, Iterator_04_32_20} = b_trees:next(Iterator_04_32_19),
+    ?assertEqual({"k_20", "v_20"}, {_Key_04_32_20, _Value_05_30_20}),
+    {_Key_04_32_21, _Value_05_30_21, Iterator_04_32_21} = b_trees:next(Iterator_04_32_20),
+    ?assertEqual({"k_21", "v_21"}, {_Key_04_32_21, _Value_05_30_21}),
+    {_Key_04_32_22, _Value_05_30_22, Iterator_04_32_22} = b_trees:next(Iterator_04_32_21),
+    ?assertEqual({"k_22", "v_22"}, {_Key_04_32_22, _Value_05_30_22}),
+    {_Key_04_32_23, _Value_05_30_23, Iterator_04_32_23} = b_trees:next(Iterator_04_32_22),
+    ?assertEqual({"k_23", "v_23"}, {_Key_04_32_23, _Value_05_30_23}),
+    {_Key_04_32_24, _Value_05_30_24, Iterator_04_32_24} = b_trees:next(Iterator_04_32_23),
+    ?assertEqual({"k_24", "v_24"}, {_Key_04_32_24, _Value_05_30_24}),
+    {_Key_04_32_25, _Value_05_30_25, Iterator_04_32_25} = b_trees:next(Iterator_04_32_24),
+    ?assertEqual({"k_25", "v_25"}, {_Key_04_32_25, _Value_05_30_25}),
+    {_Key_04_32_26, _Value_05_30_26, Iterator_04_32_26} = b_trees:next(Iterator_04_32_25),
+    ?assertEqual({"k_26", "v_26"}, {_Key_04_32_26, _Value_05_30_26}),
+    {_Key_04_32_27, _Value_05_30_27, Iterator_04_32_27} = b_trees:next(Iterator_04_32_26),
+    ?assertEqual({"k_27", "v_27"}, {_Key_04_32_27, _Value_05_30_27}),
+    {_Key_04_32_28, _Value_05_30_28, Iterator_04_32_28} = b_trees:next(Iterator_04_32_27),
+    ?assertEqual({"k_28", "v_28"}, {_Key_04_32_28, _Value_05_30_28}),
+    {_Key_04_32_29, _Value_05_30_29, _Iterator_04_32_29} = b_trees:next(Iterator_04_32_28),
+    ?assertEqual({"k_29", "v_29"}, {_Key_04_32_29, _Value_05_30_29}),
+    {_Key_04_32_30, _Value_05_30_30, _Iterator_04_32_30} = b_trees:next(_Iterator_04_32_29),
+    ?assertEqual({"k_30", "v_30"}, {_Key_04_32_30, _Value_05_30_30}),
+    {_Key_04_32_31, _Value_05_30_31, _Iterator_04_32_31} = b_trees:next(_Iterator_04_32_30),
+    ?assertEqual({"k_31", "v_31"}, {_Key_04_32_31, _Value_05_30_31}),
+    {_Key_04_32_32, _Value_05_30_32, _Iterator_04_32_32} = b_trees:next(_Iterator_04_32_31),
+    ?assertEqual({"k_32", "v_32"}, {_Key_04_32_32, _Value_05_30_32}),
+
+    ?assertEqual(none, b_trees:next(_Iterator_04_32_32)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterator & next - persistance by ets
+%%--------------------------------------------------------------------
+
+iterator_next_persistance_by_ets_test(_Config) ->
+    B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    Iterator_04_32_00 = b_trees:iterator(B_TREE_04_32),
+    {_Key_04_32_01, _Value_05_30_01, Iterator_04_32_01} = b_trees:next(Iterator_04_32_00),
+    ?assertEqual({"k_01", "v_01"}, {_Key_04_32_01, _Value_05_30_01}),
+    {_Key_04_32_02, _Value_05_30_02, Iterator_04_32_02} = b_trees:next(Iterator_04_32_01),
+    ?assertEqual({"k_02", "v_02"}, {_Key_04_32_02, _Value_05_30_02}),
+    {_Key_04_32_03, _Value_05_30_03, Iterator_04_32_03} = b_trees:next(Iterator_04_32_02),
+    ?assertEqual({"k_03", "v_03"}, {_Key_04_32_03, _Value_05_30_03}),
+    {_Key_04_32_04, _Value_05_30_04, Iterator_04_32_04} = b_trees:next(Iterator_04_32_03),
+    ?assertEqual({"k_04", "v_04"}, {_Key_04_32_04, _Value_05_30_04}),
+    {_Key_04_32_05, _Value_05_30_05, Iterator_04_32_05} = b_trees:next(Iterator_04_32_04),
+    ?assertEqual({"k_05", "v_05"}, {_Key_04_32_05, _Value_05_30_05}),
+    {_Key_04_32_06, _Value_05_30_06, Iterator_04_32_06} = b_trees:next(Iterator_04_32_05),
+    ?assertEqual({"k_06", "v_06"}, {_Key_04_32_06, _Value_05_30_06}),
+    {_Key_04_32_07, _Value_05_30_07, Iterator_04_32_07} = b_trees:next(Iterator_04_32_06),
+    ?assertEqual({"k_07", "v_07"}, {_Key_04_32_07, _Value_05_30_07}),
+    {_Key_04_32_08, _Value_05_30_08, Iterator_04_32_08} = b_trees:next(Iterator_04_32_07),
+    ?assertEqual({"k_08", "v_08"}, {_Key_04_32_08, _Value_05_30_08}),
+    {_Key_04_32_09, _Value_05_30_09, Iterator_04_32_09} = b_trees:next(Iterator_04_32_08),
+    ?assertEqual({"k_09", "v_09"}, {_Key_04_32_09, _Value_05_30_09}),
+    {_Key_04_32_10, _Value_05_30_10, Iterator_04_32_10} = b_trees:next(Iterator_04_32_09),
+    ?assertEqual({"k_10", "v_10"}, {_Key_04_32_10, _Value_05_30_10}),
+    {_Key_04_32_11, _Value_05_30_11, Iterator_04_32_11} = b_trees:next(Iterator_04_32_10),
+    ?assertEqual({"k_11", "v_11"}, {_Key_04_32_11, _Value_05_30_11}),
+    {_Key_04_32_12, _Value_05_30_12, Iterator_04_32_12} = b_trees:next(Iterator_04_32_11),
+    ?assertEqual({"k_12", "v_12"}, {_Key_04_32_12, _Value_05_30_12}),
+    {_Key_04_32_13, _Value_05_30_13, Iterator_04_32_13} = b_trees:next(Iterator_04_32_12),
+    ?assertEqual({"k_13", "v_13"}, {_Key_04_32_13, _Value_05_30_13}),
+    {_Key_04_32_14, _Value_05_30_14, Iterator_04_32_14} = b_trees:next(Iterator_04_32_13),
+    ?assertEqual({"k_14", "v_14"}, {_Key_04_32_14, _Value_05_30_14}),
+    {_Key_04_32_15, _Value_05_30_15, Iterator_04_32_15} = b_trees:next(Iterator_04_32_14),
+    ?assertEqual({"k_15", "v_15"}, {_Key_04_32_15, _Value_05_30_15}),
+    {_Key_04_32_16, _Value_05_30_16, Iterator_04_32_16} = b_trees:next(Iterator_04_32_15),
+    ?assertEqual({"k_16", "v_16"}, {_Key_04_32_16, _Value_05_30_16}),
+    {_Key_04_32_17, _Value_05_30_17, Iterator_04_32_17} = b_trees:next(Iterator_04_32_16),
+    ?assertEqual({"k_17", "v_17"}, {_Key_04_32_17, _Value_05_30_17}),
+    {_Key_04_32_18, _Value_05_30_18, Iterator_04_32_18} = b_trees:next(Iterator_04_32_17),
+    ?assertEqual({"k_18", "v_18"}, {_Key_04_32_18, _Value_05_30_18}),
+    {_Key_04_32_19, _Value_05_30_19, Iterator_04_32_19} = b_trees:next(Iterator_04_32_18),
+    ?assertEqual({"k_19", "v_19"}, {_Key_04_32_19, _Value_05_30_19}),
+    {_Key_04_32_20, _Value_05_30_20, Iterator_04_32_20} = b_trees:next(Iterator_04_32_19),
+    ?assertEqual({"k_20", "v_20"}, {_Key_04_32_20, _Value_05_30_20}),
+    {_Key_04_32_21, _Value_05_30_21, Iterator_04_32_21} = b_trees:next(Iterator_04_32_20),
+    ?assertEqual({"k_21", "v_21"}, {_Key_04_32_21, _Value_05_30_21}),
+    {_Key_04_32_22, _Value_05_30_22, Iterator_04_32_22} = b_trees:next(Iterator_04_32_21),
+    ?assertEqual({"k_22", "v_22"}, {_Key_04_32_22, _Value_05_30_22}),
+    {_Key_04_32_23, _Value_05_30_23, Iterator_04_32_23} = b_trees:next(Iterator_04_32_22),
+    ?assertEqual({"k_23", "v_23"}, {_Key_04_32_23, _Value_05_30_23}),
+    {_Key_04_32_24, _Value_05_30_24, Iterator_04_32_24} = b_trees:next(Iterator_04_32_23),
+    ?assertEqual({"k_24", "v_24"}, {_Key_04_32_24, _Value_05_30_24}),
+    {_Key_04_32_25, _Value_05_30_25, Iterator_04_32_25} = b_trees:next(Iterator_04_32_24),
+    ?assertEqual({"k_25", "v_25"}, {_Key_04_32_25, _Value_05_30_25}),
+    {_Key_04_32_26, _Value_05_30_26, Iterator_04_32_26} = b_trees:next(Iterator_04_32_25),
+    ?assertEqual({"k_26", "v_26"}, {_Key_04_32_26, _Value_05_30_26}),
+    {_Key_04_32_27, _Value_05_30_27, Iterator_04_32_27} = b_trees:next(Iterator_04_32_26),
+    ?assertEqual({"k_27", "v_27"}, {_Key_04_32_27, _Value_05_30_27}),
+    {_Key_04_32_28, _Value_05_30_28, Iterator_04_32_28} = b_trees:next(Iterator_04_32_27),
+    ?assertEqual({"k_28", "v_28"}, {_Key_04_32_28, _Value_05_30_28}),
+    {_Key_04_32_29, _Value_05_30_29, _Iterator_04_32_29} = b_trees:next(Iterator_04_32_28),
+    ?assertEqual({"k_29", "v_29"}, {_Key_04_32_29, _Value_05_30_29}),
+    {_Key_04_32_30, _Value_05_30_30, _Iterator_04_32_30} = b_trees:next(_Iterator_04_32_29),
+    ?assertEqual({"k_30", "v_30"}, {_Key_04_32_30, _Value_05_30_30}),
+    {_Key_04_32_31, _Value_05_30_31, _Iterator_04_32_31} = b_trees:next(_Iterator_04_32_30),
+    ?assertEqual({"k_31", "v_31"}, {_Key_04_32_31, _Value_05_30_31}),
+    {_Key_04_32_32, _Value_05_30_32, _Iterator_04_32_32} = b_trees:next(_Iterator_04_32_31),
+    ?assertEqual({"k_32", "v_32"}, {_Key_04_32_32, _Value_05_30_32}),
+
+    ?assertEqual(none, b_trees:next(_Iterator_04_32_32)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: iterator & next
 %%--------------------------------------------------------------------
 
@@ -1084,6 +1561,19 @@ iterator_next_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: keys - persistance by ets
+%%--------------------------------------------------------------------
+
+keys_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    _Keys_06_32 = b_trees:keys(test_generator:prepare_template_asc(B_TREE_06_32)),
+    ?assertEqual(test_generator:generate_keys_from(32, 2), _Keys_06_32),
+    ?assertEqual(32, length(_Keys_06_32)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: keys
 %%--------------------------------------------------------------------
 
@@ -1115,6 +1605,17 @@ keys_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: largest - persistance by ets
+%%--------------------------------------------------------------------
+
+largest_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual({"k_32", "v_32"}, b_trees:largest(B_TREE_06_32)),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: largest
 %%--------------------------------------------------------------------
 
@@ -1130,6 +1631,50 @@ largest_test(_Config) ->
     ?assertEqual({"k_19", "v_19"}, b_trees:largest(test_generator:prepare_template_asc(?B_TREE_18_19))),
 
     ?assertEqual({"k_01", "v_01"}, b_trees:largest(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: lookup - persistance by ets
+%%--------------------------------------------------------------------
+
+lookup_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual(none, b_trees:lookup("k_00", B_TREE_06_32)),
+    ?assertEqual({value, "v_01"}, b_trees:lookup("k_01", B_TREE_06_32)),
+    ?assertEqual({value, "v_02"}, b_trees:lookup("k_02", B_TREE_06_32)),
+    ?assertEqual({value, "v_03"}, b_trees:lookup("k_03", B_TREE_06_32)),
+    ?assertEqual({value, "v_04"}, b_trees:lookup("k_04", B_TREE_06_32)),
+    ?assertEqual({value, "v_05"}, b_trees:lookup("k_05", B_TREE_06_32)),
+    ?assertEqual({value, "v_06"}, b_trees:lookup("k_06", B_TREE_06_32)),
+    ?assertEqual({value, "v_07"}, b_trees:lookup("k_07", B_TREE_06_32)),
+    ?assertEqual({value, "v_08"}, b_trees:lookup("k_08", B_TREE_06_32)),
+    ?assertEqual({value, "v_09"}, b_trees:lookup("k_09", B_TREE_06_32)),
+    ?assertEqual({value, "v_10"}, b_trees:lookup("k_10", B_TREE_06_32)),
+    ?assertEqual({value, "v_11"}, b_trees:lookup("k_11", B_TREE_06_32)),
+    ?assertEqual({value, "v_12"}, b_trees:lookup("k_12", B_TREE_06_32)),
+    ?assertEqual({value, "v_13"}, b_trees:lookup("k_13", B_TREE_06_32)),
+    ?assertEqual({value, "v_14"}, b_trees:lookup("k_14", B_TREE_06_32)),
+    ?assertEqual({value, "v_15"}, b_trees:lookup("k_15", B_TREE_06_32)),
+    ?assertEqual({value, "v_16"}, b_trees:lookup("k_16", B_TREE_06_32)),
+    ?assertEqual({value, "v_17"}, b_trees:lookup("k_17", B_TREE_06_32)),
+    ?assertEqual({value, "v_18"}, b_trees:lookup("k_18", B_TREE_06_32)),
+    ?assertEqual({value, "v_19"}, b_trees:lookup("k_19", B_TREE_06_32)),
+    ?assertEqual({value, "v_20"}, b_trees:lookup("k_20", B_TREE_06_32)),
+    ?assertEqual({value, "v_21"}, b_trees:lookup("k_21", B_TREE_06_32)),
+    ?assertEqual({value, "v_22"}, b_trees:lookup("k_22", B_TREE_06_32)),
+    ?assertEqual({value, "v_23"}, b_trees:lookup("k_23", B_TREE_06_32)),
+    ?assertEqual({value, "v_24"}, b_trees:lookup("k_24", B_TREE_06_32)),
+    ?assertEqual({value, "v_25"}, b_trees:lookup("k_25", B_TREE_06_32)),
+    ?assertEqual({value, "v_26"}, b_trees:lookup("k_26", B_TREE_06_32)),
+    ?assertEqual({value, "v_27"}, b_trees:lookup("k_27", B_TREE_06_32)),
+    ?assertEqual({value, "v_28"}, b_trees:lookup("k_28", B_TREE_06_32)),
+    ?assertEqual({value, "v_29"}, b_trees:lookup("k_29", B_TREE_06_32)),
+    ?assertEqual({value, "v_30"}, b_trees:lookup("k_30", B_TREE_06_32)),
+    ?assertEqual({value, "v_31"}, b_trees:lookup("k_31", B_TREE_06_32)),
+    ?assertEqual({value, "v_32"}, b_trees:lookup("k_32", B_TREE_06_32)),
+    ?assertEqual(none, b_trees:lookup("k_33", B_TREE_06_32)),
 
     ok.
 
@@ -1265,6 +1810,25 @@ lookup_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: map - persistance by ets
+%%--------------------------------------------------------------------
+
+map_b_tree_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    B_TREE_04_32_MAPPED = b_trees:map(fun test_generator:map_value_to_new/2, B_TREE_04_32),
+
+    B_TREE_04_32_MAPPED_VALUES = b_trees:to_list(B_TREE_04_32_MAPPED),
+
+    ?assertEqual(B_TREE_04_32_MAPPED_VALUES, test_generator:generate_key_values_from_update(32, 2)),
+
+    ?assertEqual(11, length(ets:tab2list(StateTarget))),
+
+    ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: map
 %%--------------------------------------------------------------------
 
@@ -1281,6 +1845,17 @@ map_b_tree_test(_Config) ->
 
 map_error_test(_Config) ->
     ?assertException(error, {empty_tree, _}, b_trees:map(fun test_generator:map_value_to_new/2, test_generator:prepare_template_asc(?B_TREE_06_00))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: number_key_values - persistance by ets
+%%--------------------------------------------------------------------
+
+number_key_values_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_desc(B_TREE_06_32))),
 
     ok.
 
@@ -1314,6 +1889,17 @@ set_parameter_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: size - persistance by ets
+%%--------------------------------------------------------------------
+
+size_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual(14, b_trees:size(test_generator:prepare_template_desc(B_TREE_06_32))),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: size
 %%--------------------------------------------------------------------
 
@@ -1327,6 +1913,17 @@ size_test(_Config) ->
     ?assertEqual(10, b_trees:size(test_generator:prepare_template_asc(?B_TREE_06_21))),
 
     ?assertEqual(14, b_trees:size(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: smallest - persistance by ets
+%%--------------------------------------------------------------------
+
+smallest_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual({"k_01", "v_01"}, b_trees:smallest(B_TREE_06_32)),
 
     ok.
 
@@ -1346,6 +1943,52 @@ smallest_test(_Config) ->
     ?assertEqual({"k_32", "v_32"}, b_trees:smallest(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
 
     ?assertEqual({"k_01", "v_01"}, b_trees:smallest(test_generator:prepare_template_asc(?B_TREE_18_19))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest - persistance by ets
+%%--------------------------------------------------------------------
+
+take_largest_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    {"k_32", "v_32", B_TREE_04_32_31} = b_trees:take_largest(B_TREE_04_32_32),
+    {"k_31", "v_31", B_TREE_04_32_30} = b_trees:take_largest(B_TREE_04_32_31),
+    {"k_30", "v_30", B_TREE_04_32_29} = b_trees:take_largest(B_TREE_04_32_30),
+    {"k_29", "v_29", B_TREE_04_32_28} = b_trees:take_largest(B_TREE_04_32_29),
+    {"k_28", "v_28", B_TREE_04_32_27} = b_trees:take_largest(B_TREE_04_32_28),
+    {"k_27", "v_27", B_TREE_04_32_26} = b_trees:take_largest(B_TREE_04_32_27),
+    {"k_26", "v_26", B_TREE_04_32_25} = b_trees:take_largest(B_TREE_04_32_26),
+    {"k_25", "v_25", B_TREE_04_32_24} = b_trees:take_largest(B_TREE_04_32_25),
+    {"k_24", "v_24", B_TREE_04_32_23} = b_trees:take_largest(B_TREE_04_32_24),
+    {"k_23", "v_23", B_TREE_04_32_22} = b_trees:take_largest(B_TREE_04_32_23),
+    {"k_22", "v_22", B_TREE_04_32_21} = b_trees:take_largest(B_TREE_04_32_22),
+    {"k_21", "v_21", B_TREE_04_32_20} = b_trees:take_largest(B_TREE_04_32_21),
+    {"k_20", "v_20", B_TREE_04_32_19} = b_trees:take_largest(B_TREE_04_32_20),
+    {"k_19", "v_19", B_TREE_04_32_18} = b_trees:take_largest(B_TREE_04_32_19),
+    {"k_18", "v_18", B_TREE_04_32_17} = b_trees:take_largest(B_TREE_04_32_18),
+    {"k_17", "v_17", B_TREE_04_32_16} = b_trees:take_largest(B_TREE_04_32_17),
+    {"k_16", "v_16", B_TREE_04_32_15} = b_trees:take_largest(B_TREE_04_32_16),
+    {"k_15", "v_15", B_TREE_04_32_14} = b_trees:take_largest(B_TREE_04_32_15),
+    {"k_14", "v_14", B_TREE_04_32_13} = b_trees:take_largest(B_TREE_04_32_14),
+    {"k_13", "v_13", B_TREE_04_32_12} = b_trees:take_largest(B_TREE_04_32_13),
+    {"k_12", "v_12", B_TREE_04_32_11} = b_trees:take_largest(B_TREE_04_32_12),
+    {"k_11", "v_11", B_TREE_04_32_10} = b_trees:take_largest(B_TREE_04_32_11),
+    {"k_10", "v_10", B_TREE_04_32_09} = b_trees:take_largest(B_TREE_04_32_10),
+    {"k_09", "v_09", B_TREE_04_32_08} = b_trees:take_largest(B_TREE_04_32_09),
+    {"k_08", "v_08", B_TREE_04_32_07} = b_trees:take_largest(B_TREE_04_32_08),
+    {"k_07", "v_07", B_TREE_04_32_06} = b_trees:take_largest(B_TREE_04_32_07),
+    {"k_06", "v_06", B_TREE_04_32_05} = b_trees:take_largest(B_TREE_04_32_06),
+    {"k_05", "v_05", B_TREE_04_32_04} = b_trees:take_largest(B_TREE_04_32_05),
+    {"k_04", "v_04", B_TREE_04_32_03} = b_trees:take_largest(B_TREE_04_32_04),
+    {"k_03", "v_03", B_TREE_04_32_02} = b_trees:take_largest(B_TREE_04_32_03),
+    {"k_02", "v_02", B_TREE_04_32_01} = b_trees:take_largest(B_TREE_04_32_02),
+    {"k_01", "v_01", B_TREE_04_32_00} = b_trees:take_largest(B_TREE_04_32_01),
+
+    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+
+    ets:delete(StateTarget),
 
     ok.
 
@@ -1382,6 +2025,52 @@ take_largest_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: take_smallest - persistance by ets
+%%--------------------------------------------------------------------
+
+take_smallest_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    {"k_01", "v_01", B_TREE_04_32_01} = b_trees:take_smallest(B_TREE_04_32_32),
+    {"k_02", "v_02", B_TREE_04_32_02} = b_trees:take_smallest(B_TREE_04_32_01),
+    {"k_03", "v_03", B_TREE_04_32_03} = b_trees:take_smallest(B_TREE_04_32_02),
+    {"k_04", "v_04", B_TREE_04_32_04} = b_trees:take_smallest(B_TREE_04_32_03),
+    {"k_05", "v_05", B_TREE_04_32_05} = b_trees:take_smallest(B_TREE_04_32_04),
+    {"k_06", "v_06", B_TREE_04_32_06} = b_trees:take_smallest(B_TREE_04_32_05),
+    {"k_07", "v_07", B_TREE_04_32_07} = b_trees:take_smallest(B_TREE_04_32_06),
+    {"k_08", "v_08", B_TREE_04_32_08} = b_trees:take_smallest(B_TREE_04_32_07),
+    {"k_09", "v_09", B_TREE_04_32_09} = b_trees:take_smallest(B_TREE_04_32_08),
+    {"k_10", "v_10", B_TREE_04_32_10} = b_trees:take_smallest(B_TREE_04_32_09),
+    {"k_11", "v_11", B_TREE_04_32_11} = b_trees:take_smallest(B_TREE_04_32_10),
+    {"k_12", "v_12", B_TREE_04_32_12} = b_trees:take_smallest(B_TREE_04_32_11),
+    {"k_13", "v_13", B_TREE_04_32_13} = b_trees:take_smallest(B_TREE_04_32_12),
+    {"k_14", "v_14", B_TREE_04_32_14} = b_trees:take_smallest(B_TREE_04_32_13),
+    {"k_15", "v_15", B_TREE_04_32_15} = b_trees:take_smallest(B_TREE_04_32_14),
+    {"k_16", "v_16", B_TREE_04_32_16} = b_trees:take_smallest(B_TREE_04_32_15),
+    {"k_17", "v_17", B_TREE_04_32_17} = b_trees:take_smallest(B_TREE_04_32_16),
+    {"k_18", "v_18", B_TREE_04_32_18} = b_trees:take_smallest(B_TREE_04_32_17),
+    {"k_19", "v_19", B_TREE_04_32_19} = b_trees:take_smallest(B_TREE_04_32_18),
+    {"k_20", "v_20", B_TREE_04_32_20} = b_trees:take_smallest(B_TREE_04_32_19),
+    {"k_21", "v_21", B_TREE_04_32_21} = b_trees:take_smallest(B_TREE_04_32_20),
+    {"k_22", "v_22", B_TREE_04_32_22} = b_trees:take_smallest(B_TREE_04_32_21),
+    {"k_23", "v_23", B_TREE_04_32_23} = b_trees:take_smallest(B_TREE_04_32_22),
+    {"k_24", "v_24", B_TREE_04_32_24} = b_trees:take_smallest(B_TREE_04_32_23),
+    {"k_25", "v_25", B_TREE_04_32_25} = b_trees:take_smallest(B_TREE_04_32_24),
+    {"k_26", "v_26", B_TREE_04_32_26} = b_trees:take_smallest(B_TREE_04_32_25),
+    {"k_27", "v_27", B_TREE_04_32_27} = b_trees:take_smallest(B_TREE_04_32_26),
+    {"k_28", "v_28", B_TREE_04_32_28} = b_trees:take_smallest(B_TREE_04_32_27),
+    {"k_29", "v_29", B_TREE_04_32_29} = b_trees:take_smallest(B_TREE_04_32_28),
+    {"k_30", "v_30", B_TREE_04_32_30} = b_trees:take_smallest(B_TREE_04_32_29),
+    {"k_31", "v_31", B_TREE_04_32_31} = b_trees:take_smallest(B_TREE_04_32_30),
+    {"k_32", "v_32", B_TREE_04_32_00} = b_trees:take_smallest(B_TREE_04_32_31),
+
+    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+
+    ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_smallest
 %%--------------------------------------------------------------------
 
@@ -1410,6 +2099,19 @@ take_smallest_test(_Config) ->
     test_generator:check_equal(?B_TREE_06_00, test_generator:take_smallest_b_tree(6, 32, 2, fun b_trees:sort_descending/2)),
     test_generator:check_equal(?B_TREE_06_00, test_generator:take_smallest_b_tree(6, 36, 2)),
     test_generator:check_equal(?B_TREE_06_00, test_generator:take_smallest_b_tree(6, 40, 2)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: to_list - persistance by ets
+%%--------------------------------------------------------------------
+
+to_list_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    _KeyValues_06_32 = b_trees:to_list(B_TREE_06_32),
+    ?assertEqual(test_generator:generate_key_values_from(32, 2), _KeyValues_06_32),
+    ?assertEqual(32, length(_KeyValues_06_32)),
 
     ok.
 
@@ -1511,6 +2213,67 @@ update_error_test(_Config) ->
     ?assertException(error, {key_not_found, "k_30"}, b_trees:update("k_30", "v_30_new", test_generator:prepare_template_asc(?B_TREE_06_29))),
     ?assertException(error, {key_not_found, "k_00"}, b_trees:update("k_00", "v_00_new", test_generator:prepare_template_asc(?B_TREE_08_64))),
     ?assertException(error, {key_not_found, "k_65"}, b_trees:update("k_65", "v_65_new", test_generator:prepare_template_asc(?B_TREE_08_64))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update - persistance by ets
+%%--------------------------------------------------------------------
+
+update_persistance_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+
+    B_TREE_04_32_K_01 = b_trees:update("k_01", "v_01_new", B_TREE_04_32),
+    B_TREE_04_32_K_02 = b_trees:update("k_02", "v_02_new", B_TREE_04_32_K_01),
+    B_TREE_04_32_K_03 = b_trees:update("k_03", "v_03_new", B_TREE_04_32_K_02),
+    B_TREE_04_32_K_04 = b_trees:update("k_04", "v_04_new", B_TREE_04_32_K_03),
+    B_TREE_04_32_K_05 = b_trees:update("k_05", "v_05_new", B_TREE_04_32_K_04),
+    B_TREE_04_32_K_06 = b_trees:update("k_06", "v_06_new", B_TREE_04_32_K_05),
+    B_TREE_04_32_K_07 = b_trees:update("k_07", "v_07_new", B_TREE_04_32_K_06),
+    B_TREE_04_32_K_08 = b_trees:update("k_08", "v_08_new", B_TREE_04_32_K_07),
+    B_TREE_04_32_K_09 = b_trees:update("k_09", "v_09_new", B_TREE_04_32_K_08),
+    B_TREE_04_32_K_10 = b_trees:update("k_10", "v_10_new", B_TREE_04_32_K_09),
+    B_TREE_04_32_K_11 = b_trees:update("k_11", "v_11_new", B_TREE_04_32_K_10),
+    B_TREE_04_32_K_12 = b_trees:update("k_12", "v_12_new", B_TREE_04_32_K_11),
+    B_TREE_04_32_K_13 = b_trees:update("k_13", "v_13_new", B_TREE_04_32_K_12),
+    B_TREE_04_32_K_14 = b_trees:update("k_14", "v_14_new", B_TREE_04_32_K_13),
+    B_TREE_04_32_K_15 = b_trees:update("k_15", "v_15_new", B_TREE_04_32_K_14),
+    B_TREE_04_32_K_16 = b_trees:update("k_16", "v_16_new", B_TREE_04_32_K_15),
+    B_TREE_04_32_K_17 = b_trees:update("k_17", "v_17_new", B_TREE_04_32_K_16),
+    B_TREE_04_32_K_18 = b_trees:update("k_18", "v_18_new", B_TREE_04_32_K_17),
+    B_TREE_04_32_K_19 = b_trees:update("k_19", "v_19_new", B_TREE_04_32_K_18),
+    B_TREE_04_32_K_20 = b_trees:update("k_20", "v_20_new", B_TREE_04_32_K_19),
+    B_TREE_04_32_K_21 = b_trees:update("k_21", "v_21_new", B_TREE_04_32_K_20),
+    B_TREE_04_32_K_22 = b_trees:update("k_22", "v_22_new", B_TREE_04_32_K_21),
+    B_TREE_04_32_K_23 = b_trees:update("k_23", "v_23_new", B_TREE_04_32_K_22),
+    B_TREE_04_32_K_24 = b_trees:update("k_24", "v_24_new", B_TREE_04_32_K_23),
+    B_TREE_04_32_K_25 = b_trees:update("k_25", "v_25_new", B_TREE_04_32_K_24),
+    B_TREE_04_32_K_26 = b_trees:update("k_26", "v_26_new", B_TREE_04_32_K_25),
+    B_TREE_04_32_K_27 = b_trees:update("k_27", "v_27_new", B_TREE_04_32_K_26),
+    B_TREE_04_32_K_28 = b_trees:update("k_28", "v_28_new", B_TREE_04_32_K_27),
+    B_TREE_04_32_K_29 = b_trees:update("k_29", "v_29_new", B_TREE_04_32_K_28),
+    B_TREE_04_32_K_30 = b_trees:update("k_30", "v_30_new", B_TREE_04_32_K_29),
+    B_TREE_04_32_K_31 = b_trees:update("k_31", "v_31_new", B_TREE_04_32_K_30),
+    B_TREE_04_32_K_32 = b_trees:update("k_32", "v_32_new", B_TREE_04_32_K_31),
+
+    B_TREE_04_32_K_32_VALUES = b_trees:to_list(B_TREE_04_32_K_32),
+
+    ?assertEqual(B_TREE_04_32_K_32_VALUES, test_generator:generate_key_values_from_update(32, 2)),
+
+    ?assertEqual(11, length(ets:tab2list(StateTarget))),
+
+    ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: values - persistance by ets
+%%--------------------------------------------------------------------
+
+values_persistance_by_ets_test(_Config) ->
+    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+
+    ?assertEqual(32, length(b_trees:values(B_TREE_06_32))),
 
     ok.
 
