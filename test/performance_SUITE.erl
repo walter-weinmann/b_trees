@@ -695,7 +695,7 @@ enter_gb_tree([{Key, Value} | Tail], GBTree) ->
 from_dict_b_tree_order_1024_test(Config) ->
     _BTree = ?config(b_tree_1024, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(1024, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(1024), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -705,7 +705,7 @@ from_dict_b_tree_order_1024_test(Config) ->
 from_dict_b_tree_order_128_test(Config) ->
     _BTree = ?config(b_tree_128, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(128, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(128), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -715,7 +715,7 @@ from_dict_b_tree_order_128_test(Config) ->
 from_dict_b_tree_order_16_test(Config) ->
     _BTree = ?config(b_tree_16, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(16, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(16), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -725,7 +725,7 @@ from_dict_b_tree_order_16_test(Config) ->
 from_dict_b_tree_order_256_test(Config) ->
     _BTree = ?config(b_tree_256, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(256, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(256), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -735,7 +735,7 @@ from_dict_b_tree_order_256_test(Config) ->
 from_dict_b_tree_order_32_test(Config) ->
     _BTree = ?config(b_tree_32, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(32, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(32), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -745,7 +745,7 @@ from_dict_b_tree_order_32_test(Config) ->
 from_dict_b_tree_order_4_even_odd_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -755,7 +755,7 @@ from_dict_b_tree_order_4_even_odd_test(Config) ->
 from_dict_b_tree_order_4_odd_even_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -765,7 +765,7 @@ from_dict_b_tree_order_4_odd_even_test(Config) ->
 from_dict_b_tree_order_4_random_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -775,7 +775,7 @@ from_dict_b_tree_order_4_random_test(Config) ->
 from_dict_b_tree_order_4_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(4, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(4), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -785,7 +785,7 @@ from_dict_b_tree_order_4_test(Config) ->
 from_dict_b_tree_order_5_even_odd_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(5, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -795,7 +795,7 @@ from_dict_b_tree_order_5_even_odd_test(Config) ->
 from_dict_b_tree_order_5_odd_even_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(5, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -805,7 +805,7 @@ from_dict_b_tree_order_5_odd_even_test(Config) ->
 from_dict_b_tree_order_5_random_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(5, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -815,7 +815,7 @@ from_dict_b_tree_order_5_random_test(Config) ->
 from_dict_b_tree_order_5_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(5, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(5), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -825,7 +825,7 @@ from_dict_b_tree_order_5_test(Config) ->
 from_dict_b_tree_order_6_test(Config) ->
     _BTree = ?config(b_tree_6, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(6, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(6), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -835,7 +835,7 @@ from_dict_b_tree_order_6_test(Config) ->
 from_dict_b_tree_order_512_test(Config) ->
     _BTree = ?config(b_tree_512, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(512, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(512), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -845,7 +845,7 @@ from_dict_b_tree_order_512_test(Config) ->
 from_dict_b_tree_order_64_test(Config) ->
     _BTree = ?config(b_tree_64, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(64, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(64), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -855,7 +855,7 @@ from_dict_b_tree_order_64_test(Config) ->
 from_dict_b_tree_order_8_even_odd_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -865,7 +865,7 @@ from_dict_b_tree_order_8_even_odd_test(Config) ->
 from_dict_b_tree_order_8_odd_even_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -875,7 +875,7 @@ from_dict_b_tree_order_8_odd_even_test(Config) ->
 from_dict_b_tree_order_8_random_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -885,7 +885,7 @@ from_dict_b_tree_order_8_random_test(Config) ->
 from_dict_b_tree_order_8_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(8, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(8), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------

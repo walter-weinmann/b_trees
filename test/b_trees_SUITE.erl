@@ -302,12 +302,15 @@ enter_b_tree_order_4_test(_Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_test(_Config) ->
-    test_generator:check_equal(?B_TREE_04_04, b_trees:from_dict(4, test_generator:generate_key_values_from(4, 2))),
-    test_generator:check_equal(?B_TREE_06_01, b_trees:from_dict(6, test_generator:generate_key_values_from(1, 2))),
-    test_generator:check_equal(?B_TREE_06_29, b_trees:from_dict(6, test_generator:generate_key_values_from(29, 2))),
-    test_generator:check_equal(?B_TREE_18_19, b_trees:from_dict(18, test_generator:generate_key_values_from(19, 2))),
+    ?assertException(error, {tree_not_empty, _}, b_trees:from_dict(?B_TREE_04_04, test_generator:generate_key_values_from(4, 2))),
 
-    test_generator:check_equal(?B_TREE_06_32_DESC, b_trees:from_dict(6, test_generator:generate_key_values_from(32, 2), fun b_trees:sort_descending/2)),
+    test_generator:check_equal(?B_TREE_04_04, b_trees:from_dict(b_trees:empty(4), test_generator:generate_key_values_from(4, 2))),
+    test_generator:check_equal(?B_TREE_06_01, b_trees:from_dict(b_trees:empty(6), test_generator:generate_key_values_from(1, 2))),
+    test_generator:check_equal(?B_TREE_06_29, b_trees:from_dict(b_trees:empty(6), test_generator:generate_key_values_from(29, 2))),
+    test_generator:check_equal(?B_TREE_18_19, b_trees:from_dict(b_trees:empty(18), test_generator:generate_key_values_from(19, 2))),
+
+    test_generator:check_equal(?B_TREE_06_32_DESC, b_trees:from_dict(b_trees:empty(6, fun b_trees:sort_descending/2), test_generator:generate_key_values_from(32, 2))),
+
     ok.
 
 %%--------------------------------------------------------------------
@@ -1304,7 +1307,7 @@ number_key_values_test(_Config) ->
 
 set_parameter_test(_Config) ->
     BTree_06_00 = b_trees:empty(6),
-    BTree_06_00_DESC = b_trees:set_parameter(BTree_06_00, sort_function, fun b_trees:sort_descending/2),
+    BTree_06_00_DESC = b_trees:set_parameter(BTree_06_00, sort, fun b_trees:sort_descending/2),
     KeyValues = test_generator:generate_key_values_from(32, 2),
     test_generator:check_equal(?B_TREE_06_32_DESC, test_generator:generate_b_tree_list_and_btree(KeyValues, BTree_06_00_DESC)),
 

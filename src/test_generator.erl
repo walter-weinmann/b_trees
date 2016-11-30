@@ -354,7 +354,7 @@ take_smallest_gb_tree(Number, Width) when Number > 0 ->
 -spec check_equal(any(), any()) -> atom().
 
 check_equal(Value_1, Value_2) when is_tuple(Value_2), tuple_size(Value_2) == 6 ->
-    ?assertEqual(Value_1, setelement(4, Value_2, sort_function));
+    ?assertEqual(Value_1, setelement(4, Value_2, sort));
 check_equal(Value_1, Value_2) ->
     ?assertEqual(Value_1, Value_2).
 

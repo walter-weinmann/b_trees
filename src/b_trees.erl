@@ -190,7 +190,7 @@
 -type insert_function() :: fun((state_target(), 'insert', subtrees()) -> subtrees_key()).
 
 -export_type([iterator/0]).
--type iterator() :: [{key_values(), subtrees()}].
+-type iterator() :: [{key_values(), subtrees(), state()}].
 
 -type key() :: any().
 -type keys() :: [key()].
@@ -601,11 +601,18 @@ empty(Order, Function) when Order > 3, is_function(Function, 2) ->
 
 -spec enter(key(), value(), b_tree()) -> b_tree().
 
-enter(Key, Value, BTree) ->
+enter(Key, Value, {_, _, _, _, nil, _} = BTree) ->
     try
         update(Key, Value, BTree)
     catch
         error:{key_not_found, _} ->
+            insert(Key, Value, BTree)
+    end;
+enter(Key, Value, BTree) ->
+    case is_defined(Key, BTree) of
+        true ->
+            update(Key, Value, BTree);
+        _ ->
             insert(Key, Value, BTree)
     end.
 
@@ -684,12 +691,10 @@ insert(Key, Value, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State
 -spec insert_1(key_value(), tree(), pos_integer(), pos_integer(), sort_function(), state()) -> tree().
 
 % Leaf node.
-insert_1(KeyValue, {KeyNo, 0, KeyValues, []} = _Tree, _SubtreeNoMin, _KeyNoMax, SortFunction, _) ->
-    % ?debugFmt("wwe debugging insert_1 ===> Start ~n KeyValue: ~p~n Tree: ~p~n SubtreeNoMin: ~p~n KeyNoMax: ~p~n", [KeyValue, _Tree, _SubtreeNoMin, _KeyNoMax]),
+insert_1(KeyValue, {KeyNo, 0, KeyValues, []}, _, _, SortFunction, _) ->
     {KeyNo + 1, 0, insert_key_value(KeyValue, KeyValues, KeyNo, SortFunction), []};
 % Non-Leaf node.
-insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, KeyNoMax, SortFunction, nil) ->
-    % ?debugFmt("wwe debugging insert_1 ===> Start ~n KeyValue: ~p~n Tree: ~p~n SubtreeNoMin: ~p~n KeyNoMax: ~p~n", [KeyValue, _Tree, SubtreeNoMin, KeyNoMax]),
+insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, SortFunction, nil) ->
     {ValueFound, SubtreePos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -732,8 +737,7 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, S
             erlang:error({key_exists, Key})
     end;
 % Non-Leaf node.
-insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin, KeyNoMax, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
-    % ?debugFmt("wwe debugging insert_1 ===> Start ~n KeyValue: ~p~n Tree: ~p~n SubtreeNoMin: ~p~n KeyNoMax: ~p~n", [KeyValue, _Tree, SubtreeNoMin, KeyNoMax]),
+insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoMax, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
     ok = DeleteFunction(StateTarget, delete, SubtreesKey),
     {ValueFound, SubtreePos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
@@ -798,8 +802,7 @@ insert_key_value({Key, _} = KeyValue, KeyValues, KeyNo, SortFunction) ->
 
 -spec split_node_non_root(pos_integer(), key_values(), subtrees(), tree(), pos_integer(), pos_integer(), sort_function(), state()) -> {key_values(), subtrees(), tree(), tree(), subtrees()}.
 
-split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeKeyValues, TreeSubtrees} = _Tree, SubtreePos, SubtreeNoMin, SortFunction, nil) ->
-    % ?debugFmt("wwe debugging split_node_non_root ===> Start ~n KeyNo: ~p~n KeyValues: ~p~n Subtrees: ~p~n Tree: ~p~n SubtreePos: ~p~n SubtreeNoMin: ~p~n", [KeyNo, KeyValues, Subtrees, _Tree, SubtreePos, SubtreeNoMin]),
+split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeKeyValues, TreeSubtrees}, SubtreePos, SubtreeNoMin, SortFunction, nil) ->
     {
         % SplitKeyValues .......................................................
         insert_key_value(lists:nth(SubtreeNoMin, TreeKeyValues), KeyValues, KeyNo, SortFunction),
@@ -844,8 +847,7 @@ split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeK
         % SplitSubtrees2 .......................................................
         lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
     };
-split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeKeyValues, TreeSubtreesKey} = _Tree, SubtreePos, SubtreeNoMin, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = _State) ->
-    % ?debugFmt("wwe debugging split_node_non_root ===> Start ~n KeyNo: ~p~n KeyValues: ~p~n Subtrees: ~p~n Tree: ~p~n SubtreePos: ~p~n SubtreeNoMin: ~p~n", [KeyNo, KeyValues, Subtrees, _Tree, SubtreePos, SubtreeNoMin]),
+split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeKeyValues, TreeSubtreesKey}, SubtreePos, SubtreeNoMin, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction}) ->
     TreeSubtrees = LookupFunction(StateTarget, lookup, TreeSubtreesKey),
     ok = DeleteFunction(StateTarget, delete, TreeSubtreesKey),
     {
@@ -902,8 +904,7 @@ split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeK
 -spec split_node_root(tree(), pos_integer(), state()) -> tree().
 
 % Leaf node.
-split_node_root({KeyNo, 0, KeyValues, []} = _Tree, SubtreeNoMin, nil) ->
-    % ?debugFmt("wwe debugging split_node_root ===> Start ~n Tree: ~p~n SubtreeNoMin: ~p~n", [_Tree, SubtreeNoMin]),
+split_node_root({KeyNo, 0, KeyValues, []}, SubtreeNoMin, nil) ->
     {
         1,
         2,
@@ -923,8 +924,7 @@ split_node_root({KeyNo, 0, KeyValues, []} = _Tree, SubtreeNoMin, nil) ->
             }
         ]
     };
-split_node_root({KeyNo, 0, KeyValues, []} = _Tree, SubtreeNoMin, {StateTarget, _, InsertFunction, _} = _State) ->
-    % ?debugFmt("wwe debugging split_node_root ===> Start ~n Tree: ~p~n SubtreeNoMin: ~p~n", [_Tree, SubtreeNoMin]),
+split_node_root({KeyNo, 0, KeyValues, []}, SubtreeNoMin, {StateTarget, _, InsertFunction, _}) ->
     {
         1,
         2,
@@ -947,8 +947,7 @@ split_node_root({KeyNo, 0, KeyValues, []} = _Tree, SubtreeNoMin, {StateTarget, _
             ]
         )
     };
-split_node_root({KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, nil) ->
-    % ?debugFmt("wwe debugging split_node_root ===> Start ~n Tree: ~p~n SubtreeNoMin: ~p~n", [_Tree, SubtreeNoMin]),
+split_node_root({KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, nil) ->
     {
         1,
         2,
@@ -968,8 +967,7 @@ split_node_root({KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, n
             }
         ]
     };
-split_node_root({KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = _State) ->
-    % ?debugFmt("wwe debugging split_node_root ===> Start ~n Tree: ~p~n SubtreeNoMin: ~p~n", [_Tree, SubtreeNoMin]),
+split_node_root({KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, {StateTarget, DeleteFunction, InsertFunction, LookupFunction}) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
     DeleteFunction(StateTarget, delete, SubtreesKey),
     {
@@ -1032,21 +1030,29 @@ is_empty(_) ->
 
 iterator({_, _, 0, _, _, nil}) ->
     [];
-iterator({_, _, _, _, _, {_, _, KeyValues, Subtrees}}) ->
-    iterator_1({KeyValues, Subtrees}, []).
+iterator({_, _, _, _, State, {_, _, KeyValues, Subtrees}}) ->
+    iterator_1({KeyValues, Subtrees, State}, []).
 
 % The iterator structure is really just a list corresponding to
 % the call stack of an in-order traversal. This is quite fast.
 
--spec iterator_1({key_values(), subtrees()}, iterator()) -> iterator().
+-spec iterator_1({key_values(), subtrees(), state()}, iterator()) -> iterator().
 
 % The most left key / value.
-iterator_1({KeyValues, []}, Iterator) ->
-    [{KeyValues, []} | Iterator];
+iterator_1({KeyValues, [], State}, Iterator) ->
+    [{KeyValues, [], State} | Iterator];
 % The most left subtree.
-iterator_1({KeyValues, Subtrees}, Iterator) ->
+iterator_1({KeyValues, Subtrees, nil}, Iterator) ->
     {_, _, KeyValues_1, Subtrees_1} = lists:nth(1, Subtrees),
-    iterator_1({KeyValues_1, Subtrees_1}, [{KeyValues, Subtrees} | Iterator]).
+    iterator_1({KeyValues_1, Subtrees_1, nil}, [{KeyValues, Subtrees, nil} | Iterator]);
+iterator_1({KeyValues, Subtrees, State}, Iterator) when is_list(Subtrees) ->
+    {_, _, KeyValues_1, Subtrees_1} = lists:nth(1, Subtrees),
+    iterator_1({KeyValues_1, Subtrees_1, State}, [{KeyValues, Subtrees, State} | Iterator]);
+iterator_1({KeyValues, SubtreesKey, {StateTarget, _, _, LookupFunction} = State}, Iterator) ->
+    Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
+    {_, _, KeyValues_1, Subtrees_1Key} = lists:nth(1, Subtrees),
+    Subtrees_1 = LookupFunction(StateTarget, lookup, Subtrees_1Key),
+    iterator_1({KeyValues_1, Subtrees_1, State}, [{KeyValues, Subtrees, State} | Iterator]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1054,20 +1060,30 @@ iterator_1({KeyValues, Subtrees}, Iterator) ->
 
 iterator_from(_, {_, _, 0, _, _, nil}) ->
     [];
-iterator_from(Key, {_, _, _, SortFunction, _, Tree}) ->
-    iterator_from_1(Key, Tree, [], SortFunction).
+iterator_from(Key, {_, _, _, SortFunction, State, Tree}) ->
+    iterator_from_1(Key, Tree, [], SortFunction, State).
 
--spec iterator_from_1(key(), tree(), iterator(), sort_function()) -> iterator().
+-spec iterator_from_1(key(), tree(), iterator(), sort_function(), state()) -> iterator().
 
 % The most left key / value.
-iterator_from_1(Key, {KeyNo, 0, KeyValues, []}, Iterator, SortFunction) ->
+iterator_from_1(Key, {KeyNo, 0, KeyValues, []}, Iterator, SortFunction, State) ->
     {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
-    [{lists:sublist(KeyValues, Pos, KeyNo), []} | Iterator];
+    [{lists:sublist(KeyValues, Pos, KeyNo), [], State} | Iterator];
 % The most left subtree.
-iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, Iterator, SortFunction) ->
+iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, Iterator, SortFunction, nil) ->
     {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1} = lists:nth(Pos, Subtrees),
-    iterator_from_1(Key, {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1}, [{lists:sublist(KeyValues, Pos, KeyNo), lists:sublist(Subtrees, Pos, SubtreeNo)} | Iterator], SortFunction).
+    iterator_from_1(Key, {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1}, [{lists:sublist(KeyValues, Pos, KeyNo), lists:sublist(Subtrees, Pos, SubtreeNo), nil} | Iterator], SortFunction, nil);
+iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, Iterator, SortFunction, State) when is_list(Subtrees) ->
+    {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
+    {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1} = lists:nth(Pos, Subtrees),
+    iterator_from_1(Key, {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1}, [{lists:sublist(KeyValues, Pos, KeyNo), lists:sublist(Subtrees, Pos, SubtreeNo), State} | Iterator], SortFunction, State);
+iterator_from_1(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, Iterator, SortFunction, {StateTarget, _, _, LookupFunction} = State) ->
+    Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
+    {_, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
+    {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1Key} = lists:nth(Pos, Subtrees),
+    Subtrees_1 = LookupFunction(StateTarget, lookup, Subtrees_1Key),
+    iterator_from_1(Key, {KeyNo_1, SubtreeNo_1, KeyValues_1, Subtrees_1}, [{lists:sublist(KeyValues, Pos, KeyNo), lists:sublist(Subtrees, Pos, SubtreeNo), State} | Iterator], SortFunction, State).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1136,8 +1152,8 @@ lookup(Key, {_, _, _, SortFunction, State, Tree}) ->
 
 map(_, {_, _, 0, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-map(Function, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, StateTarget, Tree}) when is_function(Function, 2) ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, StateTarget, map_tree(Function, Tree)}.
+map(Function, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, Tree}) when is_function(Function, 2) ->
+    {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, map_tree(Function, State, Tree)}.
 
 -spec map_key_values(map_function(), key_values(), key_values()) -> key_values().
 
@@ -1146,36 +1162,40 @@ map_key_values(_, [], KeyValuesMapped) ->
 map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
     map_key_values(Function, Tail, KeyValuesMapped ++ [{Key, Function(Key, Value)}]).
 
--spec map_tree(map_function(), tree()) -> tree().
+-spec map_tree(map_function(), state(), tree()) -> tree().
 
 % Leaf node.
-map_tree(Function, {KeyNo, 0, KeyValues, []}) ->
+map_tree(Function, _, {KeyNo, 0, KeyValues, []}) ->
     {KeyNo, 0, map_key_values(Function, KeyValues, []), []};
-map_tree(Function, {KeyNo, SubtreeNo, KeyValues, Subtrees}) ->
-    {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), map_subtrees(Function, Subtrees, [])}.
+map_tree(Function, nil, {KeyNo, SubtreeNo, KeyValues, Subtrees}) ->
+    {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), map_subtrees(Function, nil, Subtrees, [])};
+map_tree(Function, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}) ->
+    Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
+    ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+    {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), InsertFunction(StateTarget, insert, map_subtrees(Function, State, Subtrees, []))}.
 
--spec map_subtrees(map_function(), subtrees(), subtrees()) -> subtrees().
+-spec map_subtrees(map_function(), state(), subtrees(), subtrees()) -> subtrees().
 
-map_subtrees(_, [], TreesMapped) ->
+map_subtrees(_, _, [], TreesMapped) ->
     TreesMapped;
-map_subtrees(Function, [Tree | Tail], TreesMapped) ->
-    map_subtrees(Function, Tail, TreesMapped ++ [map_tree(Function, Tree)]).
+map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
+    map_subtrees(Function, State, Tail, TreesMapped ++ [map_tree(Function, State, Tree)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec next(iterator()) -> 'none' | {key(), value(), iterator()}.
 
 % One level up.
-next([{[], _}, {[], _} = Iterator | TailIterator]) ->
+next([{[], _, _}, {[], _, _} = Iterator | TailIterator]) ->
     next([Iterator] ++ TailIterator);
 % End of leaf node.
-next([{[], _}, {[{Key, Value} | TailKeyValues], [_ | TailSubtrees]} | TailIterator]) ->
-    {Key, Value, iterator_1({TailKeyValues, TailSubtrees}, TailIterator)};
+next([{[], _, _}, {[{Key, Value} | TailKeyValues], [_ | TailSubtrees], State} | TailIterator]) ->
+    {Key, Value, iterator_1({TailKeyValues, TailSubtrees, State}, TailIterator)};
 % Processing a leaf node.
-next([{[{Key, Value} | KeyValues], []} | Iterator]) ->
-    {Key, Value, [{KeyValues, []} | Iterator]};
+next([{[{Key, Value} | KeyValues], [], State} | Iterator]) ->
+    {Key, Value, [{KeyValues, [], State} | Iterator]};
 % End of iterator.
-next([{[], _}]) ->
+next([{[], _, _}]) ->
     none;
 % Empty iterator.
 next([]) ->
@@ -1192,10 +1212,10 @@ number_key_values({_, _, NumberKeyValues, _, _, _}) ->
 
 -spec set_parameter(b_tree(), atom(), any()) -> b_tree().
 
-set_parameter({SubtreeNoMin, KeyNoMax, 0, _, StateTarget, nil}, sort_function, SortFunction)
+set_parameter({SubtreeNoMin, KeyNoMax, 0, _, State, nil}, sort, SortFunction)
     when is_function(SortFunction, 2) ->
-    {SubtreeNoMin, KeyNoMax, 0, SortFunction, StateTarget, nil};
-set_parameter({SubtreeNoMin, KeyNoMax, 0, SortFunction, _, nil}, state, {_StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State)
+    {SubtreeNoMin, KeyNoMax, 0, SortFunction, State, nil};
+set_parameter({SubtreeNoMin, KeyNoMax, 0, SortFunction, _, nil}, state, {_, DeleteFunction, InsertFunction, LookupFunction} = State)
     when is_function(DeleteFunction, 3),
     is_function(InsertFunction, 3),
     is_function(LookupFunction, 3) ->
@@ -1303,13 +1323,13 @@ to_list_1([KeyValue | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSubt
 
 update(Key, _, {_, _, 0, _, _, nil}) ->
     erlang:error({key_not_found, Key});
-update(Key, Value, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, StateTarget, Tree}) ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, StateTarget, update_1({Key, Value}, Tree, SortFunction)}.
+update(Key, Value, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, Tree}) ->
+    {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, update_1({Key, Value}, Tree, SortFunction, State)}.
 
--spec update_1(key_value(), tree(), sort_function()) -> tree().
+-spec update_1(key_value(), tree(), sort_function(), state()) -> tree().
 
 % Leaf node.
-update_1({Key, _} = KeyValue, {KeyNo, 0, KeyValues, []}, SortFunction) ->
+update_1({Key, _} = KeyValue, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -1324,7 +1344,7 @@ update_1({Key, _} = KeyValue, {KeyNo, 0, KeyValues, []}, SortFunction) ->
                 []
             }
     end;
-update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SortFunction) ->
+update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SortFunction, nil) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -1333,7 +1353,7 @@ update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SortFunct
                 SubtreeNo,
                 KeyValues,
                     lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                    [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction)] ++
+                    [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction, nil)] ++
                     lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
             };
         _ ->
@@ -1344,6 +1364,33 @@ update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SortFunct
                     [KeyValue] ++
                     lists:sublist(KeyValues, KeyPos + 1, KeyNo),
                 Subtrees
+            }
+    end;
+update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
+    Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
+    {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
+    case ValueFound of
+        none ->
+            ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+            {
+                KeyNo,
+                SubtreeNo,
+                KeyValues,
+                InsertFunction(StateTarget,
+                    insert,
+                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                        [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction, State)] ++
+                        lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                )
+            };
+        _ ->
+            {
+                KeyNo,
+                SubtreeNo,
+                    lists:sublist(KeyValues, 1, KeyPos - 1) ++
+                    [KeyValue] ++
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                SubtreesKey
             }
     end.
 
@@ -1495,9 +1542,97 @@ direct_test() ->
 %%
 %%    ?assertEqual(14, b_trees:size(test_generator:prepare_template_desc(B_TREE_06_32))),
 
-    B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+%%    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_30 = test_generator:generate_b_tree_from_number_ets(4, 30, 2),
+%%
+%%    B_TREE_04_32_31 = b_trees:enter("k_31", "v_31", B_TREE_04_32_30),
+%%    B_TREE_04_32_32 = b_trees:enter("k_32", "v_32", B_TREE_04_32_31),
+%%
+%%    B_TREE_04_32_01_NEW = b_trees:enter("k_01", "v_01_new", B_TREE_04_32_32),
+%%    B_TREE_04_32_02_NEW = b_trees:enter("k_02", "v_02_new", B_TREE_04_32_01_NEW),
+%%    B_TREE_04_32_03_NEW = b_trees:enter("k_03", "v_03_new", B_TREE_04_32_02_NEW),
+%%    B_TREE_04_32_04_NEW = b_trees:enter("k_04", "v_04_new", B_TREE_04_32_03_NEW),
+%%    B_TREE_04_32_05_NEW = b_trees:enter("k_05", "v_05_new", B_TREE_04_32_04_NEW),
+%%    B_TREE_04_32_06_NEW = b_trees:enter("k_06", "v_06_new", B_TREE_04_32_05_NEW),
+%%    B_TREE_04_32_07_NEW = b_trees:enter("k_07", "v_07_new", B_TREE_04_32_06_NEW),
+%%    B_TREE_04_32_08_NEW = b_trees:enter("k_08", "v_08_new", B_TREE_04_32_07_NEW),
+%%    B_TREE_04_32_09_NEW = b_trees:enter("k_09", "v_09_new", B_TREE_04_32_08_NEW),
+%%    B_TREE_04_32_10_NEW = b_trees:enter("k_10", "v_10_new", B_TREE_04_32_09_NEW),
+%%    B_TREE_04_32_11_NEW = b_trees:enter("k_11", "v_11_new", B_TREE_04_32_10_NEW),
+%%    B_TREE_04_32_12_NEW = b_trees:enter("k_12", "v_12_new", B_TREE_04_32_11_NEW),
+%%    B_TREE_04_32_13_NEW = b_trees:enter("k_13", "v_13_new", B_TREE_04_32_12_NEW),
+%%    B_TREE_04_32_14_NEW = b_trees:enter("k_14", "v_14_new", B_TREE_04_32_13_NEW),
+%%    B_TREE_04_32_15_NEW = b_trees:enter("k_15", "v_15_new", B_TREE_04_32_14_NEW),
+%%    B_TREE_04_32_16_NEW = b_trees:enter("k_16", "v_16_new", B_TREE_04_32_15_NEW),
+%%    B_TREE_04_32_17_NEW = b_trees:enter("k_17", "v_17_new", B_TREE_04_32_16_NEW),
+%%    B_TREE_04_32_18_NEW = b_trees:enter("k_18", "v_18_new", B_TREE_04_32_17_NEW),
+%%    B_TREE_04_32_19_NEW = b_trees:enter("k_19", "v_19_new", B_TREE_04_32_18_NEW),
+%%    B_TREE_04_32_20_NEW = b_trees:enter("k_20", "v_20_new", B_TREE_04_32_19_NEW),
+%%    B_TREE_04_32_21_NEW = b_trees:enter("k_21", "v_21_new", B_TREE_04_32_20_NEW),
+%%    B_TREE_04_32_22_NEW = b_trees:enter("k_22", "v_22_new", B_TREE_04_32_21_NEW),
+%%    B_TREE_04_32_23_NEW = b_trees:enter("k_23", "v_23_new", B_TREE_04_32_22_NEW),
+%%    B_TREE_04_32_24_NEW = b_trees:enter("k_24", "v_24_new", B_TREE_04_32_23_NEW),
+%%    B_TREE_04_32_25_NEW = b_trees:enter("k_25", "v_25_new", B_TREE_04_32_24_NEW),
+%%    B_TREE_04_32_26_NEW = b_trees:enter("k_26", "v_26_new", B_TREE_04_32_25_NEW),
+%%    B_TREE_04_32_27_NEW = b_trees:enter("k_27", "v_27_new", B_TREE_04_32_26_NEW),
+%%    B_TREE_04_32_28_NEW = b_trees:enter("k_28", "v_28_new", B_TREE_04_32_27_NEW),
+%%    B_TREE_04_32_29_NEW = b_trees:enter("k_29", "v_29_new", B_TREE_04_32_28_NEW),
+%%    B_TREE_04_32_30_NEW = b_trees:enter("k_30", "v_30_new", B_TREE_04_32_29_NEW),
+%%    B_TREE_04_32_31_NEW = b_trees:enter("k_31", "v_31_new", B_TREE_04_32_30_NEW),
+%%    B_TREE_04_32_32_NEW = b_trees:enter("k_32", "v_32_new", B_TREE_04_32_31_NEW),
+%%
+%%    B_TREE_04_32_MAPPED_VALUES = b_trees:to_list(B_TREE_04_32_32_NEW),
+%%
+%%    ?assertEqual(B_TREE_04_32_MAPPED_VALUES, test_generator:generate_key_values_from_update(32, 2)),
+%%
+%%    ?assertEqual(11, length(ets:tab2list(StateTarget))),
+%%
+%%    ets:delete(StateTarget),
 
-    test_generator:check_equal(?B_TREE_06_00, test_generator:take_largest_b_tree(6, 40, 2)),
+%%    ?debugFmt("wwe debugging direct_test ===> ~n ets:tab2list(StateTarget): ~p~n length: ~p~n", [ets:tab2list(StateTarget), length(ets:tab2list(StateTarget))]),
+%%    test_generator:check_equal(?B_TREE_06_00, b_trees:update("k_32", "v_32_new", _B_TREE_06_32_K_31)),
+
+
+
+
+    B_TREE_04_32 = test_generator:generate_b_tree_from_number(4, 32, 2),
+
+    Iterator_04_32_15 = b_trees:iterator_from("k_16", B_TREE_04_32),
+    {_Key_04_32_16, _Value_05_30_16, Iterator_04_32_16} = b_trees:next(Iterator_04_32_15),
+    ?assertEqual({"k_16", "v_16"}, {_Key_04_32_16, _Value_05_30_16}),
+    {_Key_04_32_17, _Value_05_30_17, Iterator_04_32_17} = b_trees:next(Iterator_04_32_16),
+    ?assertEqual({"k_17", "v_17"}, {_Key_04_32_17, _Value_05_30_17}),
+    {_Key_04_32_18, _Value_05_30_18, Iterator_04_32_18} = b_trees:next(Iterator_04_32_17),
+    ?assertEqual({"k_18", "v_18"}, {_Key_04_32_18, _Value_05_30_18}),
+    {_Key_04_32_19, _Value_05_30_19, Iterator_04_32_19} = b_trees:next(Iterator_04_32_18),
+    ?assertEqual({"k_19", "v_19"}, {_Key_04_32_19, _Value_05_30_19}),
+    {_Key_04_32_20, _Value_05_30_20, Iterator_04_32_20} = b_trees:next(Iterator_04_32_19),
+    ?assertEqual({"k_20", "v_20"}, {_Key_04_32_20, _Value_05_30_20}),
+    {_Key_04_32_21, _Value_05_30_21, Iterator_04_32_21} = b_trees:next(Iterator_04_32_20),
+    ?assertEqual({"k_21", "v_21"}, {_Key_04_32_21, _Value_05_30_21}),
+    {_Key_04_32_22, _Value_05_30_22, Iterator_04_32_22} = b_trees:next(Iterator_04_32_21),
+    ?assertEqual({"k_22", "v_22"}, {_Key_04_32_22, _Value_05_30_22}),
+    {_Key_04_32_23, _Value_05_30_23, Iterator_04_32_23} = b_trees:next(Iterator_04_32_22),
+    ?assertEqual({"k_23", "v_23"}, {_Key_04_32_23, _Value_05_30_23}),
+    {_Key_04_32_24, _Value_05_30_24, Iterator_04_32_24} = b_trees:next(Iterator_04_32_23),
+    ?assertEqual({"k_24", "v_24"}, {_Key_04_32_24, _Value_05_30_24}),
+    {_Key_04_32_25, _Value_05_30_25, Iterator_04_32_25} = b_trees:next(Iterator_04_32_24),
+    ?assertEqual({"k_25", "v_25"}, {_Key_04_32_25, _Value_05_30_25}),
+    {_Key_04_32_26, _Value_05_30_26, Iterator_04_32_26} = b_trees:next(Iterator_04_32_25),
+    ?assertEqual({"k_26", "v_26"}, {_Key_04_32_26, _Value_05_30_26}),
+    {_Key_04_32_27, _Value_05_30_27, Iterator_04_32_27} = b_trees:next(Iterator_04_32_26),
+    ?assertEqual({"k_27", "v_27"}, {_Key_04_32_27, _Value_05_30_27}),
+    {_Key_04_32_28, _Value_05_30_28, Iterator_04_32_28} = b_trees:next(Iterator_04_32_27),
+    ?assertEqual({"k_28", "v_28"}, {_Key_04_32_28, _Value_05_30_28}),
+    {_Key_04_32_29, _Value_05_30_29, _Iterator_04_32_29} = b_trees:next(Iterator_04_32_28),
+    ?assertEqual({"k_29", "v_29"}, {_Key_04_32_29, _Value_05_30_29}),
+    {_Key_04_32_30, _Value_05_30_30, _Iterator_04_32_30} = b_trees:next(_Iterator_04_32_29),
+    ?assertEqual({"k_30", "v_30"}, {_Key_04_32_30, _Value_05_30_30}),
+    {_Key_04_32_31, _Value_05_30_31, _Iterator_04_32_31} = b_trees:next(_Iterator_04_32_30),
+    ?assertEqual({"k_31", "v_31"}, {_Key_04_32_31, _Value_05_30_31}),
+    {_Key_04_32_32, _Value_05_30_32, _Iterator_04_32_32} = b_trees:next(_Iterator_04_32_31),
+    ?assertEqual({"k_32", "v_32"}, {_Key_04_32_32, _Value_05_30_32}),
+
+    ?assertEqual(none, b_trees:next(_Iterator_04_32_32)),
 
     ok.
 

@@ -230,10 +230,10 @@ Returns the number of key value pairs in b-tree B-tree as an integer. Returns 0 
 Types:
 
     B-Tree1 = B-Tree2 = b_tree()
-    Name : Value = sort_function : Function = fun((Key1, Key2) -> equal | greater | less)
-                 | state         : {StateTarget, Function = fun(StateTarget, delete, Key) -> ok,
-                                                 Function = fun(StateTarget, insert, Subtrees) -> Key,
-                                                 Function = fun(StateTarget, lookup, Key) -> Subtrees}
+    Name : Value = sort  : Function = fun((Key1, Key2) -> equal | greater | less)
+                 | state : {StateTarget, Function = fun(StateTarget, delete, Key) -> ok,
+                                         Function = fun(StateTarget, insert, Subtrees) -> Key,
+                                         Function = fun(StateTarget, lookup, Key) -> Subtrees}
     
 Sets in the empty b-tree B-Tree1 the parameter Name to value Value and returns the new b-tree B-Tree2.
 
