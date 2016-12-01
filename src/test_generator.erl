@@ -19,6 +19,7 @@
     delete_b_tree_from/3,
     delete_b_tree_from/4,
     delete_b_tree_from_ets/5,
+    delete_b_tree_from_ets_desc/5,
     delete_b_tree_from_even/4,
     delete_b_tree_from_odd/4,
     delete_b_tree_list/2,
@@ -28,6 +29,7 @@
     generate_b_tree_from_number/3,
     generate_b_tree_from_number/4,
     generate_b_tree_from_number_ets/5,
+    generate_b_tree_from_number_ets_desc/5,
     generate_b_tree_from_number_update/3,
     generate_b_tree_from_number_update_ets/5,
     generate_b_tree_list_and_btree/2,
@@ -67,8 +69,8 @@
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 delete_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
-    Keys = test_generator:generate_keys_from(Number, Width),
+    BTree = generate_b_tree_from_number(Order, Number, Width),
+    Keys = generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,7 +78,7 @@ delete_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
-    Keys = test_generator:generate_keys_from(Number, Width),
+    Keys = generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,8 +86,17 @@ delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
 -spec delete_b_tree_from_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 delete_b_tree_from_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid),
-    Keys = test_generator:generate_keys_from(Number, Width),
+    BTree = generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid),
+    Keys = generate_keys_from(Number, Width),
+    delete_b_tree_1(Keys, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec delete_b_tree_from_ets_desc(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
+
+delete_b_tree_from_ets_desc(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number > 0 ->
+    BTree = generate_b_tree_from_number_ets_desc(Order, Number, Width, StateTargetName, Pid),
+    Keys = generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,7 +104,7 @@ delete_b_tree_from_ets(Order, Number, Width, StateTargetName, Pid) when Order > 
 -spec delete_b_tree_from_even(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_from_even(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
-    Keys = test_generator:generate_keys_from_even(Number, Width),
+    Keys = generate_keys_from_even(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,7 +112,7 @@ delete_b_tree_from_even(Order, Number, Width, BTree) when Order > 3, Number > 0 
 -spec delete_b_tree_from_odd(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_from_odd(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
-    Keys = test_generator:generate_keys_from_odd(Number, Width),
+    Keys = generate_keys_from_odd(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,8 +127,8 @@ delete_b_tree_list(Keys, BTree) ->
 -spec delete_b_tree_till(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 delete_b_tree_till(Order, Number, Width) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
-    Keys = test_generator:generate_keys_till(Number, Width),
+    BTree = generate_b_tree_from_number(Order, Number, Width),
+    Keys = generate_keys_till(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -125,8 +136,8 @@ delete_b_tree_till(Order, Number, Width) when Order > 3, Number > 0 ->
 -spec delete_gb_tree_from(pos_integer(), pos_integer()) -> gb_trees:tree().
 
 delete_gb_tree_from(Number, Width) when Number > 0 ->
-    GBTree = test_generator:generate_gb_tree_from_number(Number, Width),
-    Keys = test_generator:generate_keys_from(Number, Width),
+    GBTree = generate_gb_tree_from_number(Number, Width),
+    Keys = generate_keys_from(Number, Width),
     delete_gb_tree_1(Keys, GBTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -142,6 +153,15 @@ generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
 
 generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number >= 0 ->
     B_TREE = b_trees:set_parameter(b_trees:empty(Order), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
+
+    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_b_tree_from_number_ets_desc(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_ets_desc(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number >= 0 ->
+    B_TREE = b_trees:set_parameter(b_trees:set_parameter(b_trees:empty(Order), sort, fun b_trees:sort_descending/2), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
 
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
 
@@ -306,7 +326,7 @@ generate_keys_till(Number, Width) when Number >= 0 ->
 -spec take_largest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 take_largest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
+    BTree = generate_b_tree_from_number(Order, Number, Width),
     take_largest_b_tree_1(Number, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -314,7 +334,7 @@ take_largest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
 -spec take_largest_b_tree(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
 
 take_largest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, is_function(Function, 2) ->
-    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width, Function),
+    BTree = generate_b_tree_from_number(Order, Number, Width, Function),
     take_largest_b_tree_1(Number, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -322,7 +342,7 @@ take_largest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, 
 -spec take_largest_b_tree_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 take_largest_b_tree_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid),
+    BTree = generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid),
     take_largest_b_tree_1(Number, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,7 +350,7 @@ take_largest_b_tree_ets(Order, Number, Width, StateTargetName, Pid) when Order >
 -spec take_largest_gb_tree(pos_integer(), pos_integer()) -> gb_trees:tree().
 
 take_largest_gb_tree(Number, Width) when Number > 0 ->
-    GBTree = test_generator:generate_gb_tree_from_number(Number, Width),
+    GBTree = generate_gb_tree_from_number(Number, Width),
     take_largest_gb_tree_1(Number, GBTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -338,7 +358,7 @@ take_largest_gb_tree(Number, Width) when Number > 0 ->
 -spec take_smallest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 take_smallest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width),
+    BTree = generate_b_tree_from_number(Order, Number, Width),
     take_smallest_b_tree_1(Number, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -346,7 +366,7 @@ take_smallest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
 -spec take_smallest_b_tree(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
 
 take_smallest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, is_function(Function, 2) ->
-    BTree = test_generator:generate_b_tree_from_number(Order, Number, Width, Function),
+    BTree = generate_b_tree_from_number(Order, Number, Width, Function),
     take_smallest_b_tree_1(Number, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -354,7 +374,7 @@ take_smallest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0,
 -spec take_smallest_b_tree_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 take_smallest_b_tree_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number > 0 ->
-    BTree = test_generator:generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid),
+    BTree = generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid),
     take_smallest_b_tree_1(Number, BTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -362,7 +382,7 @@ take_smallest_b_tree_ets(Order, Number, Width, StateTargetName, Pid) when Order 
 -spec take_smallest_gb_tree(pos_integer(), pos_integer()) -> gb_trees:tree().
 
 take_smallest_gb_tree(Number, Width) when Number > 0 ->
-    GBTree = test_generator:generate_gb_tree_from_number(Number, Width),
+    GBTree = generate_gb_tree_from_number(Number, Width),
     take_smallest_gb_tree_1(Number, GBTree).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

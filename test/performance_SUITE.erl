@@ -47,6 +47,7 @@ init_per_suite(Config) ->
         {gb_tree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_ACTIONS, ?WIDTH)},
 
         {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_4_desc, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH, fun b_trees:sort_descending/2)},
         {b_tree_4_ets, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets, spawn(fun test_generator:ets_owner/0))},
         {b_tree_4_ets_map, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_map, spawn(fun test_generator:ets_owner/0))},
         {b_tree_4_ets_new, test_generator:generate_b_tree_from_number_update_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_new, spawn(fun test_generator:ets_owner/0))},
@@ -88,9 +89,11 @@ end_per_suite(_Config) ->
 all() ->
     [
         delete_gb_tree_test,
+        delete_b_tree_order_4_ets_desc_test,
         delete_b_tree_order_4_ets_test,
         delete_b_tree_order_4_even_odd_test,
         delete_b_tree_order_4_odd_even_test,
+        delete_b_tree_order_4_random_desc_test,
         delete_b_tree_order_4_random_test,
         delete_b_tree_order_4_test,
         delete_b_tree_order_5_even_odd_test,
@@ -400,6 +403,14 @@ delete_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistance by ets - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_ets_desc_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 4 - persistance by ets
 %%--------------------------------------------------------------------
 
@@ -427,6 +438,14 @@ delete_b_tree_order_4_odd_even_test(_Config) ->
     _BTree_Even = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
     _BTree_Empty = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Even),
     ?assertEqual(b_trees:empty(4), _BTree_Empty),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - random - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_random_desc_test(Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_list(?config(keys_random, Config), ?config(b_tree_4_desc, Config))),
     ok.
 
 %%--------------------------------------------------------------------

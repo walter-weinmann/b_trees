@@ -945,7 +945,7 @@ enter(Key, Value, BTree) ->
 -spec from_dict(b_tree(), key_values()) -> b_tree().
 
 from_dict(BTree, KeyValues) when length(KeyValues) > 0 ->
-    case b_trees:is_empty(BTree) of
+    case is_empty(BTree) of
         true ->
             from_dict_1(KeyValues, BTree);
         _ ->
