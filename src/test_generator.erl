@@ -51,7 +51,7 @@
     generate_keys_till/2,
     iterate_next_b_tree/3,
     map_value_to_new/2,
-    persistance_by_ets/3,
+    persistence_by_ets/3,
     prepare_template_asc/1,
     prepare_template_desc/1,
     take_largest_b_tree/3,
@@ -152,7 +152,7 @@ generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
 -spec generate_b_tree_from_number_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number >= 0 ->
-    B_TREE = b_trees:set_parameter(b_trees:empty(Order), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
+    B_TREE = b_trees:set_parameter(b_trees:empty(Order), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistence_by_ets/3, fun persistence_by_ets/3, fun persistence_by_ets/3}),
 
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
 
@@ -161,7 +161,7 @@ generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid) when
 -spec generate_b_tree_from_number_ets_desc(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 generate_b_tree_from_number_ets_desc(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number >= 0 ->
-    B_TREE = b_trees:set_parameter(b_trees:set_parameter(b_trees:empty(Order), sort, fun b_trees:sort_descending/2), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
+    B_TREE = b_trees:set_parameter(b_trees:set_parameter(b_trees:empty(Order), sort, fun b_trees:sort_descending/2), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistence_by_ets/3, fun persistence_by_ets/3, fun persistence_by_ets/3}),
 
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
 
@@ -186,7 +186,7 @@ generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Number 
 -spec generate_b_tree_from_number_update_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 generate_b_tree_from_number_update_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number >= 0 ->
-    B_TREE = b_trees:set_parameter(b_trees:empty(Order), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistance_by_ets/3, fun persistance_by_ets/3, fun persistance_by_ets/3}),
+    B_TREE = b_trees:set_parameter(b_trees:empty(Order), state, {ets:new(StateTargetName, [ordered_set, public, {heir, Pid, []}, {keypos, 1}]), fun persistence_by_ets/3, fun persistence_by_ets/3, fun persistence_by_ets/3}),
 
     generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, B_TREE).
 
@@ -420,14 +420,14 @@ map_value_to_new(_, Value) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-persistance_by_ets(StateTarget, delete, SubtreesKey) ->
+persistence_by_ets(StateTarget, delete, SubtreesKey) ->
     case is_list(SubtreesKey) of
         true ->
             true;
         _ ->
             ets:delete(StateTarget, SubtreesKey)
     end;
-persistance_by_ets(StateTarget, insert, Subtrees) ->
+persistence_by_ets(StateTarget, insert, Subtrees) ->
     case Subtrees == [] of
         true ->
             Subtrees;
@@ -436,7 +436,7 @@ persistance_by_ets(StateTarget, insert, Subtrees) ->
             true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
             SubtreesKey
     end;
-persistance_by_ets(StateTarget, lookup, SubtreesKey) ->
+persistence_by_ets(StateTarget, lookup, SubtreesKey) ->
     case is_list(SubtreesKey) of
         true ->
             SubtreesKey;
