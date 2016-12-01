@@ -20,7 +20,7 @@
 %%--------------------------------------------------------------------
 
 delete_any_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -163,7 +163,7 @@ delete_b_tree_order_6_test() ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -333,7 +333,7 @@ enter_b_tree_order_4_test() ->
 %%--------------------------------------------------------------------
 
 enter_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_30 = test_generator:generate_b_tree_from_number_ets(4, 30, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_30 = test_generator:generate_b_tree_from_number_ets(4, 30, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     B_TREE_04_32_31 = b_trees:enter("k_31", "v_31", B_TREE_04_32_30),
     B_TREE_04_32_32 = b_trees:enter("k_32", "v_32", B_TREE_04_32_31),
@@ -419,7 +419,7 @@ from_dict_persistance_by_ets_test() ->
 %%--------------------------------------------------------------------
 
 get_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -598,7 +598,7 @@ get_test() ->
 %%--------------------------------------------------------------------
 
 height_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -810,7 +810,7 @@ insert_b_tree_persistance_by_ets_test() ->
 
     ets:delete_all_objects(StateTarget),
 
-    test_generator:generate_b_tree_from_number_ets(4, 99, 2),
+    test_generator:generate_b_tree_from_number_ets(4, 99, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ets:delete(StateTarget),
 
@@ -854,7 +854,7 @@ insert_error_test() ->
 %%--------------------------------------------------------------------
 
 is_defined_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1288,7 +1288,7 @@ iterator_from_next_17_test() ->
 %%--------------------------------------------------------------------
 
 iterator_next_from_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -1339,7 +1339,7 @@ iterator_next_from_persistance_by_ets_test() ->
 %%--------------------------------------------------------------------
 
 iterator_next_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -1501,7 +1501,7 @@ iterator_next_test() ->
 %%--------------------------------------------------------------------
 
 keys_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1549,7 +1549,7 @@ keys_test() ->
 %%--------------------------------------------------------------------
 
 largest_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1583,7 +1583,7 @@ largest_test() ->
 %%--------------------------------------------------------------------
 
 lookup_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1762,7 +1762,7 @@ lookup_test() ->
 %%--------------------------------------------------------------------
 
 map_b_tree_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -1803,7 +1803,7 @@ map_error_test() ->
 %%--------------------------------------------------------------------
 
 number_key_values_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1847,7 +1847,7 @@ set_parameter_test() ->
 %%--------------------------------------------------------------------
 
 size_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1879,7 +1879,7 @@ size_test() ->
 %%--------------------------------------------------------------------
 
 smallest_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -1913,7 +1913,7 @@ smallest_test() ->
 %%--------------------------------------------------------------------
 
 take_largest_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -1993,7 +1993,7 @@ take_largest_test() ->
 %%--------------------------------------------------------------------
 
 take_smallest_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -2073,7 +2073,7 @@ take_smallest_test() ->
 %%--------------------------------------------------------------------
 
 to_list_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
@@ -2191,7 +2191,7 @@ update_error_test() ->
 %%--------------------------------------------------------------------
 
 update_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
@@ -2243,7 +2243,7 @@ update_persistance_by_ets_test() ->
 %%--------------------------------------------------------------------
 
 values_persistance_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
 
