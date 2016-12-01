@@ -14,6 +14,7 @@
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
+-define(B_TREE_POS_STATE, 5).
 -define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
 -define(NUMBER_ACTIONS, 2000).
 -define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
@@ -36,6 +37,7 @@ init_per_suite(Config) ->
         {key_values_from_update, test_generator:generate_key_values_from_update(?NUMBER_ACTIONS, ?WIDTH)},
         {key_values_random, test_generator:generate_key_values_random(?NUMBER_ACTIONS, ?WIDTH)},
         {key_values_random_update, test_generator:generate_key_values_random_update(?NUMBER_ACTIONS, ?WIDTH)},
+
         {keys_from, test_generator:generate_keys_from(?NUMBER_ACTIONS, ?WIDTH)},
         {keys_from_even_odd, test_generator:generate_keys_from_even(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, ?WIDTH)},
         {keys_from_odd_even, test_generator:generate_keys_from_odd(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_keys_from_even(?NUMBER_ACTIONS, ?WIDTH)},
@@ -45,6 +47,11 @@ init_per_suite(Config) ->
         {gb_tree_new, test_generator:generate_gb_tree_from_number_update(?NUMBER_ACTIONS, ?WIDTH)},
 
         {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
+        {b_tree_4_desc, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH, fun b_trees:sort_descending/2)},
+        {b_tree_4_ets, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_4_ets_map, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_map, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_4_ets_new, test_generator:generate_b_tree_from_number_update_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_new, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_4_ets_update, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_update, spawn(fun test_generator:ets_owner/0))},
         {b_tree_4_new, test_generator:generate_b_tree_from_number_update(4, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_4_till, test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH)},
@@ -82,8 +89,11 @@ end_per_suite(_Config) ->
 all() ->
     [
         delete_gb_tree_test,
+        delete_b_tree_order_4_ets_desc_test,
+        delete_b_tree_order_4_ets_test,
         delete_b_tree_order_4_even_odd_test,
         delete_b_tree_order_4_odd_even_test,
+        delete_b_tree_order_4_random_desc_test,
         delete_b_tree_order_4_random_test,
         delete_b_tree_order_4_test,
         delete_b_tree_order_5_even_odd_test,
@@ -104,6 +114,7 @@ all() ->
         delete_b_tree_order_1024_test,
 
         enter_gb_tree_test,
+        enter_b_tree_order_4_ets_test,
         enter_b_tree_order_4_test,
         enter_b_tree_order_5_test,
         enter_b_tree_order_6_test,
@@ -117,6 +128,7 @@ all() ->
         enter_b_tree_order_1024_test,
 
         from_dict_gb_tree_test,
+        from_dict_b_tree_order_4_ets_test,
         from_dict_b_tree_order_4_even_odd_test,
         from_dict_b_tree_order_4_odd_even_test,
         from_dict_b_tree_order_4_random_test,
@@ -139,6 +151,7 @@ all() ->
         from_dict_b_tree_order_1024_test,
 
         get_gb_tree_test,
+        get_b_tree_order_4_ets_test,
         get_b_tree_order_4_test,
         get_b_tree_order_5_test,
         get_b_tree_order_6_test,
@@ -152,6 +165,7 @@ all() ->
         get_b_tree_order_1024_test,
 
         insert_gb_tree_test,
+        insert_b_tree_order_4_ets_test,
         insert_b_tree_order_4_even_odd_test,
         insert_b_tree_order_4_odd_even_test,
         insert_b_tree_order_4_random_test,
@@ -177,6 +191,7 @@ all() ->
         insert_b_tree_order_1024_test,
 
         is_defined_gb_tree_test,
+        is_defined_b_tree_order_4_ets_test,
         is_defined_b_tree_order_4_test,
         is_defined_b_tree_order_5_test,
         is_defined_b_tree_order_6_test,
@@ -190,6 +205,7 @@ all() ->
         is_defined_b_tree_order_1024_test,
 
         iterate_next_gb_tree_test,
+        iterate_next_b_tree_order_4_ets_test,
         iterate_next_b_tree_order_4_test,
         iterate_next_b_tree_order_5_test,
         iterate_next_b_tree_order_6_test,
@@ -203,6 +219,7 @@ all() ->
         iterate_next_b_tree_order_1024_test,
 
         keys_gb_tree_test,
+        keys_b_tree_order_4_ets_test,
         keys_b_tree_order_4_test,
         keys_b_tree_order_5_test,
         keys_b_tree_order_6_test,
@@ -216,6 +233,7 @@ all() ->
         keys_b_tree_order_1024_test,
 
         largest_gb_tree_test,
+        largest_b_tree_order_4_ets_test,
         largest_b_tree_order_4_test,
         largest_b_tree_order_5_test,
         largest_b_tree_order_6_test,
@@ -229,6 +247,7 @@ all() ->
         largest_b_tree_order_1024_test,
 
         lookup_gb_tree_test,
+        lookup_b_tree_order_4_ets_test,
         lookup_b_tree_order_4_test,
         lookup_b_tree_order_5_test,
         lookup_b_tree_order_6_test,
@@ -242,6 +261,7 @@ all() ->
         lookup_b_tree_order_1024_test,
 
         map_gb_tree_test,
+        map_b_tree_order_4_ets_test,
         map_b_tree_order_4_test,
         map_b_tree_order_5_test,
         map_b_tree_order_6_test,
@@ -255,6 +275,7 @@ all() ->
         map_b_tree_order_1024_test,
 
         smallest_gb_tree_test,
+        smallest_b_tree_order_4_ets_test,
         smallest_b_tree_order_4_test,
         smallest_b_tree_order_5_test,
         smallest_b_tree_order_6_test,
@@ -268,6 +289,7 @@ all() ->
         smallest_b_tree_order_1024_test,
 
         take_largest_gb_tree_test,
+        take_largest_b_tree_order_4_ets_test,
         take_largest_b_tree_order_4_test,
         take_largest_b_tree_order_5_test,
         take_largest_b_tree_order_6_test,
@@ -281,6 +303,7 @@ all() ->
         take_largest_b_tree_order_1024_test,
 
         take_smallest_gb_tree_test,
+        take_smallest_b_tree_order_4_ets_test,
         take_smallest_b_tree_order_4_test,
         take_smallest_b_tree_order_5_test,
         take_smallest_b_tree_order_6_test,
@@ -294,6 +317,7 @@ all() ->
         take_smallest_b_tree_order_1024_test,
 
         to_list_gb_tree_test,
+        to_list_b_tree_order_4_ets_test,
         to_list_b_tree_order_4_test,
         to_list_b_tree_order_5_test,
         to_list_b_tree_order_6_test,
@@ -307,6 +331,7 @@ all() ->
         to_list_b_tree_order_1024_test,
 
         update_gb_tree_test,
+        update_b_tree_order_4_ets_test,
         update_b_tree_order_4_random_test,
         update_b_tree_order_4_test,
         update_b_tree_order_5_random_test,
@@ -323,6 +348,7 @@ all() ->
         update_b_tree_order_1024_test,
 
         values_gb_tree_test,
+        values_b_tree_order_4_ets_test,
         values_b_tree_order_4_test,
         values_b_tree_order_5_test,
         values_b_tree_order_6_test,
@@ -377,6 +403,22 @@ delete_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistence by ets - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_ets_desc_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_ets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 4 - even / odd
 %%--------------------------------------------------------------------
 
@@ -396,6 +438,14 @@ delete_b_tree_order_4_odd_even_test(_Config) ->
     _BTree_Even = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
     _BTree_Empty = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Even),
     ?assertEqual(b_trees:empty(4), _BTree_Empty),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - random - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_random_desc_test(Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_list(?config(keys_random, Config), ?config(b_tree_4_desc, Config))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -593,6 +643,22 @@ enter_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_4_ets_test(Config) ->
+    KeyValues = ?config(key_values_from, Config),
+    StateTarget = ets:new(enter_order_4, [ordered_set, {keypos, 1}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
+    BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
+    test_generator:check_equal(?config(b_tree_4_ets, Config), BTree),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_4_ets_new, Config), BTreeUpdate),
+    ets:delete(StateTarget),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: enter b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -695,7 +761,7 @@ enter_gb_tree([{Key, Value} | Tail], GBTree) ->
 from_dict_b_tree_order_1024_test(Config) ->
     _BTree = ?config(b_tree_1024, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(1024, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(1024), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -705,7 +771,7 @@ from_dict_b_tree_order_1024_test(Config) ->
 from_dict_b_tree_order_128_test(Config) ->
     _BTree = ?config(b_tree_128, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(128, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(128), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -715,7 +781,7 @@ from_dict_b_tree_order_128_test(Config) ->
 from_dict_b_tree_order_16_test(Config) ->
     _BTree = ?config(b_tree_16, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(16, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(16), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -725,7 +791,7 @@ from_dict_b_tree_order_16_test(Config) ->
 from_dict_b_tree_order_256_test(Config) ->
     _BTree = ?config(b_tree_256, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(256, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(256), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -735,7 +801,7 @@ from_dict_b_tree_order_256_test(Config) ->
 from_dict_b_tree_order_32_test(Config) ->
     _BTree = ?config(b_tree_32, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(32, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(32), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -745,7 +811,7 @@ from_dict_b_tree_order_32_test(Config) ->
 from_dict_b_tree_order_4_even_odd_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -755,7 +821,7 @@ from_dict_b_tree_order_4_even_odd_test(Config) ->
 from_dict_b_tree_order_4_odd_even_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -765,7 +831,20 @@ from_dict_b_tree_order_4_odd_even_test(Config) ->
 from_dict_b_tree_order_4_random_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(4, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
+    KeyValues = ?config(key_values_from, Config),
+    StateTarget = ets:new(from_dict_order_4, [ordered_set, {keypos, 1}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
+    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    ets:delete(StateTarget),
     ok.
 
 %%--------------------------------------------------------------------
@@ -775,7 +854,7 @@ from_dict_b_tree_order_4_random_test(Config) ->
 from_dict_b_tree_order_4_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(4, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(4), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -785,7 +864,7 @@ from_dict_b_tree_order_4_test(Config) ->
 from_dict_b_tree_order_5_even_odd_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(5, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -795,7 +874,7 @@ from_dict_b_tree_order_5_even_odd_test(Config) ->
 from_dict_b_tree_order_5_odd_even_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(5, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -805,7 +884,7 @@ from_dict_b_tree_order_5_odd_even_test(Config) ->
 from_dict_b_tree_order_5_random_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(5, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -815,7 +894,7 @@ from_dict_b_tree_order_5_random_test(Config) ->
 from_dict_b_tree_order_5_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(5, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(5), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -825,7 +904,7 @@ from_dict_b_tree_order_5_test(Config) ->
 from_dict_b_tree_order_6_test(Config) ->
     _BTree = ?config(b_tree_6, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(6, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(6), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -835,7 +914,7 @@ from_dict_b_tree_order_6_test(Config) ->
 from_dict_b_tree_order_512_test(Config) ->
     _BTree = ?config(b_tree_512, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(512, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(512), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -845,7 +924,7 @@ from_dict_b_tree_order_512_test(Config) ->
 from_dict_b_tree_order_64_test(Config) ->
     _BTree = ?config(b_tree_64, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(64, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(64), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -855,7 +934,7 @@ from_dict_b_tree_order_64_test(Config) ->
 from_dict_b_tree_order_8_even_odd_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -865,7 +944,7 @@ from_dict_b_tree_order_8_even_odd_test(Config) ->
 from_dict_b_tree_order_8_odd_even_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -875,7 +954,7 @@ from_dict_b_tree_order_8_odd_even_test(Config) ->
 from_dict_b_tree_order_8_random_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(8, _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -885,7 +964,7 @@ from_dict_b_tree_order_8_random_test(Config) ->
 from_dict_b_tree_order_8_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from, Config),
-    ?assertEqual(_BTree, b_trees:from_dict(8, _KeyValues)),
+    ?assertEqual(_BTree, b_trees:from_dict(b_trees:empty(8), _KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -949,6 +1028,16 @@ get_b_tree_order_256_test(Config) ->
 
 get_b_tree_order_32_test(Config) ->
     BTree = ?config(b_tree_32, Config),
+    Keys = ?config(keys_random, Config),
+    get_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: get b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+get_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
     Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
@@ -1075,12 +1164,21 @@ insert_b_tree_order_32_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(32 div 2)))).
 
 %%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_ets_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(?config(b_tree_4_ets, _Config), BTree),
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - even / odd
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
-    _BTree = test_generator:generate_b_tree_list(4, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
@@ -1090,7 +1188,7 @@ insert_b_tree_order_4_even_odd_test(Config) ->
 
 insert_b_tree_order_4_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
-    _BTree = test_generator:generate_b_tree_list(4, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
@@ -1100,7 +1198,7 @@ insert_b_tree_order_4_odd_even_test(Config) ->
 
 insert_b_tree_order_4_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
-    _BTree = test_generator:generate_b_tree_list(4, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
 
@@ -1127,7 +1225,7 @@ insert_b_tree_order_4_till_test(_Config) ->
 
 insert_b_tree_order_5_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
-    _BTree = test_generator:generate_b_tree_list(5, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
 
@@ -1137,7 +1235,7 @@ insert_b_tree_order_5_even_odd_test(Config) ->
 
 insert_b_tree_order_5_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
-    _BTree = test_generator:generate_b_tree_list(5, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
 
@@ -1147,7 +1245,7 @@ insert_b_tree_order_5_odd_even_test(Config) ->
 
 insert_b_tree_order_5_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
-    _BTree = test_generator:generate_b_tree_list(5, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
 
@@ -1209,7 +1307,7 @@ insert_b_tree_order_64_test(_Config) ->
 
 insert_b_tree_order_8_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
-    _BTree = test_generator:generate_b_tree_list(8, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
@@ -1219,7 +1317,7 @@ insert_b_tree_order_8_even_odd_test(Config) ->
 
 insert_b_tree_order_8_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
-    _BTree = test_generator:generate_b_tree_list(8, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
@@ -1229,7 +1327,7 @@ insert_b_tree_order_8_odd_even_test(Config) ->
 
 insert_b_tree_order_8_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
-    _BTree = test_generator:generate_b_tree_list(8, KeyValues),
+    _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
 
@@ -1301,6 +1399,16 @@ is_defined_b_tree_order_256_test(Config) ->
 
 is_defined_b_tree_order_32_test(Config) ->
     BTree = ?config(b_tree_32, Config),
+    Keys = ?config(keys_random, Config),
+    is_defined_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_defined b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+is_defined_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
     Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
@@ -1438,6 +1546,16 @@ iterate_next_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: iterate & next b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -1569,6 +1687,17 @@ keys_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: keys b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+keys_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
+    _Keys = b_trees:keys(BTree),
+    ?assertEqual(?config(keys_from, Config), _Keys),
+    ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: keys b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -1691,6 +1820,15 @@ largest_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: largest b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+largest_b_tree_order_4_ets_test(Config) ->
+    _BTree = ?config(b_tree_4_ets, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: largest b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -1804,6 +1942,16 @@ lookup_b_tree_order_256_test(Config) ->
 
 lookup_b_tree_order_32_test(Config) ->
     BTree = ?config(b_tree_32, Config),
+    Keys = ?config(keys_random, Config),
+    lookup_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: lookup b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+lookup_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
     Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
@@ -1938,6 +2086,16 @@ map_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+map_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets_map, Config),
+    BTreeNew = ?config(b_tree_4_ets_new, Config),
+    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: map b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -2051,6 +2209,15 @@ smallest_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: smallest b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+smallest_b_tree_order_4_ets_test(Config) ->
+    _BTree = ?config(b_tree_4_ets, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: smallest b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -2153,6 +2320,14 @@ take_largest_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_4_ets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:take_largest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_4, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_largest b_tree order 4
 %%--------------------------------------------------------------------
 
@@ -2246,6 +2421,14 @@ take_smallest_b_tree_order_256_test(_Config) ->
 
 take_smallest_b_tree_order_32_test(_Config) ->
     ?assertEqual(b_trees:empty(32), test_generator:take_smallest_b_tree(32, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 4
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_4_ets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:take_smallest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_4, spawn(fun test_generator:ets_owner/0))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2354,6 +2537,17 @@ to_list_b_tree_order_256_test(Config) ->
 
 to_list_b_tree_order_32_test(Config) ->
     BTree = ?config(b_tree_32, Config),
+    _KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?config(key_values_from, Config), _KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: to_list b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+to_list_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2489,6 +2683,16 @@ update_b_tree_order_32_test(Config) ->
     _BTree = ?config(b_tree_32, Config),
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     ?assertEqual(?config(b_tree_32_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+update_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets_update, Config),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    test_generator:check_equal(?config(b_tree_4_ets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2642,6 +2846,16 @@ values_b_tree_order_256_test(Config) ->
 
 values_b_tree_order_32_test(Config) ->
     BTree = ?config(b_tree_32, Config),
+    _Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: values b_tree order 4 - persistence by ets
+%%--------------------------------------------------------------------
+
+values_b_tree_order_4_ets_test(Config) ->
+    BTree = ?config(b_tree_4_ets, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
