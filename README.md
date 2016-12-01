@@ -221,7 +221,7 @@ Types:
 
     B-Tree1 = B-Tree2 = b_tree()
     Name : Value = sort  : Function = fun((Key1, Key2) -> equal | greater | less)
-                 | state : {StateTarget, Function = fun(StateTarget, delete, Key) -> ok,
+                 | state : {StateTarget, Function = fun(StateTarget, delete, Key) -> true,
                                          Function = fun(StateTarget, insert, Subtrees) -> Key,
                                          Function = fun(StateTarget, lookup, Key) -> Subtrees}
     
