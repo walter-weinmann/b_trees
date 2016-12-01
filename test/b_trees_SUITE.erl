@@ -37,31 +37,31 @@ end_per_suite(_Config) ->
 
 all() ->
     [
-        delete_any_persistance_by_ets_test,
+        delete_any_persistence_by_ets_test,
         delete_any_test,
         delete_b_tree_order_4_test,
         delete_b_tree_order_6_test,
-        delete_b_tree_persistance_by_ets_test,
+        delete_b_tree_persistence_by_ets_test,
         delete_clrs_test,
         delete_error_test,
         empty_b_tree_test,
         enter_b_tree_order_4_test,
-        enter_persistance_by_ets_test,
+        enter_persistence_by_ets_test,
         from_dict_b_tree_test,
-        from_dict_persistance_by_ets_test,
-        get_persistance_by_ets_test,
+        from_dict_persistence_by_ets_test,
+        get_persistence_by_ets_test,
         get_test,
-        height_persistance_by_ets_test,
+        height_persistence_by_ets_test,
         height_test,
         insert_b_tree_order_4_test,
         insert_b_tree_order_6_test,
         insert_b_tree_order_8_test,
-        insert_b_tree_persistance_by_ets_test,
+        insert_b_tree_persistence_by_ets_test,
         insert_clrs_test,
         insert_error_test,
-        is_defined_persistance_by_ets_test,
+        is_defined_persistence_by_ets_test,
         is_defined_test,
-        is_empty_persistance_by_ets_test,
+        is_empty_persistence_by_ets_test,
         is_empty_test,
         iterator_from_next_00_test,
         iterator_from_next_01_test,
@@ -74,43 +74,43 @@ all() ->
         iterator_from_next_08_256_test,
         iterator_from_next_16_test,
         iterator_from_next_17_test,
-        iterator_next_from_persistance_by_ets_test,
-        iterator_next_persistance_by_ets_test,
+        iterator_next_from_persistence_by_ets_test,
+        iterator_next_persistence_by_ets_test,
         iterator_next_test,
-        keys_persistance_by_ets_test,
+        keys_persistence_by_ets_test,
         keys_test,
-        largest_persistance_by_ets_test,
+        largest_persistence_by_ets_test,
         largest_test,
-        lookup_persistance_by_ets_test,
+        lookup_persistence_by_ets_test,
         lookup_test,
-        map_b_tree_persistance_by_ets_test,
+        map_b_tree_persistence_by_ets_test,
         map_b_tree_test,
         map_error_test,
-        number_key_values_persistance_by_ets_test,
+        number_key_values_persistence_by_ets_test,
         number_key_values_test,
         set_parameter_test,
-        size_persistance_by_ets_test,
+        size_persistence_by_ets_test,
         size_test,
-        smallest_persistance_by_ets_test,
+        smallest_persistence_by_ets_test,
         smallest_test,
-        take_largest_persistance_by_ets_test,
+        take_largest_persistence_by_ets_test,
         take_largest_test,
-        take_smallest_persistance_by_ets_test,
+        take_smallest_persistence_by_ets_test,
         take_smallest_test,
-        to_list_persistance_by_ets_test,
+        to_list_persistence_by_ets_test,
         to_list_test,
         update_b_tree_test,
         update_error_test,
-        update_persistance_by_ets_test,
-        values_persistance_by_ets_test,
+        update_persistence_by_ets_test,
+        values_persistence_by_ets_test,
         values_test
     ].
 
 %%--------------------------------------------------------------------
-%% TEST CASES: delete_any - persistance by ets
+%% TEST CASES: delete_any - persistence by ets
 %%--------------------------------------------------------------------
 
-delete_any_persistance_by_ets_test(_Config) ->
+delete_any_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -250,10 +250,10 @@ delete_b_tree_order_6_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: delete - persistance by ets
+%% TEST CASES: delete - persistence by ets
 %%--------------------------------------------------------------------
 
-delete_b_tree_persistance_by_ets_test(_Config) ->
+delete_b_tree_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -420,10 +420,10 @@ enter_b_tree_order_4_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: enter - persistance by ets
+%% TEST CASES: enter - persistence by ets
 %%--------------------------------------------------------------------
 
-enter_persistance_by_ets_test(_Config) ->
+enter_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_30 = test_generator:generate_b_tree_from_number_ets(4, 30, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     B_TREE_04_32_31 = b_trees:enter("k_31", "v_31", B_TREE_04_32_30),
@@ -492,13 +492,13 @@ from_dict_b_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: from_dict - persistance by ets
+%% TEST CASES: from_dict - persistence by ets
 %%--------------------------------------------------------------------
 
-from_dict_persistance_by_ets_test(_Config) ->
+from_dict_persistence_by_ets_test(_Config) ->
     StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
 
-    B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+    B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 
     ?assertEqual(32, b_trees:number_key_values(b_trees:from_dict(B_TREE_06_00, test_generator:generate_key_values_from(32, 2)))),
 
@@ -507,10 +507,10 @@ from_dict_persistance_by_ets_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: get - persistance by ets
+%% TEST CASES: get - persistence by ets
 %%--------------------------------------------------------------------
 
-get_persistance_by_ets_test(_Config) ->
+get_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -686,10 +686,10 @@ get_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: height - persistance by ets
+%% TEST CASES: height - persistence by ets
 %%--------------------------------------------------------------------
 
-height_persistance_by_ets_test(_Config) ->
+height_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -856,14 +856,14 @@ insert_b_tree_order_8_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: insert - persistance by ets
+%% TEST CASES: insert - persistence by ets
 %%--------------------------------------------------------------------
 
-insert_b_tree_persistance_by_ets_test(_Config) ->
+insert_b_tree_persistence_by_ets_test(_Config) ->
     StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
     ets:delete_all_objects(StateTarget),
 
-    B_TREE_04_00 = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+    B_TREE_04_00 = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 
     B_TREE_04_01 = b_trees:insert("k_01", "v_01", B_TREE_04_00),
     B_TREE_04_02 = b_trees:insert("k_02", "v_02", B_TREE_04_01),
@@ -942,10 +942,10 @@ insert_error_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: is_defined - persistance by ets
+%% TEST CASES: is_defined - persistence by ets
 %%--------------------------------------------------------------------
 
-is_defined_persistance_by_ets_test(_Config) ->
+is_defined_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -1121,13 +1121,13 @@ is_defined_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: is_empty - persistance by ets
+%% TEST CASES: is_empty - persistence by ets
 %%--------------------------------------------------------------------
 
-is_empty_persistance_by_ets_test(_Config) ->
+is_empty_persistence_by_ets_test(_Config) ->
     StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
 
-    B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+    B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 
     ?assertEqual(true, b_trees:is_empty(test_generator:prepare_template_asc(B_TREE_06_00))),
 
@@ -1375,10 +1375,10 @@ iterator_from_next_17_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: iterator_from & next - persistance by ets
+%% TEST CASES: iterator_from & next - persistence by ets
 %%--------------------------------------------------------------------
 
-iterator_next_from_persistance_by_ets_test(_Config) ->
+iterator_next_from_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -1426,10 +1426,10 @@ iterator_next_from_persistance_by_ets_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: iterator & next - persistance by ets
+%% TEST CASES: iterator & next - persistence by ets
 %%--------------------------------------------------------------------
 
-iterator_next_persistance_by_ets_test(_Config) ->
+iterator_next_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -1588,10 +1588,10 @@ iterator_next_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: keys - persistance by ets
+%% TEST CASES: keys - persistence by ets
 %%--------------------------------------------------------------------
 
-keys_persistance_by_ets_test(_Config) ->
+keys_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -1636,10 +1636,10 @@ keys_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: largest - persistance by ets
+%% TEST CASES: largest - persistence by ets
 %%--------------------------------------------------------------------
 
-largest_persistance_by_ets_test(_Config) ->
+largest_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -1670,10 +1670,10 @@ largest_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: lookup - persistance by ets
+%% TEST CASES: lookup - persistence by ets
 %%--------------------------------------------------------------------
 
-lookup_persistance_by_ets_test(_Config) ->
+lookup_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -1849,10 +1849,10 @@ lookup_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: map - persistance by ets
+%% TEST CASES: map - persistence by ets
 %%--------------------------------------------------------------------
 
-map_b_tree_persistance_by_ets_test(_Config) ->
+map_b_tree_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -1890,10 +1890,10 @@ map_error_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: number_key_values - persistance by ets
+%% TEST CASES: number_key_values - persistence by ets
 %%--------------------------------------------------------------------
 
-number_key_values_persistance_by_ets_test(_Config) ->
+number_key_values_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -1934,10 +1934,10 @@ set_parameter_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: size - persistance by ets
+%% TEST CASES: size - persistence by ets
 %%--------------------------------------------------------------------
 
-size_persistance_by_ets_test(_Config) ->
+size_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -1966,10 +1966,10 @@ size_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: smallest - persistance by ets
+%% TEST CASES: smallest - persistence by ets
 %%--------------------------------------------------------------------
 
-smallest_persistance_by_ets_test(_Config) ->
+smallest_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -2000,10 +2000,10 @@ smallest_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: take_largest - persistance by ets
+%% TEST CASES: take_largest - persistence by ets
 %%--------------------------------------------------------------------
 
-take_largest_persistance_by_ets_test(_Config) ->
+take_largest_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -2080,10 +2080,10 @@ take_largest_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: take_smallest - persistance by ets
+%% TEST CASES: take_smallest - persistence by ets
 %%--------------------------------------------------------------------
 
-take_smallest_persistance_by_ets_test(_Config) ->
+take_smallest_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -2160,10 +2160,10 @@ take_smallest_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: to_list - persistance by ets
+%% TEST CASES: to_list - persistence by ets
 %%--------------------------------------------------------------------
 
-to_list_persistance_by_ets_test(_Config) ->
+to_list_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),
@@ -2278,10 +2278,10 @@ update_error_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: update - persistance by ets
+%% TEST CASES: update - persistence by ets
 %%--------------------------------------------------------------------
 
-update_persistance_by_ets_test(_Config) ->
+update_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_32 = test_generator:generate_b_tree_from_number_ets(4, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
@@ -2330,10 +2330,10 @@ update_persistance_by_ets_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: values - persistance by ets
+%% TEST CASES: values - persistence by ets
 %%--------------------------------------------------------------------
 
-values_persistance_by_ets_test(_Config) ->
+values_persistence_by_ets_test(_Config) ->
     {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
     ?assertEqual(4, length(ets:tab2list(StateTarget))),

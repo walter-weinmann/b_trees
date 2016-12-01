@@ -403,7 +403,7 @@ delete_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: delete b_tree order 4 - persistance by ets - descending
+%% TEST CASES: delete b_tree order 4 - persistence by ets - descending
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_ets_desc_test(_Config) ->
@@ -411,7 +411,7 @@ delete_b_tree_order_4_ets_desc_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: delete b_tree order 4 - persistance by ets
+%% TEST CASES: delete b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_ets_test(_Config) ->
@@ -643,13 +643,13 @@ enter_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: enter b_tree order 4 - persistance by ets
+%% TEST CASES: enter b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_4_ets_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     StateTarget = ets:new(enter_order_4, [ordered_set, {keypos, 1}]),
-    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
     BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
     test_generator:check_equal(?config(b_tree_4_ets, Config), BTree),
     KeyValuesUpdate = ?config(key_values_from_update, Config),
@@ -835,14 +835,14 @@ from_dict_b_tree_order_4_random_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: from_dict b_tree order 4 - persistance by ets
+%% TEST CASES: from_dict b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
     KeyValues = ?config(key_values_from, Config),
     StateTarget = ets:new(from_dict_order_4, [ordered_set, {keypos, 1}]),
-    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3, fun test_generator:persistance_by_ets/3}),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
     test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
     ets:delete(StateTarget),
     ok.
@@ -1033,7 +1033,7 @@ get_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: get b_tree order 4 - persistance by ets
+%% TEST CASES: get b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 get_b_tree_order_4_ets_test(Config) ->
@@ -1164,7 +1164,7 @@ insert_b_tree_order_32_test(_Config) ->
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(32 div 2)))).
 
 %%--------------------------------------------------------------------
-%% TEST CASES: insert b_tree order 4 - persistance by ets
+%% TEST CASES: insert b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_ets_test(_Config) ->
@@ -1404,7 +1404,7 @@ is_defined_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: is_defined b_tree order 4 - persistance by ets
+%% TEST CASES: is_defined b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 is_defined_b_tree_order_4_ets_test(Config) ->
@@ -1546,7 +1546,7 @@ iterate_next_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: iterate & next b_tree order 4 - persistance by ets
+%% TEST CASES: iterate & next b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 iterate_next_b_tree_order_4_ets_test(Config) ->
@@ -1687,7 +1687,7 @@ keys_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: keys b_tree order 4 - persistance by ets
+%% TEST CASES: keys b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 keys_b_tree_order_4_ets_test(Config) ->
@@ -1820,7 +1820,7 @@ largest_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: largest b_tree order 4 - persistance by ets
+%% TEST CASES: largest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 largest_b_tree_order_4_ets_test(Config) ->
@@ -1947,7 +1947,7 @@ lookup_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: lookup b_tree order 4 - persistance by ets
+%% TEST CASES: lookup b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 lookup_b_tree_order_4_ets_test(Config) ->
@@ -2086,7 +2086,7 @@ map_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: map b_tree order 4 - persistance by ets
+%% TEST CASES: map b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 map_b_tree_order_4_ets_test(Config) ->
@@ -2209,7 +2209,7 @@ smallest_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: smallest b_tree order 4 - persistance by ets
+%% TEST CASES: smallest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 smallest_b_tree_order_4_ets_test(Config) ->
@@ -2320,7 +2320,7 @@ take_largest_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: take_largest b_tree order 4 - persistance by ets
+%% TEST CASES: take_largest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_4_ets_test(_Config) ->
@@ -2543,7 +2543,7 @@ to_list_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: to_list b_tree order 4 - persistance by ets
+%% TEST CASES: to_list b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 to_list_b_tree_order_4_ets_test(Config) ->
@@ -2686,7 +2686,7 @@ update_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: update b_tree order 4 - persistance by ets
+%% TEST CASES: update b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 update_b_tree_order_4_ets_test(Config) ->
@@ -2851,7 +2851,7 @@ values_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: values b_tree order 4 - persistance by ets
+%% TEST CASES: values b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 values_b_tree_order_4_ets_test(Config) ->
