@@ -376,7 +376,6 @@ check_equal(Value_1, Value_2) when is_tuple(Value_1), tuple_size(Value_1) == 6, 
 
 ets_owner() ->
     receive
-        stop -> exit(normal);
         _ -> ets_owner()
     end.
 
@@ -407,18 +406,13 @@ persistance_by_ets(StateTarget, delete, SubtreesKey) ->
             ets:delete(StateTarget, SubtreesKey)
     end;
 persistance_by_ets(StateTarget, insert, Subtrees) ->
-    case is_list(Subtrees) of
+    case Subtrees == [] of
         true ->
-            case Subtrees == [] of
-                true ->
-                    Subtrees;
-                _ ->
-                    SubtreesKey = erlang:phash2(Subtrees),
-                    true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
-                    SubtreesKey
-            end;
+            Subtrees;
         _ ->
-            Subtrees
+            SubtreesKey = erlang:phash2(Subtrees),
+            true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
+            SubtreesKey
     end;
 persistance_by_ets(StateTarget, lookup, SubtreesKey) ->
     case is_list(SubtreesKey) of
