@@ -395,7 +395,8 @@ from_dict_b_tree_test() ->
     test_generator:check_equal(?B_TREE_06_29, b_trees:from_dict(b_trees:empty(6), test_generator:generate_key_values_from(29, 2))),
     test_generator:check_equal(?B_TREE_18_19, b_trees:from_dict(b_trees:empty(18), test_generator:generate_key_values_from(19, 2))),
 
-    test_generator:check_equal(?B_TREE_06_32_DESC, b_trees:from_dict(b_trees:empty(6, fun b_trees:sort_descending/2), test_generator:generate_key_values_from(32, 2))),
+    B_TREE_06_32_00 = b_trees:set_parameter(b_trees:empty(6), sort, fun b_trees:sort_descending/2),
+    test_generator:check_equal(?B_TREE_06_32_DESC, b_trees:from_dict(B_TREE_06_32_00, test_generator:generate_key_values_from(32, 2))),
 
     ok.
 

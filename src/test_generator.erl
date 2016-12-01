@@ -150,7 +150,9 @@ generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid) when
 -spec generate_b_tree_from_number(pos_integer(), pos_integer(), pos_integer(), b_trees:sort_function()) -> b_trees:b_tree().
 
 generate_b_tree_from_number(Order, Number, Width, Function) when Order > 3, Number >= 0, is_function(Function, 2) ->
-    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order, Function)).
+    B_TREE = b_trees:set_parameter(b_trees:empty(Order), sort, Function),
+
+    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
