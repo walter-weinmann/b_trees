@@ -431,7 +431,7 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
     end;
 delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, _, KeyPos, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
-    ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+    true = DeleteFunction(StateTarget, delete, SubtreesKey),
     {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesKeyXC} = lists:nth(KeyPos, Subtrees),
     SubtreesXC = LookupFunction(StateTarget, lookup, SubtreesKeyXC),
     {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesKeyXCRight} = lists:nth(KeyPos + 1, Subtrees),
@@ -1081,7 +1081,7 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
     end;
 delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
-    ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+    true = DeleteFunction(StateTarget, delete, SubtreesKey),
     {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesKeyXCLeft} = case KeyPos == 1 of
                                                                              true ->
                                                                                  {0, 0, [], []};
@@ -1430,7 +1430,7 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNo
 % Non-Leaf node.
 insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoMax, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
-    ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+    true = DeleteFunction(StateTarget, delete, SubtreesKey),
     {ValueFound, SubtreePos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -1540,7 +1540,7 @@ split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeK
     };
 split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeKeyValues, TreeSubtreesKey}, SubtreePos, SubtreeNoMin, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction}) ->
     TreeSubtrees = LookupFunction(StateTarget, lookup, TreeSubtreesKey),
-    ok = DeleteFunction(StateTarget, delete, TreeSubtreesKey),
+    true = DeleteFunction(StateTarget, delete, TreeSubtreesKey),
     {
         % SplitKeyValues .......................................................
         insert_key_value(lists:nth(SubtreeNoMin, TreeKeyValues), KeyValues, KeyNo, SortFunction),
@@ -1862,7 +1862,7 @@ map_tree(Function, nil, {KeyNo, SubtreeNo, KeyValues, Subtrees}) ->
     {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), map_subtrees(Function, nil, Subtrees, [])};
 map_tree(Function, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
-    ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+    true = DeleteFunction(StateTarget, delete, SubtreesKey),
     {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), InsertFunction(StateTarget, insert, map_subtrees(Function, State, Subtrees, []))}.
 
 -spec map_subtrees(map_function(), state(), subtrees(), subtrees()) -> subtrees().
@@ -2062,7 +2062,7 @@ update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SortFu
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
-            ok = DeleteFunction(StateTarget, delete, SubtreesKey),
+            true = DeleteFunction(StateTarget, delete, SubtreesKey),
             {
                 KeyNo,
                 SubtreeNo,

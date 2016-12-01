@@ -377,22 +377,35 @@ map_value_to_new(_, Value) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-persistance_by_ets(_, delete, []) ->
-    ok;
 persistance_by_ets(StateTarget, delete, SubtreesKey) ->
-    ets:delete(StateTarget, SubtreesKey),
-    ok;
-persistance_by_ets(_, insert, []) ->
-    [];
+    case is_list(SubtreesKey) of
+        true ->
+            true;
+        _ ->
+            ets:delete(StateTarget, SubtreesKey)
+    end;
 persistance_by_ets(StateTarget, insert, Subtrees) ->
-    SubtreesKey = erlang:phash2(Subtrees),
-    true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
-    SubtreesKey;
-persistance_by_ets(_, lookup, []) ->
-    [];
+    case is_list(Subtrees) of
+        true ->
+            case Subtrees == [] of
+                true ->
+                    Subtrees;
+                _ ->
+                    SubtreesKey = erlang:phash2(Subtrees),
+                    true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
+                    SubtreesKey
+            end;
+        _ ->
+            Subtrees
+    end;
 persistance_by_ets(StateTarget, lookup, SubtreesKey) ->
-    [{SubtreesKey, Subtrees}] = ets:lookup(StateTarget, SubtreesKey),
-    Subtrees.
+    case is_list(SubtreesKey) of
+        true ->
+            SubtreesKey;
+        _ ->
+            [{SubtreesKey, Subtrees}] = ets:lookup(StateTarget, SubtreesKey),
+            Subtrees
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
