@@ -30,6 +30,7 @@ suite() ->
     ].
 
 init_per_suite(Config) ->
+    filelib:ensure_dir("test/tmp/"),
     [
         {key_values_from, test_generator:generate_key_values_from(?NUMBER_ACTIONS, ?WIDTH)},
         {key_values_from_even_odd, test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, ?WIDTH)},
@@ -48,6 +49,10 @@ init_per_suite(Config) ->
 
         {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_4_desc, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH, fun b_trees:sort_descending/2)},
+        {b_tree_4_dets, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets)},
+        {b_tree_4_dets_map, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_map)},
+        {b_tree_4_dets_new, test_generator:generate_b_tree_from_number_update_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_new)},
+        {b_tree_4_dets_update, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_update)},
         {b_tree_4_ets, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets, spawn(fun test_generator:ets_owner/0))},
         {b_tree_4_ets_map, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_map, spawn(fun test_generator:ets_owner/0))},
         {b_tree_4_ets_new, test_generator:generate_b_tree_from_number_update_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_new, spawn(fun test_generator:ets_owner/0))},
@@ -89,6 +94,8 @@ end_per_suite(_Config) ->
 all() ->
     [
         delete_gb_tree_test,
+        delete_b_tree_order_4_dets_desc_test,
+        delete_b_tree_order_4_dets_test,
         delete_b_tree_order_4_ets_desc_test,
         delete_b_tree_order_4_ets_test,
         delete_b_tree_order_4_even_odd_test,
@@ -114,6 +121,7 @@ all() ->
         delete_b_tree_order_1024_test,
 
         enter_gb_tree_test,
+        enter_b_tree_order_4_dets_test,
         enter_b_tree_order_4_ets_test,
         enter_b_tree_order_4_test,
         enter_b_tree_order_5_test,
@@ -128,6 +136,7 @@ all() ->
         enter_b_tree_order_1024_test,
 
         from_dict_gb_tree_test,
+        from_dict_b_tree_order_4_dets_test,
         from_dict_b_tree_order_4_ets_test,
         from_dict_b_tree_order_4_even_odd_test,
         from_dict_b_tree_order_4_odd_even_test,
@@ -151,6 +160,7 @@ all() ->
         from_dict_b_tree_order_1024_test,
 
         get_gb_tree_test,
+        get_b_tree_order_4_dets_test,
         get_b_tree_order_4_ets_test,
         get_b_tree_order_4_test,
         get_b_tree_order_5_test,
@@ -165,6 +175,7 @@ all() ->
         get_b_tree_order_1024_test,
 
         insert_gb_tree_test,
+        insert_b_tree_order_4_dets_test,
         insert_b_tree_order_4_ets_test,
         insert_b_tree_order_4_even_odd_test,
         insert_b_tree_order_4_odd_even_test,
@@ -191,6 +202,7 @@ all() ->
         insert_b_tree_order_1024_test,
 
         is_defined_gb_tree_test,
+        is_defined_b_tree_order_4_dets_test,
         is_defined_b_tree_order_4_ets_test,
         is_defined_b_tree_order_4_test,
         is_defined_b_tree_order_5_test,
@@ -205,6 +217,7 @@ all() ->
         is_defined_b_tree_order_1024_test,
 
         iterate_next_gb_tree_test,
+        iterate_next_b_tree_order_4_dets_test,
         iterate_next_b_tree_order_4_ets_test,
         iterate_next_b_tree_order_4_test,
         iterate_next_b_tree_order_5_test,
@@ -219,6 +232,7 @@ all() ->
         iterate_next_b_tree_order_1024_test,
 
         keys_gb_tree_test,
+        keys_b_tree_order_4_dets_test,
         keys_b_tree_order_4_ets_test,
         keys_b_tree_order_4_test,
         keys_b_tree_order_5_test,
@@ -233,6 +247,7 @@ all() ->
         keys_b_tree_order_1024_test,
 
         largest_gb_tree_test,
+        largest_b_tree_order_4_dets_test,
         largest_b_tree_order_4_ets_test,
         largest_b_tree_order_4_test,
         largest_b_tree_order_5_test,
@@ -247,6 +262,7 @@ all() ->
         largest_b_tree_order_1024_test,
 
         lookup_gb_tree_test,
+        lookup_b_tree_order_4_dets_test,
         lookup_b_tree_order_4_ets_test,
         lookup_b_tree_order_4_test,
         lookup_b_tree_order_5_test,
@@ -261,6 +277,7 @@ all() ->
         lookup_b_tree_order_1024_test,
 
         map_gb_tree_test,
+        map_b_tree_order_4_dets_test,
         map_b_tree_order_4_ets_test,
         map_b_tree_order_4_test,
         map_b_tree_order_5_test,
@@ -275,6 +292,7 @@ all() ->
         map_b_tree_order_1024_test,
 
         smallest_gb_tree_test,
+        smallest_b_tree_order_4_dets_test,
         smallest_b_tree_order_4_ets_test,
         smallest_b_tree_order_4_test,
         smallest_b_tree_order_5_test,
@@ -289,6 +307,7 @@ all() ->
         smallest_b_tree_order_1024_test,
 
         take_largest_gb_tree_test,
+        take_largest_b_tree_order_4_dets_test,
         take_largest_b_tree_order_4_ets_test,
         take_largest_b_tree_order_4_test,
         take_largest_b_tree_order_5_test,
@@ -303,6 +322,7 @@ all() ->
         take_largest_b_tree_order_1024_test,
 
         take_smallest_gb_tree_test,
+        take_smallest_b_tree_order_4_dets_test,
         take_smallest_b_tree_order_4_ets_test,
         take_smallest_b_tree_order_4_test,
         take_smallest_b_tree_order_5_test,
@@ -317,6 +337,7 @@ all() ->
         take_smallest_b_tree_order_1024_test,
 
         to_list_gb_tree_test,
+        to_list_b_tree_order_4_dets_test,
         to_list_b_tree_order_4_ets_test,
         to_list_b_tree_order_4_test,
         to_list_b_tree_order_5_test,
@@ -331,6 +352,7 @@ all() ->
         to_list_b_tree_order_1024_test,
 
         update_gb_tree_test,
+        update_b_tree_order_4_dets_test,
         update_b_tree_order_4_ets_test,
         update_b_tree_order_4_random_test,
         update_b_tree_order_4_test,
@@ -348,6 +370,7 @@ all() ->
         update_b_tree_order_1024_test,
 
         values_gb_tree_test,
+        values_b_tree_order_4_dets_test,
         values_b_tree_order_4_ets_test,
         values_b_tree_order_4_test,
         values_b_tree_order_5_test,
@@ -400,6 +423,22 @@ delete_b_tree_order_256_test(_Config) ->
 
 delete_b_tree_order_32_test(_Config) ->
     ?assertEqual(b_trees:empty(32), test_generator:delete_b_tree_from(32, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistence by dets - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_dets_desc_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_dets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_dets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_dets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -643,6 +682,26 @@ enter_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_4_dets_test(Config) ->
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets_new, [{file, "test/tmp/b_tree_4_dets_new"}]),
+    KeyValues = ?config(key_values_from, Config),
+    {ok, _} = dets:open_file(enter_order_4, [{file, "test/tmp/enter_order_4"}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {enter_order_4, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3}),
+    BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
+    test_generator:check_equal(?config(b_tree_4_dets, Config), BTree),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_4_dets_new, Config), BTreeUpdate),
+    ok = dets:delete_all_objects(enter_order_4),
+    ok = dets:close(enter_order_4),
+    ok = dets:close(b_tree_4_dets_new),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: enter b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -655,7 +714,7 @@ enter_b_tree_order_4_ets_test(Config) ->
     KeyValuesUpdate = ?config(key_values_from_update, Config),
     BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
     test_generator:check_equal(?config(b_tree_4_ets_new, Config), BTreeUpdate),
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
     ok.
 
 %%--------------------------------------------------------------------
@@ -835,6 +894,20 @@ from_dict_b_tree_order_4_random_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_dets_test(Config) ->
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    BTree = ?config(b_tree_4_dets, Config),
+    KeyValues = ?config(key_values_from, Config),
+    {ok, _} = dets:open_file(from_dict_order_4, [{file, "test/tmp/from_dict_order_4"}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {from_dict_order_4, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3}),
+    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    ok = dets:delete_all_objects(from_dict_order_4),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: from_dict b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -844,7 +917,7 @@ from_dict_b_tree_order_4_ets_test(Config) ->
     StateTarget = ets:new(from_dict_order_4, [ordered_set, {keypos, 1}]),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
     test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1033,6 +1106,17 @@ get_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: get b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+get_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    Keys = ?config(keys_random, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    get_b_tree(Keys, BTree),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: get b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -1125,7 +1209,8 @@ get_gb_tree([Key | Tail], GBTree) ->
 insert_b_tree_order_1024_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_1024, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 128
@@ -1134,7 +1219,8 @@ insert_b_tree_order_1024_test(_Config) ->
 insert_b_tree_order_128_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(128, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_128, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(128 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(128 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 16
@@ -1143,7 +1229,8 @@ insert_b_tree_order_128_test(_Config) ->
 insert_b_tree_order_16_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(16, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_16, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(16 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(16 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 256
@@ -1152,7 +1239,8 @@ insert_b_tree_order_16_test(_Config) ->
 insert_b_tree_order_256_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(256, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_256, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(256 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(256 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 32
@@ -1161,7 +1249,21 @@ insert_b_tree_order_256_test(_Config) ->
 insert_b_tree_order_32_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(32, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_32, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(32 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(32 div 2)))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_dets_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(insert_order_4, [{file, "test/tmp/insert_order_4"}]),
+    test_generator:check_equal(?config(b_tree_4_dets, _Config), BTree),
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    dets:close(b_tree_4_dets),
+    dets:close(insert_order_4).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - persistence by ets
@@ -1170,7 +1272,8 @@ insert_b_tree_order_32_test(_Config) ->
 insert_b_tree_order_4_ets_test(_Config) ->
     BTree = test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4, spawn(fun test_generator:ets_owner/0)),
     test_generator:check_equal(?config(b_tree_4_ets, _Config), BTree),
-    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - even / odd
@@ -1180,7 +1283,8 @@ insert_b_tree_order_4_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - odd / even
@@ -1190,7 +1294,8 @@ insert_b_tree_order_4_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - random
@@ -1200,7 +1305,8 @@ insert_b_tree_order_4_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4
@@ -1209,7 +1315,8 @@ insert_b_tree_order_4_random_test(Config) ->
 insert_b_tree_order_4_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_4, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - till
@@ -1217,7 +1324,8 @@ insert_b_tree_order_4_test(_Config) ->
 
 insert_b_tree_order_4_till_test(_Config) ->
     _BTree = test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, ?WIDTH),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 5 - even / odd
@@ -1227,7 +1335,8 @@ insert_b_tree_order_5_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 5 - odd / even
@@ -1237,7 +1346,8 @@ insert_b_tree_order_5_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 5 - random
@@ -1247,7 +1357,8 @@ insert_b_tree_order_5_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 5
@@ -1256,7 +1367,8 @@ insert_b_tree_order_5_random_test(Config) ->
 insert_b_tree_order_5_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_5, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 5 - till
@@ -1264,7 +1376,8 @@ insert_b_tree_order_5_test(_Config) ->
 
 insert_b_tree_order_5_till_test(_Config) ->
     _BTree = test_generator:generate_b_tree_till_number(5, ?NUMBER_ACTIONS, ?WIDTH),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 6
@@ -1273,7 +1386,8 @@ insert_b_tree_order_5_till_test(_Config) ->
 insert_b_tree_order_6_test(_Config) ->
     _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_6_till, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 6 - till
@@ -1281,7 +1395,8 @@ insert_b_tree_order_6_test(_Config) ->
 
 insert_b_tree_order_6_till_test(_Config) ->
     _BTree = test_generator:generate_b_tree_till_number(6, ?NUMBER_ACTIONS, ?WIDTH),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(6 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 512
@@ -1290,7 +1405,8 @@ insert_b_tree_order_6_till_test(_Config) ->
 insert_b_tree_order_512_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_512, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(512 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(512 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 64
@@ -1299,7 +1415,8 @@ insert_b_tree_order_512_test(_Config) ->
 insert_b_tree_order_64_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(64, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_64, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(64 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(64 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 8 - even / odd
@@ -1309,7 +1426,8 @@ insert_b_tree_order_8_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 8 - odd / even
@@ -1319,7 +1437,8 @@ insert_b_tree_order_8_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 8 - random
@@ -1329,7 +1448,8 @@ insert_b_tree_order_8_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 8
@@ -1338,14 +1458,16 @@ insert_b_tree_order_8_random_test(Config) ->
 insert_b_tree_order_8_test(_Config) ->
     _BTree = test_generator:generate_b_tree_from_number(8, ?NUMBER_ACTIONS, ?WIDTH),
     ?assertEqual(?config(b_tree_8, _Config), _BTree),
-    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))).
+    ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert gb_tree
 %%--------------------------------------------------------------------
 
 insert_gb_tree_test(_Config) ->
-    ?assertEqual(?config(gb_tree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, ?WIDTH)).
+    ?assertEqual(?config(gb_tree, _Config), test_generator:generate_gb_tree_from_number(?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: is_defined b_tree order 1024
@@ -1402,6 +1524,17 @@ is_defined_b_tree_order_32_test(Config) ->
     Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_defined b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+is_defined_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    Keys = ?config(keys_random, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    is_defined_b_tree(Keys, BTree),
+    dets:close(b_tree_4_dets).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: is_defined b_tree order 4 - persistence by ets
@@ -1546,6 +1679,17 @@ iterate_next_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: iterate & next b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -1687,6 +1831,18 @@ keys_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: keys b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+keys_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    _Keys = b_trees:keys(BTree),
+    ?assertEqual(?config(keys_from, Config), _Keys),
+    ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: keys b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -1820,6 +1976,16 @@ largest_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: largest b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+largest_b_tree_order_4_dets_test(Config) ->
+    _BTree = ?config(b_tree_4_dets, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: largest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -1945,6 +2111,17 @@ lookup_b_tree_order_32_test(Config) ->
     Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: lookup b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+lookup_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    Keys = ?config(keys_random, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    lookup_b_tree(Keys, BTree),
+    dets:close(b_tree_4_dets).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: lookup b_tree order 4 - persistence by ets
@@ -2086,6 +2263,17 @@ map_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+map_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets_map, Config),
+    BTreeNew = ?config(b_tree_4_dets_new, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets_map, [{file, "test/tmp/b_tree_4_dets_map"}]),
+    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    dets:close(b_tree_4_dets_map).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: map b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -2209,6 +2397,16 @@ smallest_b_tree_order_32_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: smallest b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+smallest_b_tree_order_4_dets_test(Config) ->
+    _BTree = ?config(b_tree_4_dets, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
+    dets:close(b_tree_4_dets).
+
+%%--------------------------------------------------------------------
 %% TEST CASES: smallest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -2320,6 +2518,14 @@ take_largest_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_4_dets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:take_largest_b_tree_dets(4, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_4)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_largest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
@@ -2421,6 +2627,14 @@ take_smallest_b_tree_order_256_test(_Config) ->
 
 take_smallest_b_tree_order_32_test(_Config) ->
     ?assertEqual(b_trees:empty(32), test_generator:take_smallest_b_tree(32, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 4
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_4_dets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:take_smallest_b_tree_dets(4, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_4)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2541,6 +2755,18 @@ to_list_b_tree_order_32_test(Config) ->
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
     ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: to_list b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+to_list_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    _KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?config(key_values_from, Config), _KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
+    dets:close(b_tree_4_dets).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: to_list b_tree order 4 - persistence by ets
@@ -2684,6 +2910,17 @@ update_b_tree_order_32_test(Config) ->
     _KeyValuesUpdate = ?config(key_values_from_update, Config),
     ?assertEqual(?config(b_tree_32_new, Config), update_b_tree(_KeyValuesUpdate, _BTree)),
     ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+update_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets_update, Config),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets_update, [{file, "test/tmp/b_tree_4_dets_update"}]),
+    test_generator:check_equal(?config(b_tree_4_dets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    dets:close(b_tree_4_dets_update).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: update b_tree order 4 - persistence by ets
@@ -2849,6 +3086,17 @@ values_b_tree_order_32_test(Config) ->
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: values b_tree order 4 - persistence by dets
+%%--------------------------------------------------------------------
+
+values_b_tree_order_4_dets_test(Config) ->
+    BTree = ?config(b_tree_4_dets, Config),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    _Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
+    dets:close(b_tree_4_dets).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: values b_tree order 4 - persistence by ets

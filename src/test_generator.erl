@@ -18,6 +18,8 @@
     check_equal/2,
     delete_b_tree_from/3,
     delete_b_tree_from/4,
+    delete_b_tree_from_dets/4,
+    delete_b_tree_from_dets_desc/4,
     delete_b_tree_from_ets/5,
     delete_b_tree_from_ets_desc/5,
     delete_b_tree_from_even/4,
@@ -28,9 +30,12 @@
     ets_owner/0,
     generate_b_tree_from_number/3,
     generate_b_tree_from_number/4,
+    generate_b_tree_from_number_dets/4,
+    generate_b_tree_from_number_dets_desc/4,
     generate_b_tree_from_number_ets/5,
     generate_b_tree_from_number_ets_desc/5,
     generate_b_tree_from_number_update/3,
+    generate_b_tree_from_number_update_dets/4,
     generate_b_tree_from_number_update_ets/5,
     generate_b_tree_list_and_btree/2,
     generate_b_tree_list_and_order/2,
@@ -51,15 +56,18 @@
     generate_keys_till/2,
     iterate_next_b_tree/3,
     map_value_to_new/2,
+    persistence_by_dets/3,
     persistence_by_ets/3,
     prepare_template_asc/1,
     prepare_template_desc/1,
     take_largest_b_tree/3,
     take_largest_b_tree/4,
+    take_largest_b_tree_dets/4,
     take_largest_b_tree_ets/5,
     take_largest_gb_tree/2,
     take_smallest_b_tree/3,
     take_smallest_b_tree/4,
+    take_smallest_b_tree_dets/4,
     take_smallest_b_tree_ets/5,
     take_smallest_gb_tree/2
 ]).
@@ -80,6 +88,30 @@ delete_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
 delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
     Keys = generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec delete_b_tree_from_dets(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+delete_b_tree_from_dets(Order, Number, Width, StateTargetName) when Order > 3, Number > 0 ->
+    B_TREE_1 = generate_b_tree_from_number_dets(Order, Number, Width, StateTargetName),
+    Keys = generate_keys_from(Number, Width),
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}]),
+    B_TREE_2 = delete_b_tree_1(Keys, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec delete_b_tree_from_dets_desc(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+delete_b_tree_from_dets_desc(Order, Number, Width, StateTargetName) when Order > 3, Number > 0 ->
+    B_TREE_1 = generate_b_tree_from_number_dets_desc(Order, Number, Width, StateTargetName),
+    Keys = generate_keys_from(Number, Width),
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}]),
+    B_TREE_2 = delete_b_tree_1(Keys, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -149,6 +181,28 @@ generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec generate_b_tree_from_number_dets(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_dets(Order, Number, Width, StateTargetName) when Order > 3, Number >= 0 ->
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}, {keypos, 1}]),
+    B_TREE_1 = b_trees:set_parameter(b_trees:empty(Order), state, {StateTargetName, fun persistence_by_dets/3, fun persistence_by_dets/3, fun persistence_by_dets/3}),
+    B_TREE_2 = generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_b_tree_from_number_dets_desc(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_dets_desc(Order, Number, Width, StateTargetName) when Order > 3, Number >= 0 ->
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}, {keypos, 1}]),
+    B_TREE_1 = b_trees:set_parameter(b_trees:set_parameter(b_trees:empty(Order), sort, fun b_trees:sort_descending/2), state, {StateTargetName, fun persistence_by_dets/3, fun persistence_by_dets/3, fun persistence_by_dets/3}),
+    B_TREE_2 = generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec generate_b_tree_from_number_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 generate_b_tree_from_number_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number >= 0 ->
@@ -180,6 +234,17 @@ generate_b_tree_from_number(Order, Number, Width, Function) when Order > 3, Numb
 
 generate_b_tree_from_number_update(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, b_trees:empty(Order)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_b_tree_from_number_update_dets(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_update_dets(Order, Number, Width, StateTargetName) when Order > 3, Number >= 0 ->
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}, {keypos, 1}]),
+    B_TREE_1 = b_trees:set_parameter(b_trees:empty(Order), state, {StateTargetName, fun persistence_by_dets/3, fun persistence_by_dets/3, fun persistence_by_dets/3}),
+    B_TREE_2 = generate_b_tree_by_key_1(lists:seq(1, Number), "_new", Width, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -339,6 +404,17 @@ take_largest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec take_largest_b_tree_dets(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+take_largest_b_tree_dets(Order, Number, Width, StateTargetName) when Order > 3, Number > 0 ->
+    B_TREE_1 = generate_b_tree_from_number_dets(Order, Number, Width, StateTargetName),
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}]),
+    B_TREE_2 = take_largest_b_tree_1(Number, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec take_largest_b_tree_ets(pos_integer(), pos_integer(), pos_integer(), atom(), pid()) -> b_trees:b_tree().
 
 take_largest_b_tree_ets(Order, Number, Width, StateTargetName, Pid) when Order > 3, Number > 0 ->
@@ -368,6 +444,17 @@ take_smallest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
 take_smallest_b_tree(Order, Number, Width, Function) when Order > 3, Number > 0, is_function(Function, 2) ->
     BTree = generate_b_tree_from_number(Order, Number, Width, Function),
     take_smallest_b_tree_1(Number, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_smallest_b_tree_dets(pos_integer(), pos_integer(), pos_integer(), atom()) -> b_trees:b_tree().
+
+take_smallest_b_tree_dets(Order, Number, Width, StateTargetName) when Order > 3, Number > 0 ->
+    B_TREE_1 = generate_b_tree_from_number_dets(Order, Number, Width, StateTargetName),
+    {ok, _} = dets:open_file(StateTargetName, [{file, "test/tmp/" ++ atom_to_list(StateTargetName)}]),
+    B_TREE_2 = take_smallest_b_tree_1(Number, B_TREE_1),
+    ok = dets:close(StateTargetName),
+    B_TREE_2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -417,6 +504,34 @@ iterate_next_b_tree(Iterator, Count, KeyValues) ->
 
 map_value_to_new(_, Value) ->
     Value ++ "_new".
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+persistence_by_dets(StateTarget, delete, SubtreesKey) ->
+    case is_list(SubtreesKey) of
+        true ->
+            true;
+        _ ->
+            ok = dets:delete(StateTarget, SubtreesKey),
+            true
+    end;
+persistence_by_dets(StateTarget, insert, Subtrees) ->
+    case Subtrees == [] of
+        true ->
+            Subtrees;
+        _ ->
+            SubtreesKey = erlang:phash2(Subtrees),
+            ok = dets:insert(StateTarget, {SubtreesKey, Subtrees}),
+            SubtreesKey
+    end;
+persistence_by_dets(StateTarget, lookup, SubtreesKey) ->
+    case is_list(SubtreesKey) of
+        true ->
+            SubtreesKey;
+        _ ->
+            [{SubtreesKey, Subtrees}] = dets:lookup(StateTarget, SubtreesKey),
+            Subtrees
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
