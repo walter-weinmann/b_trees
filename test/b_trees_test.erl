@@ -61,7 +61,7 @@ delete_any_persistence_by_ets_test() ->
 
     ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -202,7 +202,7 @@ delete_b_tree_persistence_by_ets_test() ->
 
     ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -379,7 +379,7 @@ enter_persistence_by_ets_test() ->
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -411,7 +411,7 @@ from_dict_persistence_by_ets_test() ->
 
     ?assertEqual(32, b_trees:number_key_values(b_trees:from_dict(B_TREE_06_00, test_generator:generate_key_values_from(32, 2)))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -459,7 +459,7 @@ get_persistence_by_ets_test() ->
     ?assertEqual("v_32", b_trees:get("k_32", B_TREE_06_32)),
     ?assertException(error, {key_not_found, "k_33"}, b_trees:get("k_33", B_TREE_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -605,7 +605,7 @@ height_persistence_by_ets_test() ->
 
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_desc(B_TREE_06_32))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -809,11 +809,11 @@ insert_b_tree_persistence_by_ets_test() ->
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
-    ets:delete_all_objects(StateTarget),
+    true = ets:delete_all_objects(StateTarget),
 
     test_generator:generate_b_tree_from_number_ets(4, 99, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -894,7 +894,7 @@ is_defined_persistence_by_ets_test() ->
     ?assert(b_trees:is_defined("k_32", B_TREE_06_32)),
     ?assertNot(b_trees:is_defined("k_33", B_TREE_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1041,7 +1041,7 @@ is_empty_persistence_by_ets_test() ->
 
     ?assertEqual(true, b_trees:is_empty(test_generator:prepare_template_asc(B_TREE_06_00))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1331,7 +1331,7 @@ iterator_next_from_persistence_by_ets_test() ->
 
     ?assertEqual(none, b_trees:next(_Iterator_04_32_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1412,7 +1412,7 @@ iterator_next_persistence_by_ets_test() ->
 
     ?assertEqual(none, b_trees:next(_Iterator_04_32_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1510,7 +1510,7 @@ keys_persistence_by_ets_test() ->
     ?assertEqual(test_generator:generate_keys_from(32, 2), _Keys_06_32),
     ?assertEqual(32, length(_Keys_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1556,7 +1556,7 @@ largest_persistence_by_ets_test() ->
 
     ?assertEqual({"k_32", "v_32"}, b_trees:largest(B_TREE_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1623,7 +1623,7 @@ lookup_persistence_by_ets_test() ->
     ?assertEqual({value, "v_32"}, b_trees:lookup("k_32", B_TREE_06_32)),
     ?assertEqual(none, b_trees:lookup("k_33", B_TREE_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1775,7 +1775,7 @@ map_b_tree_persistence_by_ets_test() ->
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1810,7 +1810,7 @@ number_key_values_persistence_by_ets_test() ->
 
     ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_desc(B_TREE_06_32))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1854,7 +1854,7 @@ size_persistence_by_ets_test() ->
 
     ?assertEqual(14, b_trees:size(test_generator:prepare_template_desc(B_TREE_06_32))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1886,7 +1886,7 @@ smallest_persistence_by_ets_test() ->
 
     ?assertEqual({"k_01", "v_01"}, b_trees:smallest(B_TREE_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -1953,7 +1953,7 @@ take_largest_persistence_by_ets_test() ->
 
     ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -2033,7 +2033,7 @@ take_smallest_persistence_by_ets_test() ->
 
     ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -2082,7 +2082,7 @@ to_list_persistence_by_ets_test() ->
     ?assertEqual(test_generator:generate_key_values_from(32, 2), _KeyValues_06_32),
     ?assertEqual(32, length(_KeyValues_06_32)),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -2235,7 +2235,7 @@ update_persistence_by_ets_test() ->
 
     ?assertEqual(11, length(ets:tab2list(StateTarget))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
@@ -2250,7 +2250,7 @@ values_persistence_by_ets_test() ->
 
     ?assertEqual(32, length(b_trees:values(B_TREE_06_32))),
 
-    ets:delete(StateTarget),
+    true = ets:delete(StateTarget),
 
     ok.
 
