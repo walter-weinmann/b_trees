@@ -405,7 +405,7 @@ from_dict_b_tree_test() ->
 %%--------------------------------------------------------------------
 
 from_dict_persistence_by_ets_test() ->
-    StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
+    StateTarget = ets:new(b_trees, []),
 
     B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 
@@ -770,7 +770,7 @@ insert_b_tree_order_8_test() ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_persistence_by_ets_test() ->
-    StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
+    StateTarget = ets:new(b_trees, []),
 
     B_TREE_04_00 = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 
@@ -1035,7 +1035,7 @@ is_defined_test() ->
 %%--------------------------------------------------------------------
 
 is_empty_persistence_by_ets_test() ->
-    StateTarget = ets:new(b_trees, [ordered_set, {keypos, 1}]),
+    StateTarget = ets:new(b_trees, []),
 
     B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 

@@ -15,6 +15,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(B_TREE_POS_STATE, 5).
+-define(DIRECTORY_DETS, "test/tmp/").
 -define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
 -define(NUMBER_ACTIONS, 2000).
 -define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
@@ -30,7 +31,15 @@ suite() ->
     ].
 
 init_per_suite(Config) ->
-    filelib:ensure_dir("test/tmp/"),
+    filelib:ensure_dir(?DIRECTORY_DETS),
+    case ok == mnesia:create_schema([node()]) of
+        true ->
+            ok;
+        _ ->
+            ok = mnesia:delete_schema([node()]),
+            mnesia:create_schema([node()])
+    end,
+    ok = mnesia:start(),
     [
         {key_values_from, test_generator:generate_key_values_from(?NUMBER_ACTIONS, ?WIDTH)},
         {key_values_from_even_odd, test_generator:generate_key_values_from_even(?NUMBER_ACTIONS, ?WIDTH) ++ test_generator:generate_key_values_from_odd(?NUMBER_ACTIONS, ?WIDTH)},
@@ -49,14 +58,6 @@ init_per_suite(Config) ->
 
         {b_tree_4, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_4_desc, test_generator:generate_b_tree_from_number(4, ?NUMBER_ACTIONS, ?WIDTH, fun b_trees:sort_descending/2)},
-        {b_tree_4_dets, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets)},
-        {b_tree_4_dets_map, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_map)},
-        {b_tree_4_dets_new, test_generator:generate_b_tree_from_number_update_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_new)},
-        {b_tree_4_dets_update, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_update)},
-        {b_tree_4_ets, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets, spawn(fun test_generator:ets_owner/0))},
-        {b_tree_4_ets_map, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_map, spawn(fun test_generator:ets_owner/0))},
-        {b_tree_4_ets_new, test_generator:generate_b_tree_from_number_update_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_new, spawn(fun test_generator:ets_owner/0))},
-        {b_tree_4_ets_update, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_update, spawn(fun test_generator:ets_owner/0))},
         {b_tree_4_new, test_generator:generate_b_tree_from_number_update(4, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_4_till, test_generator:generate_b_tree_till_number(4, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_5, test_generator:generate_b_tree_from_number(5, ?NUMBER_ACTIONS, ?WIDTH)},
@@ -80,12 +81,44 @@ init_per_suite(Config) ->
         {b_tree_512, test_generator:generate_b_tree_from_number(512, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_512_new, test_generator:generate_b_tree_from_number_update(512, ?NUMBER_ACTIONS, ?WIDTH)},
         {b_tree_1024, test_generator:generate_b_tree_from_number(1024, ?NUMBER_ACTIONS, ?WIDTH)},
-        {b_tree_1024_new, test_generator:generate_b_tree_from_number_update(1024, ?NUMBER_ACTIONS, ?WIDTH)}
+        {b_tree_1024_new, test_generator:generate_b_tree_from_number_update(1024, ?NUMBER_ACTIONS, ?WIDTH)},
+
+        {b_tree_4_dets, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets)},
+        {b_tree_4_dets_map, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_map)},
+        {b_tree_4_dets_new, test_generator:generate_b_tree_from_number_update_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_new)},
+        {b_tree_4_dets_update, test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_dets_update)},
+
+        {b_tree_1024_dets, test_generator:generate_b_tree_from_number_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_dets)},
+        {b_tree_1024_dets_map, test_generator:generate_b_tree_from_number_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_dets_map)},
+        {b_tree_1024_dets_new, test_generator:generate_b_tree_from_number_update_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_dets_new)},
+        {b_tree_1024_dets_update, test_generator:generate_b_tree_from_number_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_dets_update)},
+
+        {b_tree_4_ets, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_4_ets_map, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_map, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_4_ets_new, test_generator:generate_b_tree_from_number_update_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_new, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_4_ets_update, test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_ets_update, spawn(fun test_generator:ets_owner/0))},
+
+        {b_tree_1024_ets, test_generator:generate_b_tree_from_number_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_ets, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_1024_ets_map, test_generator:generate_b_tree_from_number_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_ets_map, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_1024_ets_new, test_generator:generate_b_tree_from_number_update_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_ets_new, spawn(fun test_generator:ets_owner/0))},
+        {b_tree_1024_ets_update, test_generator:generate_b_tree_from_number_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_ets_update, spawn(fun test_generator:ets_owner/0))},
+
+        {b_tree_4_mnesia, test_generator:generate_b_tree_from_number_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_mnesia)},
+        {b_tree_4_mnesia_map, test_generator:generate_b_tree_from_number_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_mnesia_map)},
+        {b_tree_4_mnesia_new, test_generator:generate_b_tree_from_number_update_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_mnesia_new)},
+        {b_tree_4_mnesia_update, test_generator:generate_b_tree_from_number_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, b_tree_4_mnesia_update)},
+
+        {b_tree_1024_mnesia, test_generator:generate_b_tree_from_number_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_mnesia)},
+        {b_tree_1024_mnesia_map, test_generator:generate_b_tree_from_number_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_mnesia_map)},
+        {b_tree_1024_mnesia_new, test_generator:generate_b_tree_from_number_update_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_mnesia_new)},
+        {b_tree_1024_mnesia_update, test_generator:generate_b_tree_from_number_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, b_tree_1024_mnesia_update)}
+
         | Config
     ].
 
 end_per_suite(_Config) ->
-    ok.
+    stopped = mnesia:stop(),
+    ok = mnesia:delete_schema([node()]).
 
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - ALL
@@ -99,6 +132,8 @@ all() ->
         delete_b_tree_order_4_ets_desc_test,
         delete_b_tree_order_4_ets_test,
         delete_b_tree_order_4_even_odd_test,
+        delete_b_tree_order_4_mnesia_desc_test,
+        delete_b_tree_order_4_mnesia_test,
         delete_b_tree_order_4_odd_even_test,
         delete_b_tree_order_4_random_desc_test,
         delete_b_tree_order_4_random_test,
@@ -118,11 +153,15 @@ all() ->
         delete_b_tree_order_128_test,
         delete_b_tree_order_256_test,
         delete_b_tree_order_512_test,
+        delete_b_tree_order_1024_dets_test,
+        delete_b_tree_order_1024_ets_test,
+        delete_b_tree_order_1024_mnesia_test,
         delete_b_tree_order_1024_test,
 
         enter_gb_tree_test,
         enter_b_tree_order_4_dets_test,
         enter_b_tree_order_4_ets_test,
+        enter_b_tree_order_4_mnesia_test,
         enter_b_tree_order_4_test,
         enter_b_tree_order_5_test,
         enter_b_tree_order_6_test,
@@ -133,12 +172,16 @@ all() ->
         enter_b_tree_order_128_test,
         enter_b_tree_order_256_test,
         enter_b_tree_order_512_test,
+        enter_b_tree_order_1024_dets_test,
+        enter_b_tree_order_1024_ets_test,
+        enter_b_tree_order_1024_mnesia_test,
         enter_b_tree_order_1024_test,
 
         from_dict_gb_tree_test,
         from_dict_b_tree_order_4_dets_test,
         from_dict_b_tree_order_4_ets_test,
         from_dict_b_tree_order_4_even_odd_test,
+        from_dict_b_tree_order_4_mnesia_test,
         from_dict_b_tree_order_4_odd_even_test,
         from_dict_b_tree_order_4_random_test,
         from_dict_b_tree_order_4_test,
@@ -157,11 +200,15 @@ all() ->
         from_dict_b_tree_order_128_test,
         from_dict_b_tree_order_256_test,
         from_dict_b_tree_order_512_test,
+        from_dict_b_tree_order_1024_dets_test,
+        from_dict_b_tree_order_1024_ets_test,
+        from_dict_b_tree_order_1024_mnesia_test,
         from_dict_b_tree_order_1024_test,
 
         get_gb_tree_test,
         get_b_tree_order_4_dets_test,
         get_b_tree_order_4_ets_test,
+        get_b_tree_order_4_mnesia_test,
         get_b_tree_order_4_test,
         get_b_tree_order_5_test,
         get_b_tree_order_6_test,
@@ -178,6 +225,7 @@ all() ->
         insert_b_tree_order_4_dets_test,
         insert_b_tree_order_4_ets_test,
         insert_b_tree_order_4_even_odd_test,
+        insert_b_tree_order_4_mnesia_test,
         insert_b_tree_order_4_odd_even_test,
         insert_b_tree_order_4_random_test,
         insert_b_tree_order_4_test,
@@ -199,11 +247,15 @@ all() ->
         insert_b_tree_order_128_test,
         insert_b_tree_order_256_test,
         insert_b_tree_order_512_test,
+        insert_b_tree_order_1024_dets_test,
+        insert_b_tree_order_1024_ets_test,
+        insert_b_tree_order_1024_mnesia_test,
         insert_b_tree_order_1024_test,
 
         is_defined_gb_tree_test,
         is_defined_b_tree_order_4_dets_test,
         is_defined_b_tree_order_4_ets_test,
+        is_defined_b_tree_order_4_mnesia_test,
         is_defined_b_tree_order_4_test,
         is_defined_b_tree_order_5_test,
         is_defined_b_tree_order_6_test,
@@ -219,6 +271,7 @@ all() ->
         iterate_next_gb_tree_test,
         iterate_next_b_tree_order_4_dets_test,
         iterate_next_b_tree_order_4_ets_test,
+        iterate_next_b_tree_order_4_mnesia_test,
         iterate_next_b_tree_order_4_test,
         iterate_next_b_tree_order_5_test,
         iterate_next_b_tree_order_6_test,
@@ -229,11 +282,15 @@ all() ->
         iterate_next_b_tree_order_128_test,
         iterate_next_b_tree_order_256_test,
         iterate_next_b_tree_order_512_test,
+        iterate_next_b_tree_order_1024_dets_test,
+        iterate_next_b_tree_order_1024_ets_test,
+        iterate_next_b_tree_order_1024_mnesia_test,
         iterate_next_b_tree_order_1024_test,
 
         keys_gb_tree_test,
         keys_b_tree_order_4_dets_test,
         keys_b_tree_order_4_ets_test,
+        keys_b_tree_order_4_mnesia_test,
         keys_b_tree_order_4_test,
         keys_b_tree_order_5_test,
         keys_b_tree_order_6_test,
@@ -249,6 +306,7 @@ all() ->
         largest_gb_tree_test,
         largest_b_tree_order_4_dets_test,
         largest_b_tree_order_4_ets_test,
+        largest_b_tree_order_4_mnesia_test,
         largest_b_tree_order_4_test,
         largest_b_tree_order_5_test,
         largest_b_tree_order_6_test,
@@ -264,6 +322,7 @@ all() ->
         lookup_gb_tree_test,
         lookup_b_tree_order_4_dets_test,
         lookup_b_tree_order_4_ets_test,
+        lookup_b_tree_order_4_mnesia_test,
         lookup_b_tree_order_4_test,
         lookup_b_tree_order_5_test,
         lookup_b_tree_order_6_test,
@@ -279,6 +338,7 @@ all() ->
         map_gb_tree_test,
         map_b_tree_order_4_dets_test,
         map_b_tree_order_4_ets_test,
+        map_b_tree_order_4_mnesia_test,
         map_b_tree_order_4_test,
         map_b_tree_order_5_test,
         map_b_tree_order_6_test,
@@ -289,11 +349,15 @@ all() ->
         map_b_tree_order_128_test,
         map_b_tree_order_256_test,
         map_b_tree_order_512_test,
+        map_b_tree_order_1024_dets_test,
+        map_b_tree_order_1024_ets_test,
+        map_b_tree_order_1024_mnesia_test,
         map_b_tree_order_1024_test,
 
         smallest_gb_tree_test,
         smallest_b_tree_order_4_dets_test,
         smallest_b_tree_order_4_ets_test,
+        smallest_b_tree_order_4_mnesia_test,
         smallest_b_tree_order_4_test,
         smallest_b_tree_order_5_test,
         smallest_b_tree_order_6_test,
@@ -309,6 +373,7 @@ all() ->
         take_largest_gb_tree_test,
         take_largest_b_tree_order_4_dets_test,
         take_largest_b_tree_order_4_ets_test,
+        take_largest_b_tree_order_4_mnesia_test,
         take_largest_b_tree_order_4_test,
         take_largest_b_tree_order_5_test,
         take_largest_b_tree_order_6_test,
@@ -319,11 +384,15 @@ all() ->
         take_largest_b_tree_order_128_test,
         take_largest_b_tree_order_256_test,
         take_largest_b_tree_order_512_test,
+        take_largest_b_tree_order_1024_dets_test,
+        take_largest_b_tree_order_1024_ets_test,
+        take_largest_b_tree_order_1024_mnesia_test,
         take_largest_b_tree_order_1024_test,
 
         take_smallest_gb_tree_test,
         take_smallest_b_tree_order_4_dets_test,
         take_smallest_b_tree_order_4_ets_test,
+        take_smallest_b_tree_order_4_mnesia_test,
         take_smallest_b_tree_order_4_test,
         take_smallest_b_tree_order_5_test,
         take_smallest_b_tree_order_6_test,
@@ -334,11 +403,15 @@ all() ->
         take_smallest_b_tree_order_128_test,
         take_smallest_b_tree_order_256_test,
         take_smallest_b_tree_order_512_test,
+        take_smallest_b_tree_order_1024_dets_test,
+        take_smallest_b_tree_order_1024_ets_test,
+        take_smallest_b_tree_order_1024_mnesia_test,
         take_smallest_b_tree_order_1024_test,
 
         to_list_gb_tree_test,
         to_list_b_tree_order_4_dets_test,
         to_list_b_tree_order_4_ets_test,
+        to_list_b_tree_order_4_mnesia_test,
         to_list_b_tree_order_4_test,
         to_list_b_tree_order_5_test,
         to_list_b_tree_order_6_test,
@@ -354,6 +427,7 @@ all() ->
         update_gb_tree_test,
         update_b_tree_order_4_dets_test,
         update_b_tree_order_4_ets_test,
+        update_b_tree_order_4_mnesia_test,
         update_b_tree_order_4_random_test,
         update_b_tree_order_4_test,
         update_b_tree_order_5_random_test,
@@ -367,11 +441,15 @@ all() ->
         update_b_tree_order_128_test,
         update_b_tree_order_256_test,
         update_b_tree_order_512_test,
+        update_b_tree_order_1024_dets_test,
+        update_b_tree_order_1024_ets_test,
+        update_b_tree_order_1024_mnesia_test,
         update_b_tree_order_1024_test,
 
         values_gb_tree_test,
         values_b_tree_order_4_dets_test,
         values_b_tree_order_4_ets_test,
+        values_b_tree_order_4_mnesia_test,
         values_b_tree_order_4_test,
         values_b_tree_order_5_test,
         values_b_tree_order_6_test,
@@ -384,6 +462,30 @@ all() ->
         values_b_tree_order_512_test,
         values_b_tree_order_1024_test
     ].
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_1024_dets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:delete_b_tree_from_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, delete_order_1024_dets)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_1024_ets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:delete_b_tree_from_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, delete_order_1024_ets, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_1024_mnesia_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:delete_b_tree_from_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, delete_order_1024_mnesia)),
+    ok.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 1024
@@ -430,7 +532,7 @@ delete_b_tree_order_32_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_dets_desc_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_dets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4)),
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_dets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_dets_desc)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -438,7 +540,7 @@ delete_b_tree_order_4_dets_desc_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_dets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_dets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4)),
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_dets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_dets)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -446,7 +548,7 @@ delete_b_tree_order_4_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_ets_desc_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4, spawn(fun test_generator:ets_owner/0))),
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_ets_desc, spawn(fun test_generator:ets_owner/0))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -454,7 +556,7 @@ delete_b_tree_order_4_ets_desc_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4, spawn(fun test_generator:ets_owner/0))),
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_ets, spawn(fun test_generator:ets_owner/0))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -466,6 +568,22 @@ delete_b_tree_order_4_even_odd_test(_Config) ->
     _BTree_Odd = test_generator:delete_b_tree_from_even(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree),
     _BTree_Empty = test_generator:delete_b_tree_from_odd(4, ?NUMBER_ACTIONS, ?WIDTH, _BTree_Odd),
     ?assertEqual(b_trees:empty(4), _BTree_Empty),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistence by mnesia - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_mnesia_desc_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_mnesia_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_mnesia_desc)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_mnesia_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_mnesia)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -612,6 +730,57 @@ delete_gb_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_1024_dets_test(Config) ->
+    {ok, _} = dets:open_file(b_tree_1024_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets"}]),
+    {ok, _} = dets:open_file(b_tree_1024_dets_new, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets_new"}]),
+    KeyValues = ?config(key_values_from, Config),
+    {ok, _} = dets:open_file(enter_order_1024, [{file, ?DIRECTORY_DETS ++ "enter_order_1024"}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {enter_order_1024, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3}),
+    BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
+    test_generator:check_equal(?config(b_tree_1024_dets, Config), BTree),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_1024_dets_new, Config), BTreeUpdate),
+    ok = dets:close(enter_order_1024),
+    ok = dets:close(b_tree_1024_dets_new),
+    dets:close(b_tree_1024_dets).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_1024_ets_test(Config) ->
+    KeyValues = ?config(key_values_from, Config),
+    StateTarget = ets:new(enter_order_1024, []),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
+    BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
+    test_generator:check_equal(?config(b_tree_1024_ets, Config), BTree),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_1024_ets_new, Config), BTreeUpdate),
+    true = ets:delete(StateTarget),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_1024_mnesia_test(Config) ->
+
+    KeyValues = ?config(key_values_from, Config),
+    {atomic, ok} = mnesia:create_table(enter_order_1024, [{record_name, subtrees}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {enter_order_1024, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3}),
+    BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
+    test_generator:check_equal(?config(b_tree_1024_mnesia, Config), BTree),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_1024_mnesia_new, Config), BTreeUpdate),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: enter b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -686,17 +855,16 @@ enter_b_tree_order_32_test(Config) ->
 %%--------------------------------------------------------------------
 
 enter_b_tree_order_4_dets_test(Config) ->
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
-    {ok, _} = dets:open_file(b_tree_4_dets_new, [{file, "test/tmp/b_tree_4_dets_new"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets_new, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets_new"}]),
     KeyValues = ?config(key_values_from, Config),
-    {ok, _} = dets:open_file(enter_order_4, [{file, "test/tmp/enter_order_4"}]),
+    {ok, _} = dets:open_file(enter_order_4, [{file, ?DIRECTORY_DETS ++ "enter_order_4"}]),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {enter_order_4, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3}),
     BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
     test_generator:check_equal(?config(b_tree_4_dets, Config), BTree),
     KeyValuesUpdate = ?config(key_values_from_update, Config),
     BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
     test_generator:check_equal(?config(b_tree_4_dets_new, Config), BTreeUpdate),
-    ok = dets:delete_all_objects(enter_order_4),
     ok = dets:close(enter_order_4),
     ok = dets:close(b_tree_4_dets_new),
     dets:close(b_tree_4_dets).
@@ -707,7 +875,7 @@ enter_b_tree_order_4_dets_test(Config) ->
 
 enter_b_tree_order_4_ets_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
-    StateTarget = ets:new(enter_order_4, [ordered_set, {keypos, 1}]),
+    StateTarget = ets:new(enter_order_4, []),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
     BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
     test_generator:check_equal(?config(b_tree_4_ets, Config), BTree),
@@ -715,6 +883,22 @@ enter_b_tree_order_4_ets_test(Config) ->
     BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
     test_generator:check_equal(?config(b_tree_4_ets_new, Config), BTreeUpdate),
     true = ets:delete(StateTarget),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: enter b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+enter_b_tree_order_4_mnesia_test(Config) ->
+
+    KeyValues = ?config(key_values_from, Config),
+    {atomic, ok} = mnesia:create_table(enter_order_4, [{record_name, subtrees}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {enter_order_4, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3}),
+    BTree = enter_b_tree(KeyValues, B_TREE_EMPTY),
+    test_generator:check_equal(?config(b_tree_4_mnesia, Config), BTree),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_4_mnesia_new, Config), BTreeUpdate),
     ok.
 
 %%--------------------------------------------------------------------
@@ -814,6 +998,44 @@ enter_gb_tree([{Key, Value} | Tail], GBTree) ->
     enter_gb_tree(Tail, gb_trees:enter(Key, Value, GBTree)).
 
 %%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_1024_dets_test(Config) ->
+    {ok, _} = dets:open_file(b_tree_1024_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets"}]),
+    BTree = ?config(b_tree_1024_dets, Config),
+    KeyValues = ?config(key_values_from, Config),
+    {ok, _} = dets:open_file(from_dict_order_1024, [{file, ?DIRECTORY_DETS ++ "from_dict_order_1024"}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {from_dict_order_1024, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3}),
+    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    dets:close(b_tree_1024_dets).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_1024_ets_test(Config) ->
+    BTree = ?config(b_tree_1024_ets, Config),
+    KeyValues = ?config(key_values_from, Config),
+    StateTarget = ets:new(from_dict_order_1024, []),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
+    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    true = ets:delete(StateTarget),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_1024_mnesia_test(Config) ->
+    BTree = ?config(b_tree_1024_mnesia, Config),
+    KeyValues = ?config(key_values_from, Config),
+    {atomic, ok} = mnesia:create_table(from_dict_order_1024, [{record_name, subtrees}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {from_dict_order_1024, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3}),
+    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: from_dict b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -898,13 +1120,12 @@ from_dict_b_tree_order_4_random_test(Config) ->
 %%--------------------------------------------------------------------
 
 from_dict_b_tree_order_4_dets_test(Config) ->
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     BTree = ?config(b_tree_4_dets, Config),
     KeyValues = ?config(key_values_from, Config),
-    {ok, _} = dets:open_file(from_dict_order_4, [{file, "test/tmp/from_dict_order_4"}]),
+    {ok, _} = dets:open_file(from_dict_order_4, [{file, ?DIRECTORY_DETS ++ "from_dict_order_4"}]),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {from_dict_order_4, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3, fun test_generator:persistence_by_dets/3}),
     test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
-    ok = dets:delete_all_objects(from_dict_order_4),
     dets:close(b_tree_4_dets).
 
 %%--------------------------------------------------------------------
@@ -914,10 +1135,22 @@ from_dict_b_tree_order_4_dets_test(Config) ->
 from_dict_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
     KeyValues = ?config(key_values_from, Config),
-    StateTarget = ets:new(from_dict_order_4, [ordered_set, {keypos, 1}]),
+    StateTarget = ets:new(from_dict_order_4, []),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
     test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
     true = ets:delete(StateTarget),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: from_dict b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+from_dict_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
+    KeyValues = ?config(key_values_from, Config),
+    {atomic, ok} = mnesia:create_table(from_dict_order_4, [{record_name, subtrees}]),
+    B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {from_dict_order_4, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3, fun test_generator:persistence_by_mnesia/3}),
+    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1112,7 +1345,7 @@ get_b_tree_order_32_test(Config) ->
 get_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
     Keys = ?config(keys_random, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     get_b_tree(Keys, BTree),
     dets:close(b_tree_4_dets).
 
@@ -1122,6 +1355,16 @@ get_b_tree_order_4_dets_test(Config) ->
 
 get_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    Keys = ?config(keys_random, Config),
+    get_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: get b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+get_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     Keys = ?config(keys_random, Config),
     get_b_tree(Keys, BTree),
     ok.
@@ -1203,6 +1446,39 @@ get_gb_tree([Key | Tail], GBTree) ->
     get_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_1024_dets_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, insert_order_1024_dets),
+    {ok, _} = dets:open_file(b_tree_1024_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets"}]),
+    {ok, _} = dets:open_file(insert_order_1024_dets, [{file, ?DIRECTORY_DETS ++ "insert_order_1024_dets"}]),
+    test_generator:check_equal(?config(b_tree_1024_dets, _Config), BTree),
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))),
+    dets:close(b_tree_1024_dets),
+    dets:close(insert_order_1024_dets).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_1024_ets_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, insert_order_1024_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(?config(b_tree_1024_ets, _Config), BTree),
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_1024_mnesia_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, insert_order_1024_mnesia),
+    test_generator:check_equal(?config(b_tree_1024_mnesia, _Config), BTree),
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -1257,20 +1533,20 @@ insert_b_tree_order_32_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_dets_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
-    {ok, _} = dets:open_file(insert_order_4, [{file, "test/tmp/insert_order_4"}]),
+    BTree = test_generator:generate_b_tree_from_number_dets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4_dets),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(insert_order_4_dets, [{file, ?DIRECTORY_DETS ++ "insert_order_4_dets"}]),
     test_generator:check_equal(?config(b_tree_4_dets, _Config), BTree),
     ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
     dets:close(b_tree_4_dets),
-    dets:close(insert_order_4).
+    dets:close(insert_order_4_dets).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: insert b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_ets_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4, spawn(fun test_generator:ets_owner/0)),
+    BTree = test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4_ets, spawn(fun test_generator:ets_owner/0)),
     test_generator:check_equal(?config(b_tree_4_ets, _Config), BTree),
     ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
     ok.
@@ -1284,6 +1560,16 @@ insert_b_tree_order_4_even_odd_test(Config) ->
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
     ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: insert b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+insert_b_tree_order_4_mnesia_test(_Config) ->
+    BTree = test_generator:generate_b_tree_from_number_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4_mnesia),
+    test_generator:check_equal(?config(b_tree_4_mnesia, _Config), BTree),
+    ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1532,7 +1818,7 @@ is_defined_b_tree_order_32_test(Config) ->
 is_defined_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
     Keys = ?config(keys_random, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     is_defined_b_tree(Keys, BTree),
     dets:close(b_tree_4_dets).
 
@@ -1542,6 +1828,16 @@ is_defined_b_tree_order_4_dets_test(Config) ->
 
 is_defined_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    Keys = ?config(keys_random, Config),
+    is_defined_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: is_defined b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+is_defined_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     Keys = ?config(keys_random, Config),
     is_defined_b_tree(Keys, BTree),
     ok.
@@ -1623,6 +1919,37 @@ is_defined_gb_tree([Key | Tail], GBTree) ->
     is_defined_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_1024_dets_test(Config) ->
+    BTree = ?config(b_tree_1024_dets, Config),
+    {ok, _} = dets:open_file(b_tree_1024_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets"}]),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
+    dets:close(b_tree_1024_dets).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_1024_ets_test(Config) ->
+    BTree = ?config(b_tree_1024_ets, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_1024_mnesia_test(Config) ->
+    BTree = ?config(b_tree_1024_mnesia, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: iterate & next b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -1684,7 +2011,7 @@ iterate_next_b_tree_order_32_test(Config) ->
 
 iterate_next_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     dets:close(b_tree_4_dets).
@@ -1695,6 +2022,16 @@ iterate_next_b_tree_order_4_dets_test(Config) ->
 
 iterate_next_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    _Iterator = b_trees:iterator(BTree),
+    ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: iterate & next b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+iterate_next_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     _Iterator = b_trees:iterator(BTree),
     ?assertEqual(?config(key_values_from, Config), iterate_next_b_tree(_Iterator, ?NUMBER_ACTIONS, [])),
     ok.
@@ -1836,7 +2173,7 @@ keys_b_tree_order_32_test(Config) ->
 
 keys_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1848,6 +2185,17 @@ keys_b_tree_order_4_dets_test(Config) ->
 
 keys_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    _Keys = b_trees:keys(BTree),
+    ?assertEqual(?config(keys_from, Config), _Keys),
+    ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: keys b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+keys_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     _Keys = b_trees:keys(BTree),
     ?assertEqual(?config(keys_from, Config), _Keys),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
@@ -1981,7 +2329,7 @@ largest_b_tree_order_32_test(Config) ->
 
 largest_b_tree_order_4_dets_test(Config) ->
     _BTree = ?config(b_tree_4_dets, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     dets:close(b_tree_4_dets).
 
@@ -1991,6 +2339,15 @@ largest_b_tree_order_4_dets_test(Config) ->
 
 largest_b_tree_order_4_ets_test(Config) ->
     _BTree = ?config(b_tree_4_ets, Config),
+    ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: largest b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+largest_b_tree_order_4_mnesia_test(Config) ->
+    _BTree = ?config(b_tree_4_mnesia, Config),
     ?assertEqual(?LARGEST_KEY_VALUE, b_trees:largest(_BTree)),
     ok.
 
@@ -2119,7 +2476,7 @@ lookup_b_tree_order_32_test(Config) ->
 lookup_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
     Keys = ?config(keys_random, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     lookup_b_tree(Keys, BTree),
     dets:close(b_tree_4_dets).
 
@@ -2129,6 +2486,16 @@ lookup_b_tree_order_4_dets_test(Config) ->
 
 lookup_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    Keys = ?config(keys_random, Config),
+    lookup_b_tree(Keys, BTree),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: lookup b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+lookup_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     Keys = ?config(keys_random, Config),
     lookup_b_tree(Keys, BTree),
     ok.
@@ -2210,6 +2577,37 @@ lookup_gb_tree([Key | Tail], GBTree) ->
     lookup_gb_tree(Tail, GBTree).
 
 %%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+map_b_tree_order_1024_dets_test(Config) ->
+    BTree = ?config(b_tree_1024_dets_map, Config),
+    BTreeNew = ?config(b_tree_1024_dets_new, Config),
+    {ok, _} = dets:open_file(b_tree_1024_dets_map, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets_map"}]),
+    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    dets:close(b_tree_1024_dets_map).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+map_b_tree_order_1024_ets_test(Config) ->
+    BTree = ?config(b_tree_1024_ets_map, Config),
+    BTreeNew = ?config(b_tree_1024_ets_new, Config),
+    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+map_b_tree_order_1024_mnesia_test(Config) ->
+    BTree = ?config(b_tree_1024_mnesia_map, Config),
+    BTreeNew = ?config(b_tree_1024_mnesia_new, Config),
+    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: map b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -2269,7 +2667,7 @@ map_b_tree_order_32_test(Config) ->
 map_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets_map, Config),
     BTreeNew = ?config(b_tree_4_dets_new, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets_map, [{file, "test/tmp/b_tree_4_dets_map"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets_map, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets_map"}]),
     test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
     dets:close(b_tree_4_dets_map).
 
@@ -2280,6 +2678,16 @@ map_b_tree_order_4_dets_test(Config) ->
 map_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets_map, Config),
     BTreeNew = ?config(b_tree_4_ets_new, Config),
+    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: map b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+map_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia_map, Config),
+    BTreeNew = ?config(b_tree_4_mnesia_new, Config),
     test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
     ok.
 
@@ -2402,7 +2810,7 @@ smallest_b_tree_order_32_test(Config) ->
 
 smallest_b_tree_order_4_dets_test(Config) ->
     _BTree = ?config(b_tree_4_dets, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     dets:close(b_tree_4_dets).
 
@@ -2412,6 +2820,15 @@ smallest_b_tree_order_4_dets_test(Config) ->
 
 smallest_b_tree_order_4_ets_test(Config) ->
     _BTree = ?config(b_tree_4_ets, Config),
+    ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: smallest b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+smallest_b_tree_order_4_mnesia_test(Config) ->
+    _BTree = ?config(b_tree_4_mnesia, Config),
     ?assertEqual(?SMALLEST_KEY_VALUE, b_trees:smallest(_BTree)),
     ok.
 
@@ -2478,6 +2895,30 @@ smallest_gb_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_1024_dets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:take_largest_b_tree_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_1024)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_1024_ets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:take_largest_b_tree_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_1024, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_1024_mnesia_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:take_largest_b_tree_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_1024)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_largest b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -2531,6 +2972,14 @@ take_largest_b_tree_order_4_dets_test(_Config) ->
 
 take_largest_b_tree_order_4_ets_test(_Config) ->
     test_generator:check_equal(b_trees:empty(4), test_generator:take_largest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_4, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_largest b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+take_largest_b_tree_order_4_mnesia_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:take_largest_b_tree_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_4)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2590,6 +3039,30 @@ take_largest_gb_tree_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_1024_dets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:take_smallest_b_tree_dets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_1024)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_1024_ets_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:take_smallest_b_tree_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_1024, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_1024_mnesia_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(1024), test_generator:take_smallest_b_tree_mnesia(1024, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_1024)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_smallest b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -2630,7 +3103,7 @@ take_smallest_b_tree_order_32_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: take_smallest b_tree order 4
+%% TEST CASES: take_smallest b_tree order 4 - persistence by dets
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_4_dets_test(_Config) ->
@@ -2638,11 +3111,19 @@ take_smallest_b_tree_order_4_dets_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: take_smallest b_tree order 4
+%% TEST CASES: take_smallest b_tree order 4 - persistence by ets
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_4_ets_test(_Config) ->
     test_generator:check_equal(b_trees:empty(4), test_generator:take_smallest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_4, spawn(fun test_generator:ets_owner/0))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_smallest b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+take_smallest_b_tree_order_4_mnesia_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:take_smallest_b_tree_mnesia(4, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_4)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2762,7 +3243,7 @@ to_list_b_tree_order_32_test(Config) ->
 
 to_list_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2774,6 +3255,17 @@ to_list_b_tree_order_4_dets_test(Config) ->
 
 to_list_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    _KeyValues = b_trees:to_list(BTree),
+    ?assertEqual(?config(key_values_from, Config), _KeyValues),
+    ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: to_list b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+to_list_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     _KeyValues = b_trees:to_list(BTree),
     ?assertEqual(?config(key_values_from, Config), _KeyValues),
     ?assertEqual(?NUMBER_ACTIONS, length(_KeyValues)),
@@ -2857,6 +3349,37 @@ to_list_gb_tree_test(Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 1024 - persistence by dets
+%%--------------------------------------------------------------------
+
+update_b_tree_order_1024_dets_test(Config) ->
+    BTree = ?config(b_tree_1024_dets_update, Config),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    {ok, _} = dets:open_file(b_tree_1024_dets_update, [{file, ?DIRECTORY_DETS ++ "b_tree_1024_dets_update"}]),
+    test_generator:check_equal(?config(b_tree_1024_dets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    dets:close(b_tree_1024_dets_update).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 1024 - persistence by ets
+%%--------------------------------------------------------------------
+
+update_b_tree_order_1024_ets_test(Config) ->
+    BTree = ?config(b_tree_1024_ets_update, Config),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    test_generator:check_equal(?config(b_tree_1024_ets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 1024 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+update_b_tree_order_1024_mnesia_test(Config) ->
+    BTree = ?config(b_tree_1024_mnesia_update, Config),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    test_generator:check_equal(?config(b_tree_1024_mnesia_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: update b_tree order 1024
 %%--------------------------------------------------------------------
 
@@ -2918,7 +3441,7 @@ update_b_tree_order_32_test(Config) ->
 update_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets_update, Config),
     KeyValuesUpdate = ?config(key_values_from_update, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets_update, [{file, "test/tmp/b_tree_4_dets_update"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets_update, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets_update"}]),
     test_generator:check_equal(?config(b_tree_4_dets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
     dets:close(b_tree_4_dets_update).
 
@@ -2930,6 +3453,16 @@ update_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets_update, Config),
     KeyValuesUpdate = ?config(key_values_from_update, Config),
     test_generator:check_equal(?config(b_tree_4_ets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: update b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+update_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia_update, Config),
+    KeyValuesUpdate = ?config(key_values_from_update, Config),
+    test_generator:check_equal(?config(b_tree_4_mnesia_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -3093,7 +3626,7 @@ values_b_tree_order_32_test(Config) ->
 
 values_b_tree_order_4_dets_test(Config) ->
     BTree = ?config(b_tree_4_dets, Config),
-    {ok, _} = dets:open_file(b_tree_4_dets, [{file, "test/tmp/b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     dets:close(b_tree_4_dets).
@@ -3104,6 +3637,16 @@ values_b_tree_order_4_dets_test(Config) ->
 
 values_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets, Config),
+    _Keys = b_trees:values(BTree),
+    ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: values b_tree order 4 - persistence by mnesia
+%%--------------------------------------------------------------------
+
+values_b_tree_order_4_mnesia_test(Config) ->
+    BTree = ?config(b_tree_4_mnesia, Config),
     _Keys = b_trees:values(BTree),
     ?assertEqual(?NUMBER_ACTIONS, length(_Keys)),
     ok.
