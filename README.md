@@ -215,6 +215,14 @@ Types:
 
 Returns the number of key value pairs in b-tree B-tree as an integer. Returns 0 (zero) if B-Tree is empty.
 
+### number_nodes (B-Tree) -> {integer() >= 0, integer() >= 0} ###
+
+Types:
+
+    B-Tree = b_tree()
+
+Returns the number of total nodes and the number of leaf nodes in b-tree B-tree as a tuple of two integers. Returns {0, 0} (zero) if B-Tree is empty.
+
 ### set_parameter (B-Tree1, Name, Value) -> B-Tree2 ###
 
 Types:
@@ -226,14 +234,6 @@ Types:
                                          Function = fun(StateTarget, lookup, Key) -> Subtrees}
     
 Sets in the empty b-tree B-Tree1 the parameter Name to value Value and returns the new b-tree B-Tree2.
-
-### size (B-Tree) -> integer() >= 0 ###
-
-Types:
-
-    B-Tree = b_tree()
-
-Returns the number of nodes in b-tree B-Tree.
 
 ### smallest (B-Tree) -> {Key, Value} ###
 
