@@ -86,10 +86,10 @@ all() ->
         map_b_tree_persistence_by_ets_test,
         map_b_tree_test,
         map_error_test,
-        number_key_values_persistence_by_ets_test,
-        number_key_values_test,
-        number_nodes_persistence_by_ets_test,
-        number_nodes_test,
+        size_key_values_persistence_by_ets_test,
+        size_key_values_test,
+        size_nodes_persistence_by_ets_test,
+        size_nodes_test,
         set_parameter_test,
         smallest_persistence_by_ets_test,
         smallest_test,
@@ -150,7 +150,7 @@ delete_any_persistence_by_ets_test(_Config) ->
     B_TREE_04_32_31 = b_trees:delete_any("k_33", B_TREE_04_32_31),
     B_TREE_04_32_00 = b_trees:delete_any("k_32", B_TREE_04_32_31),
 
-    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+    ?assertEqual(0, b_trees:size_key_values(B_TREE_04_32_00)),
 
     true = ets:delete(StateTarget),
 
@@ -291,7 +291,7 @@ delete_b_tree_persistence_by_ets_test(_Config) ->
     B_TREE_04_32_31 = b_trees:delete("k_31", B_TREE_04_32_30),
     B_TREE_04_32_00 = b_trees:delete("k_32", B_TREE_04_32_31),
 
-    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+    ?assertEqual(0, b_trees:size_key_values(B_TREE_04_32_00)),
 
     true = ets:delete(StateTarget),
 
@@ -367,15 +367,15 @@ delete_error_test(_Config) ->
 empty_b_tree_test(_Config) ->
     test_generator:check_equal(?B_TREE_04_00, b_trees:empty(4)),
     ?assert(b_trees:is_empty(b_trees:empty(4))),
-    ?assertEqual({0, 0}, b_trees:number_nodes(b_trees:empty(4))),
+    ?assertEqual({0, 0}, b_trees:size_nodes(b_trees:empty(4))),
 
     test_generator:check_equal(?B_TREE_06_00, b_trees:empty(6)),
     ?assert(b_trees:is_empty(b_trees:empty(6))),
-    ?assertEqual({0, 0}, b_trees:number_nodes(b_trees:empty(6))),
+    ?assertEqual({0, 0}, b_trees:size_nodes(b_trees:empty(6))),
 
     test_generator:check_equal(?B_TREE_32_00, b_trees:empty(32)),
     ?assert(b_trees:is_empty(b_trees:empty(32))),
-    ?assertEqual({0, 0}, b_trees:number_nodes(b_trees:empty(32))),
+    ?assertEqual({0, 0}, b_trees:size_nodes(b_trees:empty(32))),
 
     ok.
 
@@ -500,7 +500,7 @@ from_dict_persistence_by_ets_test(_Config) ->
 
     B_TREE_06_00 = b_trees:set_parameter(b_trees:empty(6), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
 
-    ?assertEqual(32, b_trees:number_key_values(b_trees:from_dict(B_TREE_06_00, test_generator:generate_key_values_from(32, 2)))),
+    ?assertEqual(32, b_trees:size_key_values(b_trees:from_dict(B_TREE_06_00, test_generator:generate_key_values_from(32, 2)))),
 
     true = ets:delete(StateTarget),
 
@@ -752,74 +752,74 @@ insert_b_tree_order_4_test(_Config) ->
 
 insert_b_tree_order_6_test(_Config) ->
     test_generator:check_equal(?B_TREE_06_00, b_trees:empty(6)),
-    ?assertEqual(0, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_00))),
+    ?assertEqual(0, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_00))),
     ?assertException(error, {empty_tree, _}, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_00))),
-    ?assertEqual({0, 0}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_00))),
+    ?assertEqual({0, 0}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_00))),
 
     test_generator:check_equal(?B_TREE_06_01, b_trees:insert("k_01", "v_01", test_generator:prepare_template_asc(?B_TREE_06_00))),
-    ?assertEqual(1, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_01))),
+    ?assertEqual(1, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_01))),
     ?assertEqual(0, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_01))),
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_01))),
+    ?assertEqual({1, 1}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_01))),
 
     test_generator:check_equal(?B_TREE_06_02, b_trees:insert("k_02", "v_02", test_generator:generate_b_tree_from_number(6, 1, 2))),
-    ?assertEqual(2, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_02))),
+    ?assertEqual(2, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_02))),
     ?assertEqual(0, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_02))),
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_02))),
+    ?assertEqual({1, 1}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_02))),
 
     test_generator:check_equal(?B_TREE_06_03, b_trees:insert("k_03", "v_03", test_generator:generate_b_tree_from_number(6, 2, 2))),
-    ?assertEqual(3, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_03))),
+    ?assertEqual(3, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_03))),
     ?assertEqual(0, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_03))),
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_03))),
+    ?assertEqual({1, 1}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_03))),
 
     test_generator:check_equal(?B_TREE_06_04, b_trees:insert("k_04", "v_04", test_generator:generate_b_tree_from_number(6, 3, 2))),
-    ?assertEqual(4, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_04))),
+    ?assertEqual(4, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_04))),
     ?assertEqual(0, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_04))),
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_04))),
+    ?assertEqual({1, 1}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_04))),
 
     test_generator:check_equal(?B_TREE_06_05, b_trees:insert("k_05", "v_05", test_generator:generate_b_tree_from_number(6, 4, 2))),
-    ?assertEqual(5, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_05))),
+    ?assertEqual(5, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_05))),
     ?assertEqual(0, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_05))),
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_05))),
+    ?assertEqual({1, 1}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_05))),
 
     test_generator:check_equal(?B_TREE_06_09, b_trees:insert("k_09", "v_09", test_generator:generate_b_tree_from_number(6, 8, 2))),
-    ?assertEqual(9, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual(9, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_09))),
     ?assertEqual(1, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_09))),
-    ?assertEqual({4, 3}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({4, 3}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_09))),
 
     test_generator:check_equal(?B_TREE_06_13, b_trees:insert("k_13", "v_13", test_generator:generate_b_tree_from_number(6, 12, 2))),
-    ?assertEqual(13, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_13))),
+    ?assertEqual(13, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_13))),
     ?assertEqual(1, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_13))),
-    ?assertEqual({5, 4}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_13))),
+    ?assertEqual({5, 4}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_13))),
 
     test_generator:check_equal(?B_TREE_06_17, b_trees:insert("k_17", "v_17", test_generator:generate_b_tree_from_number(6, 16, 2))),
-    ?assertEqual(17, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_17))),
+    ?assertEqual(17, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_17))),
     ?assertEqual(1, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_17))),
-    ?assertEqual({6, 5}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_17))),
+    ?assertEqual({6, 5}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_17))),
 
     test_generator:check_equal(?B_TREE_06_21, b_trees:insert("k_21", "v_21", test_generator:generate_b_tree_from_number(6, 20, 2))),
-    ?assertEqual(21, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_21))),
+    ?assertEqual(21, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_21))),
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_21))),
-    ?assertEqual({10, 7}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_21))),
+    ?assertEqual({10, 7}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_21))),
 
     test_generator:check_equal(?B_TREE_06_25, b_trees:insert("k_25", "v_25", test_generator:generate_b_tree_from_number(6, 24, 2))),
-    ?assertEqual(25, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_25))),
+    ?assertEqual(25, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_25))),
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_25))),
-    ?assertEqual({11, 8}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_25))),
+    ?assertEqual({11, 8}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_25))),
 
     test_generator:check_equal(?B_TREE_06_29, b_trees:insert("k_29", "v_29", test_generator:generate_b_tree_from_number(6, 28, 2))),
-    ?assertEqual(29, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_29))),
+    ?assertEqual(29, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_29))),
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_29))),
-    ?assertEqual({13, 9}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_29))),
+    ?assertEqual({13, 9}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_29))),
 
     test_generator:check_equal(?B_TREE_06_30, b_trees:insert("k_30", "v_30", test_generator:generate_b_tree_from_number(6, 29, 2))),
-    ?assertEqual(30, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_30))),
+    ?assertEqual(30, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_30))),
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_30))),
-    ?assertEqual({14, 10}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_30))),
+    ?assertEqual({14, 10}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_30))),
 
     test_generator:check_equal(?B_TREE_06_32_DESC, b_trees:insert("k_32", "v_32", test_generator:generate_b_tree_from_number(6, 31, 2, fun b_trees:sort_descending/2))),
-    ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+    ?assertEqual(32, b_trees:size_key_values(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
-    ?assertEqual({14, 10}, b_trees:number_nodes(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+    ?assertEqual({14, 10}, b_trees:size_nodes(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
 
     ok.
 
@@ -829,29 +829,29 @@ insert_b_tree_order_6_test(_Config) ->
 
 insert_b_tree_order_8_test(_Config) ->
     test_generator:check_equal(?B_TREE_08_00, b_trees:empty(8)),
-    ?assertEqual(0, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_08_00))),
+    ?assertEqual(0, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_08_00))),
     ?assertException(error, {empty_tree, _}, b_trees:height(test_generator:prepare_template_asc(?B_TREE_08_00))),
-    ?assertEqual({0, 0}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_08_00))),
+    ?assertEqual({0, 0}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_08_00))),
 
     test_generator:check_equal(?B_TREE_06_07, b_trees:insert("k_07", "v_07", test_generator:generate_b_tree_from_number(6, 6, 2))),
-    ?assertEqual(7, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_07))),
+    ?assertEqual(7, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_07))),
     ?assertEqual(1, b_trees:height(test_generator:prepare_template_asc(?B_TREE_06_07))),
-    ?assertEqual({3, 2}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_07))),
+    ?assertEqual({3, 2}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_07))),
 
     test_generator:check_equal(?B_TREE_08_16, b_trees:insert("k_16", "v_16", test_generator:generate_b_tree_from_number(8, 15, 2))),
-    ?assertEqual(16, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_08_16))),
+    ?assertEqual(16, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_08_16))),
     ?assertEqual(1, b_trees:height(test_generator:prepare_template_asc(?B_TREE_08_16))),
-    ?assertEqual({5, 4}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_08_16))),
+    ?assertEqual({5, 4}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_08_16))),
 
     test_generator:check_equal(?B_TREE_08_32, b_trees:insert("k_32", "v_32", test_generator:generate_b_tree_from_number(8, 31, 2))),
-    ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_08_32))),
+    ?assertEqual(32, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_08_32))),
     ?assertEqual(1, b_trees:height(test_generator:prepare_template_asc(?B_TREE_08_32))),
-    ?assertEqual({9, 8}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_08_32))),
+    ?assertEqual({9, 8}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_08_32))),
 
     test_generator:check_equal(?B_TREE_08_64, b_trees:insert("k_64", "v_64", test_generator:generate_b_tree_from_number(8, 63, 2))),
-    ?assertEqual(64, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_08_64))),
+    ?assertEqual(64, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_08_64))),
     ?assertEqual(2, b_trees:height(test_generator:prepare_template_asc(?B_TREE_08_64))),
-    ?assertEqual({20, 16}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_08_64))),
+    ?assertEqual({20, 16}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_08_64))),
 
     ok.
 
@@ -1890,70 +1890,6 @@ map_error_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: number_key_values - persistence by ets
-%%--------------------------------------------------------------------
-
-number_key_values_persistence_by_ets_test(_Config) ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
-
-    ?assertEqual(4, length(ets:tab2list(StateTarget))),
-
-    ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_desc(B_TREE_06_32))),
-
-    true = ets:delete(StateTarget),
-
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: number_key_values
-%%--------------------------------------------------------------------
-
-number_key_values_test(_Config) ->
-    ?assertEqual(0, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_00))),
-    ?assertEqual(2, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_02))),
-    ?assertEqual(5, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_05))),
-    ?assertEqual(16, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_16))),
-    ?assertEqual(29, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_06_29))),
-
-    ?assertEqual(32, b_trees:number_key_values(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
-
-    ?assertEqual(19, b_trees:number_key_values(test_generator:prepare_template_asc(?B_TREE_18_19))),
-
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: number_nodes - persistence by ets
-%%--------------------------------------------------------------------
-
-number_nodes_persistence_by_ets_test(_Config) ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
-
-    ?assertEqual(4, length(ets:tab2list(StateTarget))),
-
-    ?assertEqual({14, 10}, b_trees:number_nodes(test_generator:prepare_template_desc(B_TREE_06_32))),
-
-    true = ets:delete(StateTarget),
-
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: number_nodes
-%%--------------------------------------------------------------------
-
-number_nodes_test(_Config) ->
-    ?assertEqual({0, 0}, b_trees:number_nodes(b_trees:empty(6))),
-
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_03))),
-    ?assertEqual({3, 2}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_08))),
-    ?assertEqual({5, 4}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_13))),
-    ?assertEqual({7, 6}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_20))),
-    ?assertEqual({10, 7}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_21))),
-
-    ?assertEqual({14, 10}, b_trees:number_nodes(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
-
-    ok.
-
-%%--------------------------------------------------------------------
 %% TEST CASES: set_parameter
 %%--------------------------------------------------------------------
 
@@ -1962,6 +1898,70 @@ set_parameter_test(_Config) ->
     BTree_06_00_DESC = b_trees:set_parameter(BTree_06_00, sort, fun b_trees:sort_descending/2),
     KeyValues = test_generator:generate_key_values_from(32, 2),
     test_generator:check_equal(?B_TREE_06_32_DESC, test_generator:generate_b_tree_list_and_btree(KeyValues, BTree_06_00_DESC)),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: size_key_values - persistence by ets
+%%--------------------------------------------------------------------
+
+size_key_values_persistence_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
+
+    ?assertEqual(4, length(ets:tab2list(StateTarget))),
+
+    ?assertEqual(32, b_trees:size_key_values(test_generator:prepare_template_desc(B_TREE_06_32))),
+
+    true = ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: size_key_values
+%%--------------------------------------------------------------------
+
+size_key_values_test(_Config) ->
+    ?assertEqual(0, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_00))),
+    ?assertEqual(2, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_02))),
+    ?assertEqual(5, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_05))),
+    ?assertEqual(16, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_16))),
+    ?assertEqual(29, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_06_29))),
+
+    ?assertEqual(32, b_trees:size_key_values(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
+
+    ?assertEqual(19, b_trees:size_key_values(test_generator:prepare_template_asc(?B_TREE_18_19))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: size_nodes - persistence by ets
+%%--------------------------------------------------------------------
+
+size_nodes_persistence_by_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
+
+    ?assertEqual(4, length(ets:tab2list(StateTarget))),
+
+    ?assertEqual({14, 10}, b_trees:size_nodes(test_generator:prepare_template_desc(B_TREE_06_32))),
+
+    true = ets:delete(StateTarget),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: size_nodes
+%%--------------------------------------------------------------------
+
+size_nodes_test(_Config) ->
+    ?assertEqual({0, 0}, b_trees:size_nodes(b_trees:empty(6))),
+
+    ?assertEqual({1, 1}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_03))),
+    ?assertEqual({3, 2}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_08))),
+    ?assertEqual({5, 4}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_13))),
+    ?assertEqual({7, 6}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_20))),
+    ?assertEqual({10, 7}, b_trees:size_nodes(test_generator:prepare_template_asc(?B_TREE_06_21))),
+
+    ?assertEqual({14, 10}, b_trees:size_nodes(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
 
     ok.
 
@@ -2041,7 +2041,7 @@ take_largest_persistence_by_ets_test(_Config) ->
     {"k_02", "v_02", B_TREE_04_32_01} = b_trees:take_largest(B_TREE_04_32_02),
     {"k_01", "v_01", B_TREE_04_32_00} = b_trees:take_largest(B_TREE_04_32_01),
 
-    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+    ?assertEqual(0, b_trees:size_key_values(B_TREE_04_32_00)),
 
     true = ets:delete(StateTarget),
 
@@ -2121,7 +2121,7 @@ take_smallest_persistence_by_ets_test(_Config) ->
     {"k_31", "v_31", B_TREE_04_32_31} = b_trees:take_smallest(B_TREE_04_32_30),
     {"k_32", "v_32", B_TREE_04_32_00} = b_trees:take_smallest(B_TREE_04_32_31),
 
-    ?assertEqual(0, b_trees:number_key_values(B_TREE_04_32_00)),
+    ?assertEqual(0, b_trees:size_key_values(B_TREE_04_32_00)),
 
     true = ets:delete(StateTarget),
 
