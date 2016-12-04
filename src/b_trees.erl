@@ -91,15 +91,15 @@
 %%   the iterator I, and I1 is the new iterator to be used for traversing the
 %%   remaining entries, or the atom `none' if no entries remain.
 %%
-%% - number_key_values(B): returns the number of key / value pairs in the
-%%   B-Tree B as an integer. Returns 0 (zero) if the B-Tree B is empty.
-%%
-%% - number_nodes(B): returns the number of total nodes and the number of 
-%%   leaf nodes in the B-tree B as a tuple of two integers. Returns {0, 0} 
-%%   (zero) if B-Tree is empty.
-%%
 %% - set_parameter(B, P, V): sets in B-Tree B the parameter P to value V;
 %%   returns a new B-Tree B'.
+%%
+%% - size_key_values(B): returns the number of key / value pairs in the
+%%   B-Tree B as an integer. Returns 0 (zero) if the B-Tree B is empty.
+%%
+%% - size_nodes(B): returns the number of total nodes and the number of 
+%%   leaf nodes in the B-tree B as a tuple of two integers. Returns {0, 0} 
+%%   (zero) if B-Tree is empty.
 %%
 %% - smallest(B): returns tuple {K, V}, where K is the smallest key in B-Tree B,
 %%   and V is the value associated with K in B. Assumes that the B-Tree B is
@@ -148,8 +148,8 @@
     lookup/2,
     map/2,
     next/1,
-    number_key_values/1,
-    number_nodes/1,
+    size_key_values/1,
+    size_nodes/1,
     set_parameter/3,
     smallest/1,
     sort_ascending/2,
@@ -1522,41 +1522,6 @@ next([]) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec number_key_values(b_tree()) -> non_neg_integer().
-
-number_key_values({_, _, NumberKeyValues, _, _, _}) ->
-    NumberKeyValues.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--spec number_nodes(b_tree()) -> {non_neg_integer(), non_neg_integer()}.
-
-number_nodes({_, _, 0, _, _, nil}) ->
-    {0, 0};
-number_nodes({_, _, _, _, nil, Tree}) ->
-    number_nodes_tree(Tree, nil, {0, 0});
-number_nodes({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}}) ->
-    number_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {0, 0}).
-
--spec number_nodes_tree(tree(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
-
-% Leaf node.
-number_nodes_tree({_, 0, _, []}, _, {NumberTotal, NumberLeaves}) ->
-    {NumberTotal + 1, NumberLeaves + 1};
-number_nodes_tree({_, _, _, Subtrees}, State, {NumberTotal, NumberLeaves}) ->
-    number_nodes_subtrees(Subtrees, State, {NumberTotal + 1, NumberLeaves}).
-
--spec number_nodes_subtrees(subtrees(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
-
-number_nodes_subtrees([], _, {NumberTotal, NumberLeaves}) ->
-    {NumberTotal, NumberLeaves};
-number_nodes_subtrees([Tree | Tail], nil, {NumberTotal, NumberLeaves}) ->
-    number_nodes_subtrees(Tail, nil, number_nodes_tree(Tree, nil, {NumberTotal, NumberLeaves}));
-number_nodes_subtrees([{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | Tail], {StateTarget, _, _, LookupFunction} = State, {NumberTotal, NumberLeaves}) ->
-    number_nodes_subtrees(Tail, State, number_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {NumberTotal, NumberLeaves})).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 -spec set_parameter(b_tree(), atom(), any()) -> b_tree().
 
 set_parameter({SubtreeNoMin, KeyNoMax, 0, _, State, nil}, sort, SortFunction)
@@ -1567,6 +1532,41 @@ set_parameter({SubtreeNoMin, KeyNoMax, 0, SortFunction, _, nil}, state, {_, Dele
     is_function(InsertFunction, 3),
     is_function(LookupFunction, 3) ->
     {SubtreeNoMin, KeyNoMax, 0, SortFunction, State, nil}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec size_key_values(b_tree()) -> non_neg_integer().
+
+size_key_values({_, _, NumberKeyValues, _, _, _}) ->
+    NumberKeyValues.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec size_nodes(b_tree()) -> {non_neg_integer(), non_neg_integer()}.
+
+size_nodes({_, _, 0, _, _, nil}) ->
+    {0, 0};
+size_nodes({_, _, _, _, nil, Tree}) ->
+    size_nodes_tree(Tree, nil, {0, 0});
+size_nodes({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}}) ->
+    size_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {0, 0}).
+
+-spec size_nodes_tree(tree(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
+
+% Leaf node.
+size_nodes_tree({_, 0, _, []}, _, {NumberTotal, NumberLeaves}) ->
+    {NumberTotal + 1, NumberLeaves + 1};
+size_nodes_tree({_, _, _, Subtrees}, State, {NumberTotal, NumberLeaves}) ->
+    size_nodes_subtrees(Subtrees, State, {NumberTotal + 1, NumberLeaves}).
+
+-spec size_nodes_subtrees(subtrees(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
+
+size_nodes_subtrees([], _, {NumberTotal, NumberLeaves}) ->
+    {NumberTotal, NumberLeaves};
+size_nodes_subtrees([Tree | Tail], nil, {NumberTotal, NumberLeaves}) ->
+    size_nodes_subtrees(Tail, nil, size_nodes_tree(Tree, nil, {NumberTotal, NumberLeaves}));
+size_nodes_subtrees([{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | Tail], {StateTarget, _, _, LookupFunction} = State, {NumberTotal, NumberLeaves}) ->
+    size_nodes_subtrees(Tail, State, size_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {NumberTotal, NumberLeaves})).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1833,45 +1833,3 @@ sort_descending(Key_1, Key_2) ->
         Key_1 > Key_2 -> less;
         true -> equal
     end.
-
-%%--------------------------------------------------------------------
-%% Direct tests.
-%%--------------------------------------------------------------------
-
-% -define(NODEBUG, true).
--include_lib("eunit/include/eunit.hrl").
-
--include_lib("../include/b_trees_templates.hrl").
-
-%%--------------------------------------------------------------------
-%% TEST CASES: number_nodes - persistence by ets
-%%--------------------------------------------------------------------
-
-number_nodes_persistence_by_ets_test() ->
-    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_06_32 = test_generator:generate_b_tree_from_number_ets(6, 32, 2, b_trees_test, spawn(fun test_generator:ets_owner/0)),
-
-    ?assertEqual(4, length(ets:tab2list(StateTarget))),
-
-    ?assertEqual({14, 10}, b_trees:number_nodes(test_generator:prepare_template_desc(B_TREE_06_32))),
-
-    true = ets:delete(StateTarget),
-
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: number_nodes
-%%--------------------------------------------------------------------
-
-number_nodes_test() ->
-    ?assertEqual({0, 0}, b_trees:number_nodes(b_trees:empty(6))),
-
-    ?assertEqual({1, 1}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_03))),
-    ?assertEqual({3, 2}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_08))),
-    ?assertEqual({5, 4}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_13))),
-    ?assertEqual({7, 6}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_20))),
-    ?assertEqual({10, 7}, b_trees:number_nodes(test_generator:prepare_template_asc(?B_TREE_06_21))),
-
-    ?assertEqual({14, 10}, b_trees:number_nodes(test_generator:prepare_template_desc(?B_TREE_06_32_DESC))),
-
-    ok.
-

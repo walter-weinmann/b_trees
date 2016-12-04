@@ -1092,7 +1092,7 @@ from_dict_b_tree_order_32_test(Config) ->
 from_dict_b_tree_order_4_even_odd_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1102,7 +1102,7 @@ from_dict_b_tree_order_4_even_odd_test(Config) ->
 from_dict_b_tree_order_4_odd_even_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1112,7 +1112,7 @@ from_dict_b_tree_order_4_odd_even_test(Config) ->
 from_dict_b_tree_order_4_random_test(Config) ->
     _BTree = ?config(b_tree_4, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(4), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1170,7 +1170,7 @@ from_dict_b_tree_order_4_test(Config) ->
 from_dict_b_tree_order_5_even_odd_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1180,7 +1180,7 @@ from_dict_b_tree_order_5_even_odd_test(Config) ->
 from_dict_b_tree_order_5_odd_even_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1190,7 +1190,7 @@ from_dict_b_tree_order_5_odd_even_test(Config) ->
 from_dict_b_tree_order_5_random_test(Config) ->
     _BTree = ?config(b_tree_5, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(5), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1240,7 +1240,7 @@ from_dict_b_tree_order_64_test(Config) ->
 from_dict_b_tree_order_8_even_odd_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_even_odd, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1250,7 +1250,7 @@ from_dict_b_tree_order_8_even_odd_test(Config) ->
 from_dict_b_tree_order_8_odd_even_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_from_odd_even, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1260,7 +1260,7 @@ from_dict_b_tree_order_8_odd_even_test(Config) ->
 from_dict_b_tree_order_8_random_test(Config) ->
     _BTree = ?config(b_tree_8, Config),
     _KeyValues = ?config(key_values_random, Config),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(b_trees:from_dict(b_trees:empty(8), _KeyValues))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1558,7 +1558,7 @@ insert_b_tree_order_4_ets_test(_Config) ->
 insert_b_tree_order_4_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
     ok.
 
@@ -1579,7 +1579,7 @@ insert_b_tree_order_4_mnesia_test(_Config) ->
 insert_b_tree_order_4_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
     ok.
 
@@ -1590,7 +1590,7 @@ insert_b_tree_order_4_odd_even_test(Config) ->
 insert_b_tree_order_4_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 4),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
     ok.
 
@@ -1620,7 +1620,7 @@ insert_b_tree_order_4_till_test(_Config) ->
 insert_b_tree_order_5_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
     ok.
 
@@ -1631,7 +1631,7 @@ insert_b_tree_order_5_even_odd_test(Config) ->
 insert_b_tree_order_5_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
     ok.
 
@@ -1642,7 +1642,7 @@ insert_b_tree_order_5_odd_even_test(Config) ->
 insert_b_tree_order_5_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 5),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(5 div 2)))),
     ok.
 
@@ -1711,7 +1711,7 @@ insert_b_tree_order_64_test(_Config) ->
 insert_b_tree_order_8_even_odd_test(Config) ->
     KeyValues = ?config(key_values_from_even_odd, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
     ok.
 
@@ -1722,7 +1722,7 @@ insert_b_tree_order_8_even_odd_test(Config) ->
 insert_b_tree_order_8_odd_even_test(Config) ->
     KeyValues = ?config(key_values_from_odd_even, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
     ok.
 
@@ -1733,7 +1733,7 @@ insert_b_tree_order_8_odd_even_test(Config) ->
 insert_b_tree_order_8_random_test(Config) ->
     KeyValues = ?config(key_values_random, Config),
     _BTree = test_generator:generate_b_tree_list_and_order(KeyValues, 8),
-    ?assertEqual(?NUMBER_ACTIONS, b_trees:number_key_values(_BTree)),
+    ?assertEqual(?NUMBER_ACTIONS, b_trees:size_key_values(_BTree)),
     ?assert(b_trees:height(_BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(8 div 2)))),
     ok.
 
