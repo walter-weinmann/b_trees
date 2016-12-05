@@ -20,6 +20,7 @@
     check_equal/2,
     delete_b_tree_from/3,
     delete_b_tree_from/4,
+    delete_b_tree_from_desc/3,
     delete_b_tree_from_dets/4,
     delete_b_tree_from_dets_desc/4,
     delete_b_tree_from_ets/5,
@@ -34,6 +35,7 @@
     ets_owner/0,
     generate_b_tree_from_number/3,
     generate_b_tree_from_number/4,
+    generate_b_tree_from_number_desc/3,
     generate_b_tree_from_number_dets/4,
     generate_b_tree_from_number_dets_desc/4,
     generate_b_tree_from_number_ets/5,
@@ -99,6 +101,15 @@ delete_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
 -spec delete_b_tree_from(pos_integer(), pos_integer(), pos_integer(), b_trees:b_tree()) -> b_trees:b_tree().
 
 delete_b_tree_from(Order, Number, Width, BTree) when Order > 3, Number > 0 ->
+    Keys = generate_keys_from(Number, Width),
+    delete_b_tree_1(Keys, BTree).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec delete_b_tree_from_desc(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+
+delete_b_tree_from_desc(Order, Number, Width) when Order > 3, Number > 0 ->
+    BTree = generate_b_tree_from_number_desc(Order, Number, Width),
     Keys = generate_keys_from(Number, Width),
     delete_b_tree_1(Keys, BTree).
 
@@ -209,6 +220,15 @@ delete_gb_tree_from(Number, Width) when Number > 0 ->
 
 generate_b_tree_from_number(Order, Number, Width) when Order > 3, Number >= 0 ->
     generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, b_trees:empty(Order)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec generate_b_tree_from_number_desc(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+
+generate_b_tree_from_number_desc(Order, Number, Width) when Order > 3, Number >= 0 ->
+    BTree_1 = b_trees:empty(Order),
+    BTree_2 = b_trees:set_parameter(BTree_1, sort, fun b_trees:sort_descending/2),
+    generate_b_tree_by_key_1(lists:seq(1, Number), [], Width, BTree_2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
