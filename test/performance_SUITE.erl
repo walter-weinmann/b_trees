@@ -16,10 +16,19 @@
 
 -define(B_TREE_POS_STATE, 5).
 -define(DIRECTORY_DETS, "test/tmp/").
+
+%%% Performance tests
+%%-define(LARGEST_KEY_VALUE, {"k_10000", "v_10000"}).
+%%-define(NUMBER_ACTIONS, 10000).
+%%-define(SMALLEST_KEY_VALUE, {"k_00001", "v_00001"}).
+%%-define(WIDTH, 5).
+
+% Standard tests
 -define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
 -define(NUMBER_ACTIONS, 2000).
 -define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
 -define(WIDTH, 4).
+
 
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE
@@ -127,6 +136,7 @@ end_per_suite(_Config) ->
 all() ->
     [
         delete_gb_tree_test,
+        delete_b_tree_order_4_desc_test,
         delete_b_tree_order_4_dets_desc_test,
         delete_b_tree_order_4_dets_test,
         delete_b_tree_order_4_ets_desc_test,
@@ -142,20 +152,35 @@ all() ->
         delete_b_tree_order_4_random_desc_test,
         delete_b_tree_order_4_random_test,
         delete_b_tree_order_4_test,
+        delete_b_tree_order_5_ets_even_odd_test,
+        delete_b_tree_order_5_ets_odd_even_test,
+        delete_b_tree_order_5_ets_random_test,
+        delete_b_tree_order_5_ets_test,
         delete_b_tree_order_5_even_odd_test,
         delete_b_tree_order_5_odd_even_test,
         delete_b_tree_order_5_random_test,
         delete_b_tree_order_5_test,
+        delete_b_tree_order_6_ets_test,
         delete_b_tree_order_6_test,
+        delete_b_tree_order_8_ets_even_odd_test,
+        delete_b_tree_order_8_ets_odd_even_test,
+        delete_b_tree_order_8_ets_random_test,
+        delete_b_tree_order_8_ets_test,
         delete_b_tree_order_8_even_odd_test,
         delete_b_tree_order_8_odd_even_test,
         delete_b_tree_order_8_random_test,
         delete_b_tree_order_8_test,
+        delete_b_tree_order_16_ets_test,
         delete_b_tree_order_16_test,
+        delete_b_tree_order_32_ets_test,
         delete_b_tree_order_32_test,
+        delete_b_tree_order_64_ets_test,
         delete_b_tree_order_64_test,
+        delete_b_tree_order_128_ets_test,
         delete_b_tree_order_128_test,
+        delete_b_tree_order_256_ets_test,
         delete_b_tree_order_256_test,
+        delete_b_tree_order_512_ets_test,
         delete_b_tree_order_512_test,
         delete_b_tree_order_1024_dets_test,
         delete_b_tree_order_1024_ets_test,
@@ -503,11 +528,33 @@ delete_b_tree_order_1024_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 128 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_128_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(128, ?NUMBER_ACTIONS, ?WIDTH, delete_order_128_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(128), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 128
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_128_test(_Config) ->
     ?assertEqual(b_trees:empty(128), test_generator:delete_b_tree_from(128, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 16 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_16_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(16, ?NUMBER_ACTIONS, ?WIDTH, delete_order_16_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(16), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -519,6 +566,17 @@ delete_b_tree_order_16_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 256 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_256_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(256, ?NUMBER_ACTIONS, ?WIDTH, delete_order_256_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(256), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 256
 %%--------------------------------------------------------------------
 
@@ -527,11 +585,30 @@ delete_b_tree_order_256_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 32 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_32_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(32, ?NUMBER_ACTIONS, ?WIDTH, delete_order_32_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(32), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 32
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_32_test(_Config) ->
     ?assertEqual(b_trees:empty(32), test_generator:delete_b_tree_from(32, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 4 - descending
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_4_desc_test(_Config) ->
+    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_desc(4, ?NUMBER_ACTIONS, ?WIDTH)),
     ok.
 
 %%--------------------------------------------------------------------
@@ -685,6 +762,74 @@ delete_b_tree_order_4_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 512 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_512_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(512, ?NUMBER_ACTIONS, ?WIDTH, delete_order_512_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(512), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 512
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_512_test(_Config) ->
+    ?assertEqual(b_trees:empty(512), test_generator:delete_b_tree_from(512, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 5 - even / odd - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_5_ets_even_odd_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:generate_b_tree_from_number_ets(5, ?NUMBER_ACTIONS, ?WIDTH, delete_order_5_ets_even_odd, spawn(fun test_generator:ets_owner/0)),
+    BTree_Odd = test_generator:delete_b_tree_from_even(5, ?NUMBER_ACTIONS, ?WIDTH, BTree),
+    BTree_Empty = test_generator:delete_b_tree_from_odd(5, ?NUMBER_ACTIONS, ?WIDTH, BTree_Odd),
+    test_generator:check_equal(b_trees:empty(5), BTree_Empty),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree_Empty),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 5 - odd / even - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_5_ets_odd_even_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:generate_b_tree_from_number_ets(5, ?NUMBER_ACTIONS, ?WIDTH, delete_order_5_ets_odd_even, spawn(fun test_generator:ets_owner/0)),
+    BTree_Even = test_generator:delete_b_tree_from_odd(5, ?NUMBER_ACTIONS, ?WIDTH, BTree),
+    BTree_Empty = test_generator:delete_b_tree_from_even(5, ?NUMBER_ACTIONS, ?WIDTH, BTree_Even),
+    test_generator:check_equal(b_trees:empty(5), BTree_Empty),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree_Empty),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 5 - random - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_5_ets_random_test(Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_1 = test_generator:generate_b_tree_from_number_ets(5, ?NUMBER_ACTIONS, ?WIDTH, delete_order_5_ets_random, spawn(fun test_generator:ets_owner/0)),
+    B_TREE_2 = test_generator:delete_b_tree_list(?config(keys_random, Config), B_TREE_1),
+    test_generator:check_equal(b_trees:empty(5), B_TREE_2),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE_2),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 5 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_5_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(5, ?NUMBER_ACTIONS, ?WIDTH, delete_order_5_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(5), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: delete b_tree order 5 - even / odd
 %%--------------------------------------------------------------------
 
@@ -723,19 +868,14 @@ delete_b_tree_order_5_test(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% TEST CASES: delete b_tree order 6
+%% TEST CASES: delete b_tree order 64 - persistence by ets
 %%--------------------------------------------------------------------
 
-delete_b_tree_order_6_test(_Config) ->
-    ?assertEqual(b_trees:empty(6), test_generator:delete_b_tree_from(6, ?NUMBER_ACTIONS, ?WIDTH)),
-    ok.
-
-%%--------------------------------------------------------------------
-%% TEST CASES: delete b_tree order 512
-%%--------------------------------------------------------------------
-
-delete_b_tree_order_512_test(_Config) ->
-    ?assertEqual(b_trees:empty(512), test_generator:delete_b_tree_from(512, ?NUMBER_ACTIONS, ?WIDTH)),
+delete_b_tree_order_64_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(64, ?NUMBER_ACTIONS, ?WIDTH, delete_order_64_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(64), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -744,6 +884,74 @@ delete_b_tree_order_512_test(_Config) ->
 
 delete_b_tree_order_64_test(_Config) ->
     ?assertEqual(b_trees:empty(64), test_generator:delete_b_tree_from(64, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 6 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_6_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(6, ?NUMBER_ACTIONS, ?WIDTH, delete_order_6_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(6), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 6
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_6_test(_Config) ->
+    ?assertEqual(b_trees:empty(6), test_generator:delete_b_tree_from(6, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 8 - even / odd - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_8_ets_even_odd_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:generate_b_tree_from_number_ets(8, ?NUMBER_ACTIONS, ?WIDTH, delete_order_8_ets_even_odd, spawn(fun test_generator:ets_owner/0)),
+    BTree_Odd = test_generator:delete_b_tree_from_even(8, ?NUMBER_ACTIONS, ?WIDTH, BTree),
+    BTree_Empty = test_generator:delete_b_tree_from_odd(8, ?NUMBER_ACTIONS, ?WIDTH, BTree_Odd),
+    test_generator:check_equal(b_trees:empty(8), BTree_Empty),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree_Empty),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 8 - odd / even - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_8_ets_odd_even_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:generate_b_tree_from_number_ets(8, ?NUMBER_ACTIONS, ?WIDTH, delete_order_8_ets_odd_even, spawn(fun test_generator:ets_owner/0)),
+    BTree_Even = test_generator:delete_b_tree_from_odd(8, ?NUMBER_ACTIONS, ?WIDTH, BTree),
+    BTree_Empty = test_generator:delete_b_tree_from_even(8, ?NUMBER_ACTIONS, ?WIDTH, BTree_Even),
+    test_generator:check_equal(b_trees:empty(8), BTree_Empty),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree_Empty),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 8 - random - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_8_ets_random_test(Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_1 = test_generator:generate_b_tree_from_number_ets(8, ?NUMBER_ACTIONS, ?WIDTH, delete_order_8_ets_random, spawn(fun test_generator:ets_owner/0)),
+    B_TREE_2 = test_generator:delete_b_tree_list(?config(keys_random, Config), B_TREE_1),
+    test_generator:check_equal(b_trees:empty(8), B_TREE_2),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE_2),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: delete b_tree order 8 - persistence by ets
+%%--------------------------------------------------------------------
+
+delete_b_tree_order_8_ets_test(_Config) ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(8, ?NUMBER_ACTIONS, ?WIDTH, delete_order_8_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(8), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
