@@ -163,7 +163,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Data structure:
-%% - {MinimumSubtrees, MaximumKeys, NumberKeyValues, SortFunction, State, Tree},
+%% - {MinimumSubtrees, MaximumKeys, SizeKeyValues, SortFunction, State, Tree},
 %%   where `Tree' is composed of :
 %%   - {KeyNo, SubtreeNo, [{Key, Value}], [Tree]}.
 
@@ -224,26 +224,26 @@
 delete(Key, {_, _, 0, _, _, nil}) ->
     erlang:error({key_not_found, Key});
 % Root node is leaf node.
-delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, {KeyNo, 0, KeyValues, []}}) ->
+delete(Key, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, {KeyNo, 0, KeyValues, []}}) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
             erlang:error({key_not_found, Key});
         _ ->
-            {SubtreeNoMin, KeyNoMax, NumberKeyValues - 1, SortFunction, State, case KeyNo == 1 of
-                                                                                   true ->
-                                                                                       nil;
-                                                                                   _ ->
-                                                                                       {
-                                                                                           KeyNo - 1,
-                                                                                           0,
-                                                                                               lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                                                                           []
-                                                                                       }
-                                                                               end}
+            {SubtreeNoMin, KeyNoMax, SizeKeyValues - 1, SortFunction, State, case KeyNo == 1 of
+                                                                                 true ->
+                                                                                     nil;
+                                                                                 _ ->
+                                                                                     {
+                                                                                         KeyNo - 1,
+                                                                                         0,
+                                                                                             lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                                                                                         []
+                                                                                     }
+                                                                             end}
     end;
-delete(Key, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, Tree}) ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues - 1, SortFunction, State, delete_1(Key, Tree, SubtreeNoMin, KeyNoMax, SortFunction, State)}.
+delete(Key, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) ->
+    {SubtreeNoMin, KeyNoMax, SizeKeyValues - 1, SortFunction, State, delete_1(Key, Tree, SubtreeNoMin, KeyNoMax, SortFunction, State)}.
 
 -spec combine(tree(), tree(), state()) -> tree().
 
@@ -992,13 +992,13 @@ height({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, Subtree
 -spec height_1(tree(), state(), non_neg_integer()) -> non_neg_integer().
 
 % Leaf node.
-height_1({_, _, _, []}, _, Number) ->
-    Number;
+height_1({_, _, _, []}, _, Height) ->
+    Height;
 % The most left subtree.
-height_1({_, _, _, [Tree | _]}, nil, Number) ->
-    height_1(Tree, nil, Number + 1);
-height_1({_, _, _, [{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | _]}, {StateTarget, _, _, LookupFunction} = State, Number) ->
-    height_1({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, Number + 1).
+height_1({_, _, _, [Tree | _]}, nil, Height) ->
+    height_1(Tree, nil, Height + 1);
+height_1({_, _, _, [{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | _]}, {StateTarget, _, _, LookupFunction} = State, Height) ->
+    height_1({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, Height + 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1008,11 +1008,11 @@ height_1({_, _, _, [{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | _]}, {StateTarg
 insert(Key, Value, {SubtreeNoMin, KeyNoMax, 0, SortFunction, State, nil}) ->
     {SubtreeNoMin, KeyNoMax, 1, SortFunction, State, {1, 0, [{Key, Value}], []}};
 % Split root node.
-insert(Key, Value, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, {KeyNo, _, _, _} = Tree}) when KeyNo == KeyNoMax ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues + 1, SortFunction, State, insert_1({Key, Value}, split_node_root(Tree, SubtreeNoMin, State), SubtreeNoMin, KeyNoMax, SortFunction, State)};
+insert(Key, Value, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, {KeyNo, _, _, _} = Tree}) when KeyNo == KeyNoMax ->
+    {SubtreeNoMin, KeyNoMax, SizeKeyValues + 1, SortFunction, State, insert_1({Key, Value}, split_node_root(Tree, SubtreeNoMin, State), SubtreeNoMin, KeyNoMax, SortFunction, State)};
 % Normal.
-insert(Key, Value, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, Tree}) ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues + 1, SortFunction, State, insert_1({Key, Value}, Tree, SubtreeNoMin, KeyNoMax, SortFunction, State)}.
+insert(Key, Value, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) ->
+    {SubtreeNoMin, KeyNoMax, SizeKeyValues + 1, SortFunction, State, insert_1({Key, Value}, Tree, SubtreeNoMin, KeyNoMax, SortFunction, State)}.
 
 -spec insert_1(key_value(), tree(), pos_integer(), pos_integer(), sort_function(), state()) -> tree().
 
@@ -1471,8 +1471,8 @@ lookup(Key, {_, _, _, SortFunction, State, Tree}) ->
 
 map(_, {_, _, 0, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
-map(Function, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, Tree}) when is_function(Function, 2) ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, map_tree(Function, State, Tree)}.
+map(Function, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) when is_function(Function, 2) ->
+    {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, map_tree(Function, State, Tree)}.
 
 -spec map_key_values(map_function(), key_values(), key_values()) -> key_values().
 
@@ -1537,8 +1537,8 @@ set_parameter({SubtreeNoMin, KeyNoMax, 0, SortFunction, _, nil}, state, {_, Dele
 
 -spec size_key_values(b_tree()) -> non_neg_integer().
 
-size_key_values({_, _, NumberKeyValues, _, _, _}) ->
-    NumberKeyValues.
+size_key_values({_, _, SizeKeyValues, _, _, _}) ->
+    SizeKeyValues.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1554,19 +1554,19 @@ size_nodes({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, Sub
 -spec size_nodes_tree(tree(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
 
 % Leaf node.
-size_nodes_tree({_, 0, _, []}, _, {NumberTotal, NumberLeaves}) ->
-    {NumberTotal + 1, NumberLeaves + 1};
-size_nodes_tree({_, _, _, Subtrees}, State, {NumberTotal, NumberLeaves}) ->
-    size_nodes_subtrees(Subtrees, State, {NumberTotal + 1, NumberLeaves}).
+size_nodes_tree({_, 0, _, []}, _, {SizeTotal, SizeLeaves}) ->
+    {SizeTotal + 1, SizeLeaves + 1};
+size_nodes_tree({_, _, _, Subtrees}, State, {SizeTotal, SizeLeaves}) ->
+    size_nodes_subtrees(Subtrees, State, {SizeTotal + 1, SizeLeaves}).
 
 -spec size_nodes_subtrees(subtrees(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
 
-size_nodes_subtrees([], _, {NumberTotal, NumberLeaves}) ->
-    {NumberTotal, NumberLeaves};
-size_nodes_subtrees([Tree | Tail], nil, {NumberTotal, NumberLeaves}) ->
-    size_nodes_subtrees(Tail, nil, size_nodes_tree(Tree, nil, {NumberTotal, NumberLeaves}));
-size_nodes_subtrees([{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | Tail], {StateTarget, _, _, LookupFunction} = State, {NumberTotal, NumberLeaves}) ->
-    size_nodes_subtrees(Tail, State, size_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {NumberTotal, NumberLeaves})).
+size_nodes_subtrees([], _, {SizeTotal, SizeLeaves}) ->
+    {SizeTotal, SizeLeaves};
+size_nodes_subtrees([Tree | Tail], nil, {SizeTotal, SizeLeaves}) ->
+    size_nodes_subtrees(Tail, nil, size_nodes_tree(Tree, nil, {SizeTotal, SizeLeaves}));
+size_nodes_subtrees([{KeyNo, SubtreeNo, KeyValues, SubtreesKey} | Tail], {StateTarget, _, _, LookupFunction} = State, {SizeTotal, SizeLeaves}) ->
+    size_nodes_subtrees(Tail, State, size_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {SizeTotal, SizeLeaves})).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1642,8 +1642,8 @@ to_list_1([KeyValue | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSubt
 
 update(Key, _, {_, _, 0, _, _, nil}) ->
     erlang:error({key_not_found, Key});
-update(Key, Value, {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, Tree}) ->
-    {SubtreeNoMin, KeyNoMax, NumberKeyValues, SortFunction, State, update_1({Key, Value}, Tree, SortFunction, State)}.
+update(Key, Value, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) ->
+    {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, update_1({Key, Value}, Tree, SortFunction, State)}.
 
 -spec update_1(key_value(), tree(), sort_function(), state()) -> tree().
 
