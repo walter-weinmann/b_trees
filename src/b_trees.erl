@@ -745,6 +745,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoM
             if
                 KeyNoXCLeft >= SubtreeNoMin ->
                     % CLRS: case 3a - left
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXCLeft),
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     {
                         KeyNo,
                         SubtreeNo,
@@ -790,6 +792,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoM
                     };
                 KeyNoXCRight >= SubtreeNoMin ->
                     % CLRS: case 3a - right
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXCRight),
                     {
                         KeyNo,
                         SubtreeNo,
@@ -834,6 +838,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoM
                     };
                 KeyNoXCRight == 0 ->
                     % CLRS: case 3b left
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXCLeft),
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     case KeyNo == 1 of
                         true ->
                             delete_1(Key, {KeyNoXCLeft + KeyNoXC + 1, SubtreeNoXCLeft + SubtreeNoXC, KeyValuesXCLeft ++ KeyValues ++ KeyValuesXC, SubtreesXCLeft ++ SubtreesXC}, SubtreeNoMin, KeyNoMax, SortFunction, State);
@@ -863,6 +869,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, KeyNoM
                     end;
                 true ->
                     % CLRS: case 3b right
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
+                    true = DeleteFunction(StateTarget, delete, SubtreesKeyXCRight),
                     case KeyNo == 1 of
                         true ->
                             delete_1(Key, {KeyNoXC + KeyNoXCRight + 1, SubtreeNoXC + SubtreeNoXCRight, KeyValuesXC ++ KeyValues ++ KeyValuesXCRight, SubtreesXC ++ SubtreesXCRight}, SubtreeNoMin, KeyNoMax, SortFunction, State);

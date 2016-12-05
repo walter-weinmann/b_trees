@@ -476,7 +476,10 @@ delete_b_tree_order_1024_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_1024_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(1024), test_generator:delete_b_tree_from_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, delete_order_1024_ets, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, delete_order_1024_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(1024), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -548,7 +551,10 @@ delete_b_tree_order_4_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_ets_desc_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_ets_desc, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets_desc(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_ets_desc, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(4), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -556,7 +562,10 @@ delete_b_tree_order_4_ets_desc_test(_Config) ->
 %%--------------------------------------------------------------------
 
 delete_b_tree_order_4_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:delete_b_tree_from_ets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_ets, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE = test_generator:delete_b_tree_from_ets(4, ?NUMBER_ACTIONS, ?WIDTH, delete_order_4_ets, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(4), B_TREE),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -761,6 +770,8 @@ enter_b_tree_order_1024_ets_test(Config) ->
     KeyValuesUpdate = ?config(key_values_from_update, Config),
     BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
     test_generator:check_equal(?config(b_tree_1024_ets_new, Config), BTreeUpdate),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTreeUpdate),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     true = ets:delete(StateTarget),
     ok.
 
@@ -882,6 +893,8 @@ enter_b_tree_order_4_ets_test(Config) ->
     KeyValuesUpdate = ?config(key_values_from_update, Config),
     BTreeUpdate = enter_b_tree(KeyValuesUpdate, BTree),
     test_generator:check_equal(?config(b_tree_4_ets_new, Config), BTreeUpdate),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTreeUpdate),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     true = ets:delete(StateTarget),
     ok.
 
@@ -1019,7 +1032,10 @@ from_dict_b_tree_order_1024_ets_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     StateTarget = ets:new(from_dict_order_1024, []),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(1024), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
-    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    B_TREE_FROM_DICT = b_trees:from_dict(B_TREE_EMPTY, KeyValues),
+    test_generator:check_equal(BTree, B_TREE_FROM_DICT),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE_FROM_DICT),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     true = ets:delete(StateTarget),
     ok.
 
@@ -1137,7 +1153,10 @@ from_dict_b_tree_order_4_ets_test(Config) ->
     KeyValues = ?config(key_values_from, Config),
     StateTarget = ets:new(from_dict_order_4, []),
     B_TREE_EMPTY = b_trees:set_parameter(b_trees:empty(4), state, {StateTarget, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3, fun test_generator:persistence_by_ets/3}),
-    test_generator:check_equal(BTree, b_trees:from_dict(B_TREE_EMPTY, KeyValues)),
+    B_TREE_FROM_DICT = b_trees:from_dict(B_TREE_EMPTY, KeyValues),
+    test_generator:check_equal(BTree, B_TREE_FROM_DICT),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(B_TREE_FROM_DICT),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     true = ets:delete(StateTarget),
     ok.
 
@@ -1463,9 +1482,11 @@ insert_b_tree_order_1024_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_1024_ets_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, insert_order_1024_ets, spawn(fun test_generator:ets_owner/0)),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:generate_b_tree_from_number_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, insert_order_1024_ets, spawn(fun test_generator:ets_owner/0)),
     test_generator:check_equal(?config(b_tree_1024_ets, _Config), BTree),
     ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(1024 div 2)))),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -1546,9 +1567,11 @@ insert_b_tree_order_4_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 insert_b_tree_order_4_ets_test(_Config) ->
-    BTree = test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4_ets, spawn(fun test_generator:ets_owner/0)),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:generate_b_tree_from_number_ets(4, ?NUMBER_ACTIONS, ?WIDTH, insert_order_4_ets, spawn(fun test_generator:ets_owner/0)),
     test_generator:check_equal(?config(b_tree_4_ets, _Config), BTree),
     ?assert(b_trees:height(BTree) =< trunc((math:log((?NUMBER_ACTIONS + 1) / 2) / math:log(4 div 2)))),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2594,7 +2617,10 @@ map_b_tree_order_1024_dets_test(Config) ->
 map_b_tree_order_1024_ets_test(Config) ->
     BTree = ?config(b_tree_1024_ets_map, Config),
     BTreeNew = ?config(b_tree_1024_ets_new, Config),
-    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTreeMap = b_trees:map(fun map_value_to_new/2, BTree),
+    test_generator:check_equal(BTreeNew, BTreeMap),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTreeMap),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2678,7 +2704,10 @@ map_b_tree_order_4_dets_test(Config) ->
 map_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets_map, Config),
     BTreeNew = ?config(b_tree_4_ets_new, Config),
-    test_generator:check_equal(BTreeNew, b_trees:map(fun map_value_to_new/2, BTree)),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTreeMap = b_trees:map(fun map_value_to_new/2, BTree),
+    test_generator:check_equal(BTreeNew, BTreeMap),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTreeMap),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2907,7 +2936,10 @@ take_largest_b_tree_order_1024_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_1024_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(1024), test_generator:take_largest_b_tree_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_1024, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:take_largest_b_tree_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_1024, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(1024), BTree),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -2971,7 +3003,10 @@ take_largest_b_tree_order_4_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_largest_b_tree_order_4_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:take_largest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_4, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:take_largest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_largest_order_4, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(4), BTree),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -3051,7 +3086,10 @@ take_smallest_b_tree_order_1024_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_1024_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(1024), test_generator:take_smallest_b_tree_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_1024, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:take_smallest_b_tree_ets(1024, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_1024, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(1024), BTree),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -3115,7 +3153,10 @@ take_smallest_b_tree_order_4_dets_test(_Config) ->
 %%--------------------------------------------------------------------
 
 take_smallest_b_tree_order_4_ets_test(_Config) ->
-    test_generator:check_equal(b_trees:empty(4), test_generator:take_smallest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_4, spawn(fun test_generator:ets_owner/0))),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTree = test_generator:take_smallest_b_tree_ets(4, ?NUMBER_ACTIONS, ?WIDTH, take_smallest_order_4, spawn(fun test_generator:ets_owner/0)),
+    test_generator:check_equal(b_trees:empty(4), BTree),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTree),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -3366,7 +3407,10 @@ update_b_tree_order_1024_dets_test(Config) ->
 update_b_tree_order_1024_ets_test(Config) ->
     BTree = ?config(b_tree_1024_ets_update, Config),
     KeyValuesUpdate = ?config(key_values_from_update, Config),
-    test_generator:check_equal(?config(b_tree_1024_ets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTreeUpdate = update_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_1024_ets_new, Config), BTreeUpdate),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTreeUpdate),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
@@ -3452,7 +3496,10 @@ update_b_tree_order_4_dets_test(Config) ->
 update_b_tree_order_4_ets_test(Config) ->
     BTree = ?config(b_tree_4_ets_update, Config),
     KeyValuesUpdate = ?config(key_values_from_update, Config),
-    test_generator:check_equal(?config(b_tree_4_ets_new, Config), update_b_tree(KeyValuesUpdate, BTree)),
+    {_, _, _, _, {StateTarget, _, _, _}, _} = BTreeUpdate = update_b_tree(KeyValuesUpdate, BTree),
+    test_generator:check_equal(?config(b_tree_4_ets_new, Config), BTreeUpdate),
+    {SizeNodesTotal, SizeNodesLeafes} = b_trees:size_nodes(BTreeUpdate),
+    ?assertEqual(SizeNodesTotal - SizeNodesLeafes, length(ets:tab2list(StateTarget))),
     ok.
 
 %%--------------------------------------------------------------------
