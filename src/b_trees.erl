@@ -171,7 +171,7 @@
 %% Some types.
 
 -export_type([b_tree/0]).
--type b_tree() :: {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), any(), tree()}.
+-type b_tree() :: {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), state(), tree()}.
 
 -export_type([delete_function/0]).
 -type delete_function() :: fun((state_target(), 'delete', subtrees_key()) -> 'ok').

@@ -13,15 +13,15 @@ A module for balanced n-ary search trees of order `n` in which each non-leaf nod
 
 ## DESCRIPTION ##
 
-A B-Tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The B-Tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the  B-tree is optimized for systems that read and write large blocks of data.
+A b-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The b-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the  B-tree is optimized for systems that read and write large blocks of data.
 
-This module considers two keys as different if and only if they do not compare equal (==).
+Persistence and sort facilities are pluggable via `set_parameter` function. The function `sort_ascending` is used as the default sort option. If no persistence parameter given, the B-Tree is stored in the ram memory.
 
 ### Data Structure ###
 
-    {MinimumSubtrees, MaximumKeys, NumberKeyValues, SortFunction, Tree}
+    {MinimumSubtrees, MaximumKeys, SizeKeyValues, SortFunction/2, State, Tree}
 
-Tree is composed of nodes of the form 
+`Tree` is composed of nodes of the form 
 
     {KeyNumber, SubtreeNumber, [{Key, Value}], [Tree]} 
 
@@ -29,12 +29,16 @@ and the "empty tree" node
 
     nil
 
+`State` is a tuple composed of the following parameters: 
+
+    {StateTarget, DeleteFunction/3, InsertFunction/3, LookupFunction/3} 
+
 Since the trees are always balanced, there is no need for a balance operation.
 
 
 ## DATA TYPES ##
 
-    b_tree() = {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), tree()}
+    b_tree() = {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), state(), tree()}
 
 A general balanced tree.
 
@@ -70,7 +74,7 @@ Types:
     Order = pos_integer()
     B-Tree = b_tree()
 
-Returns a new empty b-tree. The order is defined as the maximum number of children nodes a non-leaf node may hold. The minimum value is 4. The sort order of the key values is ascending.
+Returns a new empty b-tree. The order is defined as the maximum number of children nodes a non-leaf node may hold.
 
 ### enter (Key, Value, B-Tree1) -> B-Tree2 ###
 
@@ -217,7 +221,7 @@ Types:
                                          Function = fun(StateTarget, insert, Subtrees) -> Key,
                                          Function = fun(StateTarget, lookup, Key) -> Subtrees}
     
-Sets in the empty b-tree B-Tree1 the parameter Name to value Value and returns the new b-tree B-Tree2.
+Sets in the empty b-tree B-Tree1 the parameter Name to value Value and returns the new b-tree B-Tree2. This function can only be used in conjunction with an empty b-tree.
 
 ### size_key_values (B-Tree) -> integer() >= 0 ###
 
@@ -312,6 +316,93 @@ Types:
     Value = any()
 
 Returns the values in b-tree B-Tree as an ordered list, sorted by their corresponding keys. Duplicates are not removed.
+
+## Pluggable Persistence Functionality ##
+
+### Format: ###
+
+    {StateTarget, DeleteFunction, InsertFunction, LookupFunction}
+    
+    StateTarget = any()
+    
+    DeleteFunction(StateTarget, delete, Key) -> true
+    
+    InsertFunction(StateTarget, insert, Subtrees) -> Key
+    
+    LookupFunction(StateTarget, lookup, Key) -> Subtrees
+
+Examples for state targets are a Dets table or a Mnesia table. The delete function takes a state target, the atom `delete` and a key as arguments and returns the atom `true` if successful. The insert function takes a state target, the atom `insert` and a subtrees data structure as arguments and returns a key if successful. The lookup function takes a state target, the atom `lookup` and a key as arguments and returns a subtrees data structure if successful.
+
+### Example functions: ###
+
+The following examples is based on Mnesia.
+
+    persistence_by_mnesia(_, delete, SubtreesKey) when is_list(SubtreesKey) ->
+        true;
+    persistence_by_mnesia(StateTarget, delete, SubtreesKey) ->
+        F = fun() ->
+            ok = mnesia:delete({StateTarget, SubtreesKey}),
+            true
+        end,
+        mnesia:activity(transaction, F);
+        
+    persistence_by_mnesia(_, insert, []) ->
+        [];
+    persistence_by_mnesia(StateTarget, insert, [{_, _, [{Key, _} | _], _} | _] = Subtrees) ->
+        SubtreesKey = list_to_binary(Key),
+        F = fun() ->
+            ok = mnesia:write(StateTarget, #subtrees{subtreesKey = SubtreesKey, subtrees = Subtrees}, write),
+            SubtreesKey
+        end,
+        mnesia:activity(transaction, F);
+        
+    persistence_by_mnesia(_, lookup, SubtreesKey) when is_list(SubtreesKey) ->
+        SubtreesKey;
+    persistence_by_mnesia(StateTarget, lookup, SubtreesKey) ->
+        F = fun() ->
+            [{subtrees, SubtreesKey, Subtrees}] = mnesia:read(StateTarget, SubtreesKey),
+            Subtrees
+        end,
+    mnesia:activity(transaction, F).
+    
+### Example usage: ###
+
+Creating the Mnesia table:
+
+    -record(subtrees, {subtreesKey, subtrees}).
+        
+    {atomic, ok} = mnesia:create_table(StateTargetName, [{record_name, subtrees}]),
+
+Creating the b-tree:
+
+    BTree1 = b_trees:empty(500),
+    BTree2 = b_trees:set_parameter(BTree1, state, {StateTargetName, fun persistence_by_mnesia/3, fun persistence_by_mnesia/3, fun persistence_by_mnesia/3}),
+
+## Pluggable Sort Functionality ##
+
+### Format: ###
+
+    FunctionName(Key1, Key2) -> equal | greater | less
+    
+    Key1 = Key2 = any()
+
+The sort function takes two keys as arguments and returns the atom `less` if Key1 < Key2, the atom `greater` if Key1 > Key2 and the atom `equal` else wise.
+
+### Example function: ###
+
+    -spec sort_descending(key(), key()) -> sort_result().
+    
+    sort_descending(Key_1, Key_2) ->
+    if
+        Key_1 < Key_2 -> greater;
+        Key_1 > Key_2 -> less;
+        true -> equal
+    end.
+    
+### Example usage: ###
+
+    BTree1 = b_trees:empty(500),
+    BTree2 = b_trees:set_parameter(BTree1, sort, fun sort_descending/2),
 
 ## See Also ##
 
