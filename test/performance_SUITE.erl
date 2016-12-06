@@ -29,14 +29,13 @@
 -define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
 -define(WIDTH, 4).
 
-
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE
 %%--------------------------------------------------------------------
 
 suite() ->
     [
-        {timetrap, {minutes, 10}}
+        {timetrap, {minutes, 30}}
     ].
 
 init_per_suite(Config) ->

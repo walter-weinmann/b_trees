@@ -608,15 +608,12 @@ persistence_by_dets(StateTarget, delete, SubtreesKey) ->
             ok = dets:delete(StateTarget, SubtreesKey),
             true
     end;
-persistence_by_dets(StateTarget, insert, Subtrees) ->
-    case Subtrees == [] of
-        true ->
-            Subtrees;
-        _ ->
-            SubtreesKey = erlang:phash2(Subtrees),
-            ok = dets:insert(StateTarget, {SubtreesKey, Subtrees}),
-            SubtreesKey
-    end;
+persistence_by_dets(_, insert, []) ->
+    [];
+persistence_by_dets(StateTarget, insert, [{_, _, [{Key, _} | _], _} | _] = Subtrees) ->
+    SubtreesKey = list_to_binary(Key),
+    ok = dets:insert(StateTarget, {SubtreesKey, Subtrees}),
+    SubtreesKey;
 persistence_by_dets(StateTarget, lookup, SubtreesKey) ->
     case is_list(SubtreesKey) of
         true ->
@@ -635,15 +632,12 @@ persistence_by_ets(StateTarget, delete, SubtreesKey) ->
         _ ->
             ets:delete(StateTarget, SubtreesKey)
     end;
-persistence_by_ets(StateTarget, insert, Subtrees) ->
-    case Subtrees == [] of
-        true ->
-            Subtrees;
-        _ ->
-            SubtreesKey = erlang:phash2(Subtrees),
-            true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
-            SubtreesKey
-    end;
+persistence_by_ets(_, insert, []) ->
+    [];
+persistence_by_ets(StateTarget, insert, [{_, _, [{Key, _} | _], _} | _] = Subtrees) ->
+    SubtreesKey = list_to_binary(Key),
+    true = ets:insert(StateTarget, {SubtreesKey, Subtrees}),
+    SubtreesKey;
 persistence_by_ets(StateTarget, lookup, SubtreesKey) ->
     case is_list(SubtreesKey) of
         true ->
@@ -665,8 +659,8 @@ persistence_by_mnesia(StateTarget, delete, SubtreesKey) ->
     mnesia:activity(transaction, F);
 persistence_by_mnesia(_, insert, []) ->
     [];
-persistence_by_mnesia(StateTarget, insert, Subtrees) ->
-    SubtreesKey = erlang:phash2(Subtrees),
+persistence_by_mnesia(StateTarget, insert, [{_, _, [{Key, _} | _], _} | _] = Subtrees) ->
+    SubtreesKey = list_to_binary(Key),
     F = fun() ->
         ok = mnesia:write(StateTarget, #subtrees{subtreesKey = SubtreesKey, subtrees = Subtrees}, write),
         SubtreesKey
