@@ -400,9 +400,19 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                         true ->
                             {
                                 KeyNoXC + KeyNoXCRight,
-                                SubtreeNoXC + SubtreeNoXCRight - 1,
+                                case SubtreeNoXCRight == 0 of
+                                    true ->
+                                        0;
+                                    _ ->
+                                        SubtreeNoXC + SubtreeNoXCRight - 1
+                                end,
                                     KeyValuesXC ++ KeyValuesXCRight,
-                                    lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(LeftTree, RightTree, nil)] ++ lists:sublist(SubtreesXCRight, 2, KeyNoXCRight)
+                                case SubtreeNoXCRight == 0 of
+                                    true ->
+                                        [];
+                                    _ ->
+                                        lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(LeftTree, RightTree, nil)] ++ lists:sublist(SubtreesXCRight, 2, KeyNoXCRight)
+                                end
                             };
                         _ ->
                             {
