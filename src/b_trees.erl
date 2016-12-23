@@ -170,17 +170,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some types.
 
--export_type([b_tree/0]).
--type b_tree() :: {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), state(), tree()}.
+-export_type([b_tree/0, iter/0]).
 
--export_type([delete_function/0]).
+-opaque b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), tree()}.
+
 -type delete_function() :: fun((state_target(), 'delete', subtrees_key()) -> 'ok').
 
--export_type([insert_function/0]).
 -type insert_function() :: fun((state_target(), 'insert', subtrees()) -> subtrees_key()).
 
--export_type([iterator/0]).
--type iterator() :: [{key_values(), subtrees(), state()}].
+-opaque iter() :: [{key_values(), subtrees(), state()}].
 
 -type key() :: any().
 -type keys() :: [key()].
@@ -188,13 +186,10 @@
 -type key_value() :: {key(), value()}.
 -type key_values() :: [key_value()].
 
--export_type([lookup_function/0]).
 -type lookup_function() :: fun((state_target(), 'lookup', subtrees_key()) -> subtrees()).
 
--export_type([map_function/0]).
 -type map_function() :: fun((key(), value()) -> value()).
 
--export_type([sort_function/0]).
 -type sort_function() :: fun((key(), key()) -> sort_result()).
 -type sort_result() :: 'less' | 'equal' | 'greater'.
 
@@ -202,14 +197,13 @@
 | {state_target(), delete_function(), insert_function(), lookup_function()}.
 -type state_target() :: any().
 
--export_type([subtrees/0]).
 -type subtrees() :: subtrees_key()
 | [tree()].
 -type subtrees_key() :: integer().
 
 -type tree() :: 'nil'
-| {pos_integer(), pos_integer(), key_values(), []}
-| {pos_integer(), pos_integer(), key_values(), subtrees()}.
+| {KeyNo :: pos_integer(), SubtreeNo :: pos_integer(), key_values(), []}
+| {KeyNo :: pos_integer(), SubtreeNo :: pos_integer(), key_values(), subtrees()}.
 
 -type value() :: any().
 -type values() :: [value()].
@@ -1379,7 +1373,7 @@ is_empty(_) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec iterator(b_tree()) -> iterator().
+-spec iterator(b_tree()) -> iter().
 
 iterator({_, _, 0, _, _, nil}) ->
     [];
@@ -1389,7 +1383,7 @@ iterator({_, _, _, _, State, {_, _, KeyValues, Subtrees}}) ->
 % The iterator structure is really just a list corresponding to
 % the call stack of an in-order traversal. This is quite fast.
 
--spec iterator_1({key_values(), subtrees(), state()}, iterator()) -> iterator().
+-spec iterator_1({key_values(), subtrees(), state()}, iter()) -> iter().
 
 % The most left key / value.
 iterator_1({KeyValues, [], State}, Iterator) ->
@@ -1406,14 +1400,14 @@ iterator_1({KeyValues, SubtreesKey, {StateTarget, _, _, LookupFunction} = State}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec iterator_from(key(), b_tree()) -> iterator().
+-spec iterator_from(key(), b_tree()) -> iter().
 
 iterator_from(_, {_, _, 0, _, _, nil}) ->
     [];
 iterator_from(Key, {_, _, _, SortFunction, State, Tree}) ->
     iterator_from_1(Key, Tree, [], SortFunction, State).
 
--spec iterator_from_1(key(), tree(), iterator(), sort_function(), state()) -> iterator().
+-spec iterator_from_1(key(), tree(), iter(), sort_function(), state()) -> iter().
 
 % The most left key / value.
 iterator_from_1(Key, {KeyNo, 0, KeyValues, []}, Iterator, SortFunction, State) ->
@@ -1529,7 +1523,7 @@ map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec next(iterator()) -> 'none' | {key(), value(), iterator()}.
+-spec next(iter()) -> 'none' | {key(), value(), iter()}.
 
 % One level up.
 next([{[], _, _}, {[], _, _} = Iterator | TailIterator]) ->
