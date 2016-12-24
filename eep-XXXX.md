@@ -1,21 +1,47 @@
-<center> <h1> b_trees </h1> </center>
+    Author: Walter Weinmann <walter.weinmann@gmail.com>
+    Status: Draft
+    Type: Standards Track
+    Created: 06-Dec-2016
+    Erlang-Version: OTP 20.0
+    Post-History:
+****
+EEP XXX: B-trees: balanced n-ary search trees of order n.
+----
 
-[![Build Status](https://travis-ci.org/walter-weinmann/b_trees.svg?branch=master)](https://travis-ci.org/walter-weinmann/b_trees)
 
 
-## MODULE ##
+Abstract
+========
 
-**b_trees**
+This EEP proposes the creation of a new module b-trees for the administration of B-trees. Both the optional 
+persistence and the sort order should be implemented by pluggable functionality.
 
-## MODULE SUMMARY ##
 
-A module for balanced n-ary search trees of order `n` in which each non-leaf node has up to `n` children.
 
-## DESCRIPTION ##
+Rationale
+=========
 
-A b-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The b-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the b-tree is optimized for systems that read and write large blocks of data.
+B-trees are self-balancing tree data structure that keep data sorted and allows searches, sequential access, 
+insertions, and deletions in logarithmic time. B-trees are a generalization of a binary search trees in that 
+a node can have more than two children. Unlike self-balancing binary search trees, the B-tree is optimized 
+for systems that read and write large blocks of data. B-trees are a good example of a data structure for 
+external memory.
 
-Persistence and sort facilities are pluggable via `set_parameter` function. The function `sort_ascending` is used as the default sort option. If no persistence parameter given, the b-tree is stored in the memory.
+
+
+Motivation
+==========
+
+B-trees are self-balancing tree data structure that keep data sorted and allows searches, sequential access, 
+insertions, and deletions in logarithmic time. B-trees are a generalization of a binary search trees in that 
+a node can have more than two children. Unlike self-balancing binary search trees, the B-tree is optimized 
+for systems that read and write large blocks of data. B-trees are a good example of a data structure for 
+external memory.
+
+
+
+Specification
+=============
 
 ### Data Structure ###
 
@@ -257,7 +283,7 @@ Types:
     equal = greater = less = atom()
     
 Returns the atom '**greater**' if Key1 > Key2, the atom '**less**' if Key1 < Key2 and otherwise the atom '**equal**'.
- 
+
 ### sort_descending (Key1, Key2) -> 'equal' | 'greater' | 'less' ###
 
 Types:
@@ -349,7 +375,7 @@ Returns the values in b-tree B-Tree as an ordered list, sorted by their correspo
     
     LookupFunction(StateTarget, lookup, Key) -> Subtrees
 
-Examples for state targets are a Dets table or a Mnesia table. The delete function takes a state target, the atom '**delete**' and a key as arguments and returns the atom '**true**' if successful. The insert function takes a state target, the atom '**insert**' and a subtrees data structure as arguments and returns a key if successful. The lookup function takes a state target, the atom '**lookup**' and a key as arguments and returns a subtrees data structure if successful.
+Examples for state targets are a Dets table or a Mnesia table. The delete function takes a state target, the atom `delete` and a key as arguments and returns the atom `true` if successful. The insert function takes a state target, the atom `insert` and a subtrees data structure as arguments and returns a key if successful. The lookup function takes a state target, the atom `lookup` and a key as arguments and returns a subtrees data structure if successful.
 
 ### Example functions: ###
 
@@ -382,8 +408,8 @@ The following examples are based on Mnesia.
             Subtrees
         end,
     mnesia:activity(transaction, F).
-    
-### Example usage: ###
+
+## Pluggable Sort Functionality ##
 
 Creating the Mnesia table:
 
@@ -400,11 +426,11 @@ Creating the b-tree:
 
 ### Format: ###
 
-    FunctionName(Key1, Key2) -> 'equal' | 'greater' | 'less'
+    FunctionName(Key1, Key2) -> equal | greater | less
     
     Key1 = Key2 = any()
 
-The sort function takes two keys as arguments and returns the atom '**less**' if Key1 < Key2, the atom '**greater**' if Key1 > Key2 and otherwise the atom '**equal**'.
+The sort function takes two keys as arguments and returns the atom `less` if Key1 < Key2, the atom `greater` if Key1 > Key2 and otherwise the atom `equal`.
 
 ### Example function: ###
 
@@ -422,6 +448,36 @@ The sort function takes two keys as arguments and returns the atom '**less**' if
     BTree1 = b_trees:empty(500),
     BTree2 = b_trees:set_parameter(BTree1, sort, fun sort_descending/2),
 
-## See Also ##
 
-Additional documentation for **b_trees** is available here: [Wiki](https://github.com/walter-weinmann/b_trees/wiki).
+
+Backwards Compatibility
+=======================
+
+No issues - except module name collisions.
+
+
+
+Implementation
+==============
+
+The reference implementation can be fetched from Github:
+
+    https://github.com/walter-weinmann/b_trees/blob/master/src/b_trees.erl
+
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+
+[EmacsVar]: <> "Local Variables:"
+[EmacsVar]: <> "mode: indented-text"
+[EmacsVar]: <> "indent-tabs-mode: nil"
+[EmacsVar]: <> "sentence-end-double-space: t"
+[EmacsVar]: <> "fill-column: 70"
+[EmacsVar]: <> "coding: utf-8"
+[EmacsVar]: <> "End:"
+[VimVar]: <> " vim: set fileencoding=utf-8 expandtab shiftwidth=4 softtabstop=4: "

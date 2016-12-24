@@ -52,7 +52,7 @@
 
     <p><c>Tree</c> is composed of nodes of the form 
        <c>{KeyNumber, SubtreeNumber, [{Key, Value}], [Tree]}</c> 
-       and the "empty tree" node <c>nil</c>.</p>
+       and the "empty b-tree" node <c>nil</c>.</p>
 
     <p><c>State</c> is a tuple composed of the following parameters:
       <c>{StateTarget, DeleteFunction/3, InsertFunction/3, LookupFunction/3}</c>.</p>
@@ -304,7 +304,7 @@
       <desc>
         <p>returns the atom <c>greater</c> if <c><anno>Key1</anno></c> &gt; <c><anno>Key2</anno></c>, 
           the atom <c>less</c> if <c><anno>Key1</anno></c> &lt; <c><anno>Key2</anno></c> and 
-          the atom <c>equal</c> else-wise.</p>
+          the atom <c>equal</c> otherwise.</p>
       </desc>
     </func>
 
@@ -314,7 +314,7 @@
       <desc>
         <p>returns the atom <c>greater</c> if <c><anno>Key1</anno></c> &lt; <c><anno>Key2</anno></c>,
           the atom <c>less</c> if <c><anno>Key1</anno></c> &gt; <c><anno>Key2</anno></c> and
-          the atom <c>equal</c> else-wise.</p>
+          the atom <c>equal</c> otherwise.</p>
       </desc>
     </func>
 
