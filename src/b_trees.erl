@@ -24,115 +24,116 @@
 %%
 %% An efficient implementation of B-trees. The definition of B-trees and its
 %% components corresponds to Knuth's definitions in Volume 3 of "The Art of
-%% Computer Programming": The order O of a B-Tree is an integer expressing
-%% the maximum number of subtrees (sons) in a node and the height of a B-Tree is
+%% Computer Programming": The order O of a b-tree is an integer expressing
+%% the maximum number of subtrees (sons) in a node and the height of a b-tree is
 %% its maximum level, i.e. the length of the longest path from the root node to
-%% a leaf node. The minimum order of a B-Tree is 4.
+%% a leaf node. The minimum order of a b-tree is 4.
 %% -----------------------------------------------------------------------------
 %% Operations:
 %%
-%% - delete(K, B): removes key K from B-Tree B; returns a new B-Tree B'. Assumes
-%%   that the key is present in the tree.
+%% - delete(K, B): removes key K from b-tree B; returns a new b-tree B'. Assumes
+%%   that the key is present in the b-tree.
 %%
-%% - delete_any(K, B): removes key K from B-Tree B if the key is present in the
-%%   tree, otherwise does nothing; returns a new B-Tree B'.
+%% - delete_any(K, B): removes key K from b-tree B if the key is present in the
+%%   b-tree, otherwise does nothing; returns a new b-tree B'.
 %%
-%% - empty(O): returns a new empty B-Tree of order O. Order is defined as the
+%% - empty(O): returns a new empty b-tree of order O. Order is defined as the
 %%   maximum number of children nodes a non-leaf node may hold. The minimum
 %%   value is 4. The sort order of the key values is ascending.
 %%
-%% - enter(K, V, B): inserts key K with value V into B-Tree B if the key is not
-%%   present in the tree, otherwise updates key K to value V in B. Returns the
-%%   new tree.
+%% - enter(K, V, B): inserts key K with value V into b-tree B if the key is not
+%%   present in the b-tree, otherwise updates key K to value V in B. Returns a
+%%   new b-tree.
 %%
-%% - from_dict(B, L): turns a list L of {Key, Value} pairs into a B-Tree. B must
-%%   be an empty B-Tree. The list must not contain duplicate keys.
+%% - from_dict(B, L): turns a list L of {Key, Value} pairs into a b-tree. B must
+%%   be an empty b-tree. The list must not contain duplicate keys.
 %%
-%% - get(K, B): retrieves the value stored with key K in B-Tree B. Assumes that
-%%   the key is present in the tree.
+%% - get(K, B): retrieves the value stored with key K in b-tree B. Assumes that
+%%   the key is present in the b-tree.
 %%
-%% - height(B): returns the height of the B-Tree B as an integer. Assumes that
-%%   the B-Tree B is non-empty.
+%% - height(B): returns the height of the b-tree B as an integer. Assumes that
+%%   the b-tree B is non-empty.
 %%
-%% - insert(K, V, B): inserts key K with value V into B-Tree B; returns a new
-%%   B-Tree. Assumes that the key K is *not* present in the B-Tree B.
+%% - insert(K, V, B): inserts key K with value V into b-tree B; returns a new
+%%   b-tree. Assumes that the key K is *not* present in the b-tree B.
 %%
-%% - is_defined(K, B): returns `true' if key K is present in B-Tree B, and
+%% - is_defined(K, B): returns `true' if key K is present in b-tree B, and
 %%   `false' otherwise.
 %%
-%% - is_empty(B): returns 'true' if B is an empty B-Tree, and 'false' otherwise.
+%% - is_empty(B): returns 'true' if B is an empty b-tree, and 'false' otherwise.
 %%
 %% - iterator(B): returns an iterator that can be used for traversing the
-%%   entries of B-Tree B; see `next'. The implementation of this is very
-%%   efficient; traversing the whole tree using `next' is only slightly slower
-%%   than getting the list of all elements using `to_list' and traversing that.
-%%   The main advantage of the iterator approach is that it does not require the
-%%   complete list of all elements to be built in memory at one time.
+%%   entries of b-tree B; see `next'. The implementation of this is very
+%%   efficient; traversing the whole b-tree using `next' is only slightly slower
+%%   than getting the list of all key-value pairs using `to_list' and traversing 
+%%   that. The main advantage of the iterator approach is that it does not require 
+%%   the complete list of all key-value pairs to be built in memory at one time.
 %%
 %% - iterator_from(K, B): Returns an iterator that can be used for traversing the
-%%   entries of B-Tree B; see next/1. The difference as compared to the iterator
-%%   returned by iterator/1 is that the first key greater than or equal to Key K
+%%   entries of b-tree B; see next/1. The difference, as compared to the iterator
+%%   returned by iterator/1, is that the first key greater than or equal to Key K
 %%   is returned.
 %%
-%% - keys(B): returns an ordered list of all keys in B-Tree B.
+%% - keys(B): returns an ordered list of all keys in b-tree B.
 %%
-%% - largest(B): returns tuple {K, V}, where K is the largest key in B-Tree B,
-%%   and V is the value associated with K in B. Assumes that the B-Tree B is
+%% - largest(B): returns tuple {K, V}, where K is the largest key in b-tree B,
+%%   and V is the value associated with K in B. Assumes that the b-tree B is
 %%   non-empty.
 %%
-%% - lookup(K, B): looks up key K in B-Tree B; returns {value, V}, or `none' if
+%% - lookup(K, B): looks up key K in b-tree B; returns {value, V}, or `none' if
 %%   the key K is not present.
 %%
 %% - map(F, B): maps the function F(K, V) -> V' to all key-value pairs of the
-%%   B-Tree B and returns a new B-Tree B' with the same set of keys as B and
+%%   b-tree B and returns a new b-tree B' with the same set of keys as B and
 %%   the new set of values V'.
 %%
 %% - next(I): returns {K, V, I1} where K is the smallest key referred to by
 %%   the iterator I, and I1 is the new iterator to be used for traversing the
 %%   remaining entries, or the atom `none' if no entries remain.
 %%
-%% - set_parameter(B, P, V): sets in B-Tree B the parameter P to value V;
-%%   returns a new B-Tree B'.
+%% - set_parameter(B, P, V): sets the parameter P to value V in b-tree B;
+%%   returns a new b-tree B'.
 %%
-%% - size_key_values(B): returns the number of key / value pairs in the
-%%   B-Tree B as an integer. Returns 0 (zero) if the B-Tree B is empty.
+%% - size_key_values(B): returns the number of key-value pairs in the
+%%   b-tree B as an integer. Returns 0 (zero) if the b-tree B is empty.
 %%
 %% - size_nodes(B): returns the number of total nodes and the number of 
-%%   leaf nodes in the B-tree B as a tuple of two integers. Returns {0, 0} 
-%%   (zero) if B-Tree is empty.
+%%   leaf nodes in the b-tree B as a tuple of two integers. Returns {0, 0} 
+%%   (zero) if b-tree B is empty.
 %%
-%% - smallest(B): returns tuple {K, V}, where K is the smallest key in B-Tree B,
-%%   and V is the value associated with K in B. Assumes that the B-Tree B is
+%% - smallest(B): returns tuple {K, V}, where K is the smallest key in b-tree B,
+%%   and V is the value associated with K in B. Assumes that the b-tree B is
 %%   non-empty.
 %%
-%% - sort_ascending(K1, K2): returns the atom greater if K1 > K2, the atom less
-%%   if K1 < K2 and the atom equal else-wise.
+%% - sort_ascending(K1, K2): returns the atom 'greater' if K1 > K2, the atom 
+%%   'less' if K1 < K2 and otherwise the atom 'equal'.
 %%
-%% - sort_descending(K1, K2): returns the atom greater if K1 < K2, the atom less
-%%   if K1 > K2 and the atom equal else-wise.
+%% - sort_descending(K1, K2): returns the atom 'greater' if K1 < K2, the atom 
+%%   'less' if K1 > K2 and otherwise the atom 'equal'.
 %%
-%% - take(K, B): removes element with key K from b-tree B; returns new b-tree
-%%   without removed element. Assumes that the key is present in the b-tree.
+%% - take(K, B): removes the key-value pair with key K from b-tree B; returns a
+%%   new b-tree B' without the removed key-value pair . Assumes that the key is 
+%%   present in the b-tree B.
 %%
-%% - take_any(K, B): removes element with key K from b-tree B and returns
-%%   a new b-tree if the key is present; otherwise does nothing and returns
-%%   'error'.
+%% - take_any(K, B): removes the key-value pair with key K from b-tree B and 
+%%   returns a new b-tree B' if the key is present; otherwise does nothing and 
+%%   returns the atom 'error'.
 %%
-%% - take_largest(B): returns {K, V, B'}, where K is the largest key in B-Tree
-%%   B, V is the value associated with K in B, and B' is the B-Tree B with key
-%%   K deleted. Assumes that B-Tree B is non-empty.
+%% - take_largest(B): returns {K, V, B'}, where K is the largest key in b-tree
+%%   B, V is the value associated with K in B, and B' is the b-tree B with key
+%%   K deleted. Assumes that b-tree B is non-empty.
 %%
 %% - take_smallest(B): returns {K, V, B'}, where K is the smallest key in
-%%   B-Tree B, V is the value associated with K in B, and B' is the B-Tree B
-%%   with key K deleted. Assumes that B-Tree B is non-empty.
+%%   b-tree B, V is the value associated with K in B, and B' is the b-tree B
+%%   with key K deleted. Assumes that b-tree B is non-empty.
 %%
 %% - to_list(B): returns an ordered list of {Key, Value} pairs for all keys in
-%%   B-Tree B.
+%%   b-tree B.
 %%
-%% - update(K, V, B): updates key K to value V in B-Tree B; returns a new
-%%   B-Tree B'. Assumes that the key is present in the tree.
+%% - update(K, V, B): updates key K to value V in b-tree B; returns a new
+%%   b-tree B'. Assumes that the key is present in the b-tree.
 %%
-%% - values(B): returns the list of values for all keys in B-Tree B, sorted by
+%% - values(B): returns the list of values for all keys in b-tree B, sorted by
 %%   their corresponding keys. Duplicates are not removed.
 
 -module(b_trees).
