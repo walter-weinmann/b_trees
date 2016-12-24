@@ -267,6 +267,24 @@ Types:
     
 Returns the atom **less** if Key1 > Key2, the atom **greater** if Key1 < Key2 and the atom **equal** else-wise.
 
+### take(Key, B-Tree1) -> B-Tree2 ###
+
+Types:
+
+    Key = any()
+    B-Tree1 = B-Tree2 = b_tree()
+
+Removes the node with key Key from b-tree B-Tree1 and returns the new b-tree B-Tree2. Assumes that Key is present in B-Tree1, crashes otherwise.
+
+### delete_any (Key, B-Tree1) -> B-Tree2 ###
+
+Types:
+
+    Key = any()
+    B-Tree1 = B-Tree2 = b_tree()
+
+Removes the node with key Key from b-tree B-Tree1 if Key is present in B-Tree1, otherwise does nothing. Returns the new b-tree B-Tree2.
+
 ### take_largest (B-Tree1) -> {Key, Value, B-Tree2} ###
 
 Types:

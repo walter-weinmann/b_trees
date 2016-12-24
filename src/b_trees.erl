@@ -111,6 +111,13 @@
 %% - sort_descending(K1, K2): returns the atom greater if K1 < K2, the atom less
 %%   if K1 > K2 and the atom equal else-wise.
 %%
+%% - take(K, B): removes element with key K from b-tree B; returns new b-tree
+%%   without removed element. Assumes that the key is present in the b-tree.
+%%
+%% - take_any(K, B): removes element with key K from b-tree B and returns
+%%   a new b-tree if the key is present; otherwise does nothing and returns
+%%   'error'.
+%%
 %% - take_largest(B): returns {K, V, B'}, where K is the largest key in B-Tree
 %%   B, V is the value associated with K in B, and B' is the B-Tree B with key
 %%   K deleted. Assumes that B-Tree B is non-empty.
@@ -154,6 +161,8 @@
     smallest/1,
     sort_ascending/2,
     sort_descending/2,
+    take/2,
+    take_any/2,
     take_smallest/1,
     take_largest/1,
     to_list/1,
@@ -1611,6 +1620,26 @@ smallest_1({_, _, _, Subtrees}, nil) ->
 smallest_1({_, _, _, Subtrees}, {StateTarget, _, _, LookupFunction} = State) ->
     {NextKeyNo, NextSubtreeNo, NextKeyValues, NextSubtreesKey} = lists:nth(1, Subtrees),
     smallest_1({NextKeyNo, NextSubtreeNo, NextKeyValues, LookupFunction(StateTarget, lookup, NextSubtreesKey)}, State).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take(key(), b_tree()) -> {value(), b_tree()}.
+
+take(Key, BTree) ->
+    {value, Value} = lookup(Key, BTree),
+    {Value, delete(Key, BTree)}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_any(key(), b_tree()) -> {value(), b_tree()} | error.
+
+take_any(Key, BTree) ->
+    case is_defined(Key, BTree) of
+        true ->
+            take(Key, BTree);
+        false ->
+            error
+    end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -16,15 +16,18 @@
 
 -define(B_TREE_POS_STATE, 5).
 -define(DIRECTORY_DETS, "test/tmp/").
+-define(OTP_RELEASE, erlang:system_info(otp_release)).
 
 %%% Performance tests
-%%-define(LARGEST_KEY_VALUE, {"k_10000", "v_10000"}).
+%%-define(LARGEST_KEY_VALUE, {"k_10000", ?LARGEST_VALUE}).
+%%-define(LARGEST_VALUE, "v_10000").
 %%-define(NUMBER_ACTIONS, 10000).
 %%-define(SMALLEST_KEY_VALUE, {"k_00001", "v_00001"}).
 %%-define(WIDTH, 5).
 
 % Standard tests
--define(LARGEST_KEY_VALUE, {"k_2000", "v_2000"}).
+-define(LARGEST_KEY_VALUE, {"k_2000", ?LARGEST_VALUE}).
+-define(LARGEST_VALUE, "v_2000").
 -define(NUMBER_ACTIONS, 2000).
 -define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
 -define(WIDTH, 4).
@@ -397,6 +400,32 @@ all() ->
         smallest_b_tree_order_256_test,
         smallest_b_tree_order_512_test,
         smallest_b_tree_order_1024_test,
+
+        take_any_gb_tree_test,
+        take_any_b_tree_order_4_test,
+        take_any_b_tree_order_5_test,
+        take_any_b_tree_order_6_test,
+        take_any_b_tree_order_8_test,
+        take_any_b_tree_order_16_test,
+        take_any_b_tree_order_32_test,
+        take_any_b_tree_order_64_test,
+        take_any_b_tree_order_128_test,
+        take_any_b_tree_order_256_test,
+        take_any_b_tree_order_512_test,
+        take_any_b_tree_order_1024_test,
+
+        take_gb_tree_test,
+        take_b_tree_order_4_test,
+        take_b_tree_order_5_test,
+        take_b_tree_order_6_test,
+        take_b_tree_order_8_test,
+        take_b_tree_order_16_test,
+        take_b_tree_order_32_test,
+        take_b_tree_order_64_test,
+        take_b_tree_order_128_test,
+        take_b_tree_order_256_test,
+        take_b_tree_order_512_test,
+        take_b_tree_order_1024_test,
 
         take_largest_gb_tree_test,
         take_largest_b_tree_order_4_dets_test,
@@ -3183,6 +3212,208 @@ smallest_b_tree_order_8_test(Config) ->
 smallest_gb_tree_test(_Config) ->
     ?assertEqual(?SMALLEST_KEY_VALUE, gb_trees:smallest(?config(gb_tree, _Config))),
     ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 1024
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_1024_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(1024)}, test_generator:take_any_b_tree_from(1024, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 128
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_128_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(128)}, test_generator:take_any_b_tree_from(128, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 16
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_16_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(16)}, test_generator:take_any_b_tree_from(16, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 256
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_256_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(256)}, test_generator:take_any_b_tree_from(256, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 32
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_32_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(32)}, test_generator:take_any_b_tree_from(32, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 4
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_4_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(4)}, test_generator:take_any_b_tree_from(4, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 512
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_512_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(512)}, test_generator:take_any_b_tree_from(512, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 5
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_5_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(5)}, test_generator:take_any_b_tree_from(5, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 64
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_64_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(64)}, test_generator:take_any_b_tree_from(64, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 6
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_6_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(6)}, test_generator:take_any_b_tree_from(6, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any b_tree order 8
+%%--------------------------------------------------------------------
+
+take_any_b_tree_order_8_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(8)}, test_generator:take_any_b_tree_from(8, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take_any gb_tree
+%%--------------------------------------------------------------------
+
+take_any_gb_tree_test(_Config) ->
+    case ?OTP_RELEASE > "19" of
+        true ->
+            ?assertEqual({?LARGEST_VALUE, gb_trees:empty()}, test_generator:take_any_gb_tree_from(?NUMBER_ACTIONS, ?WIDTH)),
+            ok;
+        _ ->
+            not_available
+    end.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 1024
+%%--------------------------------------------------------------------
+
+take_b_tree_order_1024_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(1024)}, test_generator:take_b_tree_from(1024, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 128
+%%--------------------------------------------------------------------
+
+take_b_tree_order_128_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(128)}, test_generator:take_b_tree_from(128, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 16
+%%--------------------------------------------------------------------
+
+take_b_tree_order_16_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(16)}, test_generator:take_b_tree_from(16, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 256
+%%--------------------------------------------------------------------
+
+take_b_tree_order_256_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(256)}, test_generator:take_b_tree_from(256, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 32
+%%--------------------------------------------------------------------
+
+take_b_tree_order_32_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(32)}, test_generator:take_b_tree_from(32, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 4
+%%--------------------------------------------------------------------
+
+take_b_tree_order_4_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(4)}, test_generator:take_b_tree_from(4, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 512
+%%--------------------------------------------------------------------
+
+take_b_tree_order_512_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(512)}, test_generator:take_b_tree_from(512, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 5
+%%--------------------------------------------------------------------
+
+take_b_tree_order_5_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(5)}, test_generator:take_b_tree_from(5, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 64
+%%--------------------------------------------------------------------
+
+take_b_tree_order_64_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(64)}, test_generator:take_b_tree_from(64, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 6
+%%--------------------------------------------------------------------
+
+take_b_tree_order_6_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(6)}, test_generator:take_b_tree_from(6, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take b_tree order 8
+%%--------------------------------------------------------------------
+
+take_b_tree_order_8_test(_Config) ->
+    ?assertEqual({?LARGEST_VALUE, b_trees:empty(8)}, test_generator:take_b_tree_from(8, ?NUMBER_ACTIONS, ?WIDTH)),
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take gb_tree
+%%--------------------------------------------------------------------
+
+take_gb_tree_test(_Config) ->
+    case ?OTP_RELEASE > "19" of
+        true ->
+            ?assertEqual({?LARGEST_VALUE, gb_trees:empty()}, test_generator:take_gb_tree_from(?NUMBER_ACTIONS, ?WIDTH)),
+            ok;
+        _ ->
+            not_available
+    end.
 
 %%--------------------------------------------------------------------
 %% TEST CASES: take_largest b_tree order 1024 - persistence by dets

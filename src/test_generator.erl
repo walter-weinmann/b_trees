@@ -11,8 +11,8 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--define(BTree_POS_SORT, 4).
--define(BTree_POS_STATE, 5).
+-define(B_TREE_POS_SORT, 4).
+-define(B_TREE_POS_STATE, 5).
 -define(DIRECTORY_DETS, "test/tmp/").
 -define(VALUE_UPDATE_SUFFIX, "_new").
 
@@ -70,6 +70,10 @@
     persistence_by_mnesia/3,
     prepare_template_asc/1,
     prepare_template_desc/1,
+    take_any_b_tree_from/3,
+    take_any_gb_tree_from/2,
+    take_b_tree_from/3,
+    take_gb_tree_from/2,
     take_largest_b_tree/3,
     take_largest_b_tree/4,
     take_largest_b_tree_dets/4,
@@ -465,6 +469,42 @@ generate_keys_till(Number, Width) when Number >= 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-spec take_any_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+
+take_any_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
+    BTree = generate_b_tree_from_number(Order, Number, Width),
+    Keys = generate_keys_from(Number, Width),
+    take_any_b_tree_1(Keys, {none, BTree}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_any_gb_tree_from(pos_integer(), pos_integer()) -> gb_trees:tree().
+
+take_any_gb_tree_from(Number, Width) when Number > 0 ->
+    GBTree = generate_gb_tree_from_number(Number, Width),
+    Keys = generate_keys_from(Number, Width),
+    take_any_gb_tree_1(Keys, {none, GBTree}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+
+take_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
+    BTree = generate_b_tree_from_number(Order, Number, Width),
+    Keys = generate_keys_from(Number, Width),
+    take_b_tree_1(Keys, {none, BTree}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_gb_tree_from(pos_integer(), pos_integer()) -> gb_trees:tree().
+
+take_gb_tree_from(Number, Width) when Number > 0 ->
+    GBTree = generate_gb_tree_from_number(Number, Width),
+    Keys = generate_keys_from(Number, Width),
+    take_gb_tree_1(Keys, {none, GBTree}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 -spec take_largest_b_tree(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
 
 take_largest_b_tree(Order, Number, Width) when Order > 3, Number > 0 ->
@@ -572,7 +612,7 @@ take_smallest_gb_tree(Number, Width) when Number > 0 ->
 -spec check_equal(any(), any()) -> atom().
 
 check_equal(Value_1, Value_2) when is_tuple(Value_1), tuple_size(Value_1) == 6, is_tuple(Value_2), tuple_size(Value_2) == 6 ->
-    ?assertEqual(setelement(?BTree_POS_STATE, setelement(?BTree_POS_SORT, Value_1, sort), nil), setelement(?BTree_POS_STATE, setelement(?BTree_POS_SORT, Value_2, sort), nil)).
+    ?assertEqual(setelement(?B_TREE_POS_STATE, setelement(?B_TREE_POS_SORT, Value_1, sort), nil), setelement(?B_TREE_POS_STATE, setelement(?B_TREE_POS_SORT, Value_2, sort), nil)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -677,17 +717,17 @@ persistence_by_mnesia(StateTarget, lookup, SubtreesKey) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec prepare_template_asc(b_trees:b_tree()) -> b_trees:b_tree().
+-spec prepare_template_asc(tuple()) -> tuple().
 
 prepare_template_asc(BTree) ->
-    setelement(?BTree_POS_SORT, BTree, fun b_trees:sort_ascending/2).
+    setelement(?B_TREE_POS_SORT, BTree, fun b_trees:sort_ascending/2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec prepare_template_desc(b_trees:b_tree()) -> b_trees:b_tree().
+-spec prepare_template_desc(tuple()) -> tuple().
 
 prepare_template_desc(BTree) ->
-    setelement(?BTree_POS_SORT, BTree, fun b_trees:sort_descending/2).
+    setelement(?B_TREE_POS_SORT, BTree, fun b_trees:sort_descending/2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Generator helper functions.
@@ -870,6 +910,42 @@ generate_keys_2_odd([Key | Tail], Format, Keys) ->
         _ ->
             generate_keys_2_odd(Tail, Format, Keys)
     end.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_b_tree_1([non_neg_integer()], {any(), b_trees:b_tree()}) -> {any(), b_trees:b_tree()}.
+
+take_b_tree_1([], {Value, BTree}) ->
+    {Value, BTree};
+take_b_tree_1([Key | Tail], {_, BTree}) ->
+    take_b_tree_1(Tail, b_trees:take(Key, BTree)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_any_b_tree_1([non_neg_integer()], {any(), b_trees:b_tree()}) -> {any(), b_trees:b_tree()}.
+
+take_any_b_tree_1([], {Value, BTree}) ->
+    {Value, BTree};
+take_any_b_tree_1([Key | Tail], {_, BTree}) ->
+    take_any_b_tree_1(Tail, b_trees:take_any(Key, BTree)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_any_gb_tree_1([non_neg_integer()], {any(), gb_trees:tree()}) -> {any(), gb_trees:tree()}.
+
+take_any_gb_tree_1([], {Value, Tree}) ->
+    {Value, Tree};
+take_any_gb_tree_1([Key | Tail], {_, Tree}) ->
+    take_any_gb_tree_1(Tail, gb_trees:take_any(Key, Tree)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-spec take_gb_tree_1([non_neg_integer()], {any(), gb_trees:tree()}) -> {any(), gb_trees:tree()}.
+
+take_gb_tree_1([], {Value, Tree}) ->
+    {Value, Tree};
+take_gb_tree_1([Key | Tail], {_, Tree}) ->
+    take_gb_tree_1(Tail, gb_trees:take(Key, Tree)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

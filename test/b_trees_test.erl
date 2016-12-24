@@ -1922,6 +1922,101 @@ smallest_test() ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: take_any
+%%--------------------------------------------------------------------
+
+take_any_test() ->
+    ?assertEqual(error, b_trees:take_any("k_00", test_generator:prepare_template_asc(?B_TREE_06_00))),
+    ?assertEqual({"v_01", test_generator:prepare_template_asc(?B_TREE_06_00)}, b_trees:take_any("k_01", test_generator:prepare_template_asc(?B_TREE_06_01))),
+    ?assertEqual(error, b_trees:take_any("k_00", test_generator:prepare_template_asc(?B_TREE_06_01))),
+    ?assertEqual({"v_04", test_generator:prepare_template_asc(?B_TREE_06_03)}, b_trees:take_any("k_04", test_generator:prepare_template_asc(?B_TREE_06_04))),
+    ?assertEqual({"v_07", test_generator:prepare_template_asc(?B_TREE_06_06)}, b_trees:take_any("k_07", test_generator:prepare_template_asc(?B_TREE_06_07))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take - order 4
+%%--------------------------------------------------------------------
+
+take_b_tree_order_4_test() ->
+    ?assertEqual({"v_02", test_generator:prepare_template_asc(?B_TREE_04_10_MINUS_02)}, b_trees:take("k_02", test_generator:prepare_template_asc(?B_TREE_04_10))),
+
+    ?assertEqual({"v_02", test_generator:prepare_template_asc(?B_TREE_04_17_MINUS_02)}, b_trees:take("k_02", test_generator:prepare_template_asc(?B_TREE_04_17))),
+    ?assertEqual({"v_04", test_generator:prepare_template_asc(?B_TREE_04_17_MINUS_02_04)}, b_trees:take("k_04", test_generator:prepare_template_asc(?B_TREE_04_17_MINUS_02))),
+    ?assertEqual({"v_12", test_generator:prepare_template_asc(?B_TREE_04_17_MINUS_02_TILL_12)}, b_trees:take("k_12", test_generator:prepare_template_asc(?B_TREE_04_17_MINUS_02_TILL_10))),
+
+    ?assertEqual({"v_02", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_02)}, b_trees:take("k_02", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_04", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_04)}, b_trees:take("k_04", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_06", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_06)}, b_trees:take("k_06", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_08", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_08)}, b_trees:take("k_08", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_10", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_10)}, b_trees:take("k_10", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_12", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_12)}, b_trees:take("k_12", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_14", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_14)}, b_trees:take("k_14", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_16", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_16)}, b_trees:take("k_16", test_generator:prepare_template_asc(?B_TREE_04_20))),
+    ?assertEqual({"v_18", test_generator:prepare_template_asc(?B_TREE_04_20_MINUS_18)}, b_trees:take("k_18", test_generator:prepare_template_asc(?B_TREE_04_20))),
+
+    ?assertEqual({"v_18", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_18)}, b_trees:take("k_18", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_16))),
+    ?assertEqual({"v_20", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_20)}, b_trees:take("k_20", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_18))),
+    ?assertEqual({"v_22", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_22)}, b_trees:take("k_22", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_20))),
+    ?assertEqual({"v_30", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_30)}, b_trees:take("k_30", test_generator:prepare_template_asc(?B_TREE_04_33_MINUS_02_TILL_28))),
+
+    ?assertEqual({"v_08", test_generator:prepare_template_asc(?B_TREE_04_64_MINUS_08)}, b_trees:take("k_08", test_generator:prepare_template_asc(?B_TREE_04_64))),
+    ?assertEqual({"v_16", test_generator:prepare_template_asc(?B_TREE_04_64_MINUS_16)}, b_trees:take("k_16", test_generator:prepare_template_asc(?B_TREE_04_64))),
+    ?assertEqual({"v_32", test_generator:prepare_template_asc(?B_TREE_04_64_MINUS_32)}, b_trees:take("k_32", test_generator:prepare_template_asc(?B_TREE_04_64))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take - order 6
+%%--------------------------------------------------------------------
+
+take_b_tree_order_6_test() ->
+    ?assertEqual({"v_01", test_generator:prepare_template_asc(?B_TREE_06_00)}, b_trees:take("k_01", test_generator:prepare_template_asc(?B_TREE_06_01))),
+
+    ?assertEqual({"v_01", test_generator:prepare_template_asc(?B_TREE_06_06_MINUS_01)}, b_trees:take("k_01", test_generator:prepare_template_asc(?B_TREE_06_06))),
+    ?assertEqual({"v_02", test_generator:prepare_template_asc(?B_TREE_06_06_MINUS_02)}, b_trees:take("k_02", test_generator:prepare_template_asc(?B_TREE_06_06))),
+    ?assertEqual({"v_03", test_generator:prepare_template_asc(?B_TREE_06_06_MINUS_03)}, b_trees:take("k_03", test_generator:prepare_template_asc(?B_TREE_06_06))),
+    ?assertEqual({"v_04", test_generator:prepare_template_asc(?B_TREE_06_06_MINUS_04)}, b_trees:take("k_04", test_generator:prepare_template_asc(?B_TREE_06_06))),
+    ?assertEqual({"v_05", test_generator:prepare_template_asc(?B_TREE_06_06_MINUS_05)}, b_trees:take("k_05", test_generator:prepare_template_asc(?B_TREE_06_06))),
+    ?assertEqual({"v_06", test_generator:prepare_template_asc(?B_TREE_06_06_MINUS_06)}, b_trees:take("k_06", test_generator:prepare_template_asc(?B_TREE_06_06))),
+
+    ?assertEqual({"v_01", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_01)}, b_trees:take("k_01", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_02", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_02)}, b_trees:take("k_02", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_03", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_03)}, b_trees:take("k_03", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_04", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_04)}, b_trees:take("k_04", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_05", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_05)}, b_trees:take("k_05", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_06", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_06)}, b_trees:take("k_06", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_07", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_07)}, b_trees:take("k_07", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_08", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_08)}, b_trees:take("k_08", test_generator:prepare_template_asc(?B_TREE_06_09))),
+    ?assertEqual({"v_09", test_generator:prepare_template_asc(?B_TREE_06_09_MINUS_09)}, b_trees:take("k_09", test_generator:prepare_template_asc(?B_TREE_06_09))),
+
+    ?assertEqual({"v_01", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_01)}, b_trees:take("k_01", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_02", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_02)}, b_trees:take("k_02", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_03", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_03)}, b_trees:take("k_03", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_04", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_04)}, b_trees:take("k_04", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_05", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_05)}, b_trees:take("k_05", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_06", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_06)}, b_trees:take("k_06", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_07", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_07)}, b_trees:take("k_07", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_08", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_08)}, b_trees:take("k_08", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_09", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_09)}, b_trees:take("k_09", test_generator:prepare_template_asc(?B_TREE_06_10))),
+    ?assertEqual({"v_10", test_generator:prepare_template_asc(?B_TREE_06_10_MINUS_10)}, b_trees:take("k_10", test_generator:prepare_template_asc(?B_TREE_06_10))),
+
+    ok.
+
+%%--------------------------------------------------------------------
+%% TEST CASES: take - error
+%%--------------------------------------------------------------------
+
+take_error_test() ->
+    ?assertException(error, {badmatch, none}, b_trees:take("k_00", test_generator:prepare_template_asc(?B_TREE_06_00))),
+
+    ?assertException(error, {badmatch, none}, b_trees:take("k_00", test_generator:prepare_template_asc(?B_TREE_06_01))),
+
+    ?assertException(error, {badmatch, none}, b_trees:take("k_10", test_generator:prepare_template_asc(?B_TREE_06_09))),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_largest - persistence by ets
 %%--------------------------------------------------------------------
 
