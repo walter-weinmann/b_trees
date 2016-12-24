@@ -13,9 +13,13 @@ A module for balanced n-ary search trees of order `n` in which each non-leaf nod
 
 ## DESCRIPTION ##
 
-A b-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The b-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the b-tree is optimized for systems that read and write large blocks of data.
+A b-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. 
+The b-tree is a generalization of a binary search tree in that a node can have more than two children. 
+Unlike self-balancing binary search trees, the b-tree is optimized for systems that read and write large blocks of data.
 
-Persistence and sort facilities are pluggable via `set_parameter` function. The function `sort_ascending` is used as the default sort option. If no persistence parameter given, the b-tree is stored in the memory.
+Persistence and sort facilities are pluggable via the `set_parameter` function. 
+The function `sort_ascending` is used as the default sort option. 
+If no persistence parameter given, the b-tree is stored in the memory.
 
 ### Data Structure ###
 

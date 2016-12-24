@@ -5,7 +5,7 @@
     Erlang-Version: OTP 20.0
     Post-History:
 ****
-EEP XXX: B-trees: balanced n-ary search trees of order n.
+EEP XXX: B-trees: balanced search trees of order n.
 ----
 
 
@@ -13,30 +13,15 @@ EEP XXX: B-trees: balanced n-ary search trees of order n.
 Abstract
 ========
 
-This EEP proposes the creation of a new module b-trees for the administration of B-trees. Both the optional 
-persistence and the sort order should be implemented by pluggable functionality.
+This EEP proposes the creation of a new module named b_trees for the administration of b-trees. 
+Both the optional persistence and the sort order should be implemented by pluggable functionality.
 
 
 
-Rationale
+Copyright
 =========
 
-B-trees are self-balancing tree data structure that keep data sorted and allows searches, sequential access, 
-insertions, and deletions in logarithmic time. B-trees are a generalization of a binary search trees in that 
-a node can have more than two children. Unlike self-balancing binary search trees, the B-tree is optimized 
-for systems that read and write large blocks of data. B-trees are a good example of a data structure for 
-external memory.
-
-
-
-Motivation
-==========
-
-B-trees are self-balancing tree data structure that keep data sorted and allows searches, sequential access, 
-insertions, and deletions in logarithmic time. B-trees are a generalization of a binary search trees in that 
-a node can have more than two children. Unlike self-balancing binary search trees, the B-tree is optimized 
-for systems that read and write large blocks of data. B-trees are a good example of a data structure for 
-external memory.
+This document has been placed in the public domain.
 
 
 
@@ -450,6 +435,27 @@ The sort function takes two keys as arguments and returns the atom `less` if Key
 
 
 
+Motivation
+==========
+
+B-trees are self-balancing tree data structures that keep data sorted and allow searches, sequential access, insertions, and deletions in logarithmic time. 
+B-trees are a generalization of a binary search trees in that a node can have more than two children. 
+Unlike self-balancing binary search trees, the b-tree is optimized for systems that read and write large blocks of data. 
+B-trees are a good example of a data structure for external memory.
+
+
+
+Rationale
+=========
+
+B-trees are self-balancing tree data structure that keep data sorted and allows searches, sequential access, 
+insertions, and deletions in logarithmic time. B-trees are a generalization of a binary search trees in that 
+a node can have more than two children. Unlike self-balancing binary search trees, the B-tree is optimized 
+for systems that read and write large blocks of data. B-trees are a good example of a data structure for 
+external memory.
+
+
+
 Backwards Compatibility
 =======================
 
@@ -457,19 +463,12 @@ No issues - except module name collisions.
 
 
 
-Implementation
-==============
+Reference Implementation
+========================
 
 The reference implementation can be fetched from Github:
 
-    https://github.com/walter-weinmann/b_trees/blob/master/src/b_trees.erl
-
-
-
-Copyright
-=========
-
-This document has been placed in the public domain.
+    https://github.com/walter-weinmann/b_trees
 
 
 
