@@ -3,6 +3,7 @@ notifications:
   email:
     - walter.weinmann@gmail.com
 otp_release:
+  - 19.2
   - 19.1
   - 19.0
   - 18.3

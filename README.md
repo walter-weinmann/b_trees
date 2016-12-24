@@ -13,9 +13,9 @@ A module for balanced n-ary search trees of order `n` in which each non-leaf nod
 
 ## DESCRIPTION ##
 
-A b-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The b-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the  B-tree is optimized for systems that read and write large blocks of data.
+A b-tree is a self-balancing tree data structure that keeps data sorted and allows searches, sequential access, insertions, and deletions in logarithmic  time. The b-tree is a generalization of a binary search tree in that a node can have more than two children. Unlike self-balancing binary search trees, the b-tree is optimized for systems that read and write large blocks of data.
 
-Persistence and sort facilities are pluggable via `set_parameter` function. The function `sort_ascending` is used as the default sort option. If no persistence parameter given, the B-Tree is stored in the ram memory.
+Persistence and sort facilities are pluggable via `set_parameter` function. The function `sort_ascending` is used as the default sort option. If no persistence parameter given, the b-tree is stored in the memory.
 
 ### Data Structure ###
 
@@ -266,6 +266,24 @@ Types:
     equal = greater = less = atom()
     
 Returns the atom **less** if Key1 > Key2, the atom **greater** if Key1 < Key2 and the atom **equal** else-wise.
+
+### take(Key, B-Tree1) -> B-Tree2 ###
+
+Types:
+
+    Key = any()
+    B-Tree1 = B-Tree2 = b_tree()
+
+Removes the node with key Key from b-tree B-Tree1 and returns the new b-tree B-Tree2. Assumes that Key is present in B-Tree1, crashes otherwise.
+
+### delete_any (Key, B-Tree1) -> B-Tree2 ###
+
+Types:
+
+    Key = any()
+    B-Tree1 = B-Tree2 = b_tree()
+
+Removes the node with key Key from b-tree B-Tree1 if Key is present in B-Tree1, otherwise does nothing. Returns the new b-tree B-Tree2.
 
 ### take_largest (B-Tree1) -> {Key, Value, B-Tree2} ###
 

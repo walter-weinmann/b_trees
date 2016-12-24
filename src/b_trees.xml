@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE erlref SYSTEM "erlref.dtd">
+
+<erlref>
+  <header>
+    <copyright>
+      <year>2017</year><year>2017</year>
+      <holder>Ericsson AB. All Rights Reserved.</holder>
+    </copyright>
+    <legalnotice>
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
+ 
+          http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+
+    </legalnotice>
+
+    <title>b_trees</title>
+    <prepared></prepared>
+    <docno></docno>
+    <date></date>
+    <rev></rev>
+  </header>
+  
+  <module>b_trees</module>
+  
+  <modulesummary>A module for balanced n-ary search trees of order n in which each non-leaf node has up to n children.</modulesummary>
+  
+  <description>
+    <p>A b-tree is a self-balancing b-tree data structure that keeps 
+      data sorted and allows searches, sequential access, insertions, 
+      and deletions in logarithmic time. The b-tree is a generalization 
+      of a binary search b-tree in that a node can have more than two children. 
+      Unlike self-balancing binary search trees, the b-tree is optimized 
+      for systems that read and write large blocks of data.</p>
+
+    <p>Persistence and sort facilities are pluggable via set_parameter function. 
+      The function sort_ascending is used as the default sort option. 
+      If no persistence parameter given, the b-tree is stored in the memory.</p>
+  </description>
+
+  <section>
+    <title>Data Structure</title>
+    <code type="none">{MinimumSubtrees, MaximumKeys, SizeKeyValues, SortFunction/2, State, Tree}</code>
+
+    <p><c>Tree</c> is composed of nodes of the form 
+       <c>{KeyNumber, SubtreeNumber, [{Key, Value}], [Tree]}</c> 
+       and the "empty tree" node <c>nil</c>.</p>
+
+    <p><c>State</c> is a tuple composed of the following parameters:
+      <c>{StateTarget, DeleteFunction/3, InsertFunction/3, LookupFunction/3}</c>.</p>
+
+    <p>Since the trees are always balanced, there is no need for a balance operation.</p>
+  </section>
+
+  <datatypes>
+    <datatype>
+      <name name="b_tree" n_vars="0"/>
+      <desc><p>A general balanced b-tree.</p></desc>
+    </datatype>
+    <datatype>
+      <name name="iter" n_vars="0"/>
+      <desc><p>A general balanced b-tree iterator.</p></desc>
+    </datatype>
+  </datatypes>
+
+  <funcs>
+    <func>
+      <name name="delete" arity="2"/>
+      <fsummary>Remove a node from a b-tree.</fsummary>
+      <desc>
+        <p>Removes the node with key <c><anno>Key</anno></c> from
+          <c><anno>B-Tree1</anno></c> and returns the new b-tree. Assumes that the
+          key is present in the b-tree, crashes otherwise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="delete_any" arity="2"/>
+      <fsummary>Remove a (possibly non-existing) node from a b-tree.</fsummary>
+      <desc>
+        <p>Removes the node with key <c><anno>Key</anno></c> from
+          <c><anno>B-Tree1</anno></c> if
+          the key is present in the b-tree, otherwise does nothing.
+          Returns the new b-tree.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="empty" arity="1"/>
+      <fsummary>Return an empty b-tree.</fsummary>
+      <desc>
+        <p>Returns a new empty b-tree of order <c><anno>Order</anno></c>.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="enter" arity="3"/>
+      <fsummary>Insert or update key with value in a b-tree.</fsummary>
+      <desc>
+        <p>Inserts <c><anno>Key</anno></c> with value <c><anno>Value</anno></c>
+          into <c><anno>B-Tree1</anno></c> if the key is not present in the b-tree,
+          otherwise updates <c><anno>Key</anno></c> to value
+          <c><anno>Value</anno></c> in <c><anno>B-Tree1</anno></c>. Returns the
+          new b-tree.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="from_dict" arity="2"/>
+      <fsummary>Make a b-tree from an dict.</fsummary>
+      <desc>
+        <p>Turns an list <c><anno>List</anno></c> of key-value tuples
+          into a b-tree. The given <c><anno>B-Tree1</anno></c> must be empty.
+          The list must not contain duplicate keys.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="get" arity="2"/>
+      <fsummary>Look up a key in a b-tree, if present.</fsummary>
+      <desc>
+        <p>Retrieves the value stored with <c><anno>Key</anno></c> in
+          <c><anno>B-Tree</anno></c>.
+          Assumes that the key is present in the b-tree, crashes
+          otherwise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="height" arity="1"/>
+      <fsummary>Return the height of a b-tree.</fsummary>
+      <desc>
+        <p>Returns the height of <c><anno>B-Tree</anno></c> as an integer.
+        Assumes that the b-tree is non-empty.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="insert" arity="3"/>
+      <fsummary>Insert a new key and value in a b-tree.</fsummary>
+      <desc>
+        <p>Inserts <c><anno>Key</anno></c> with value <c><anno>Value</anno></c>
+          into <c><anno>B-Tree1</anno></c> and
+          returns the new b-tree. Assumes that the key is not present in
+          the b-tree, crashes otherwise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="is_defined" arity="2"/>
+      <fsummary>Test for membership of a b-tree.</fsummary>
+      <desc>
+        <p>Returns <c>true</c> if <c><anno>Key</anno></c> is present in
+          <c><anno>B-Tree</anno></c>, otherwise <c>false</c>.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="is_empty" arity="1"/>
+      <fsummary>Test for empty b-tree.</fsummary>
+      <desc>
+        <p>Returns <c>true</c> if <c><anno>B-Tree</anno></c> is an empty b-tree,
+          othwewise  <c>false</c>.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="iterator" arity="1"/>
+      <fsummary>Return an iterator for a b-tree.</fsummary>
+      <desc>
+        <p>Returns an iterator that can be used for traversing the
+          entries of <c><anno>B-Tree</anno></c>; see
+          <seealso marker="#next/1"><c>next/1</c></seealso>. The implementation
+          of this is very efficient; traversing the whole b-tree using
+          <c>next/1</c> is only slightly slower than getting the list
+          of all elements using
+          <seealso marker="#to_list/1"><c>to_list/1</c></seealso>
+          and traversing that.
+          The main advantage of the iterator approach is that it does
+          not require the complete list of all elements to be built in
+          memory at one time.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="iterator_from" arity="2"/>
+      <fsummary>Return an iterator for a b-tree starting from a specified key.
+      </fsummary>
+      <desc>
+        <p>Returns an iterator that can be used for traversing the
+          entries of <c><anno>B-Tree</anno></c>; see
+          <seealso marker="#next/1"><c>next/1</c></seealso>.
+          The difference as compared to the iterator returned by
+          <seealso marker="#iterator/1"><c>iterator/1</c></seealso>
+          is that the first key greater than
+          or equal to <c><anno>Key</anno></c> is returned.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="keys" arity="1"/>
+      <fsummary>Return a list of the keys in a b-tree.</fsummary>
+      <desc>
+        <p>Returns the keys in <c><anno>B-Tree</anno></c> as an ordered list.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="largest" arity="1"/>
+      <fsummary>Return largest key and value.</fsummary>
+      <desc>
+        <p>Returns <c>{<anno>Key</anno>, <anno>Value</anno>}</c>, where
+          <c><anno>Key</anno></c> is the largest
+          key in <c><anno>B-Tree</anno></c>, and <c><anno>Value</anno></c> is
+          the value associated
+          with this key. Assumes that the b-tree is not empty.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="lookup" arity="2"/>
+      <fsummary>Look up a key in a b-tree.</fsummary>
+      <desc>
+        <p>Looks up <c><anno>Key</anno></c> in <c><anno>B-Tree</anno></c>.
+          Returns <c>{value, <anno>Value</anno>}</c>, or <c>none</c> if
+          <c><anno>Key</anno></c> is not present.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="map" arity="2"/>
+      <fsummary>Return largest key and value.</fsummary>
+      <desc>
+        <p>Maps function F(<anno>K</anno>, <anno>V1</anno>) -> <anno>V2</anno>
+          to all key-value pairs of b-tree <c><anno>B-Tree1</anno></c>. Returns a
+          new b-tree <c><anno>B-Tree2</anno></c> with the same set of keys as
+	      <c><anno>B-Tree1</anno></c> and the new set of values
+          <c><anno>V2</anno></c>.</p>
+         </desc>
+    </func>
+
+    <func>
+      <name name="next" arity="1"/>
+      <fsummary>Traverse a b-tree with an iterator.</fsummary>
+      <desc>
+        <p>Returns <c>{<anno>Key</anno>, <anno>Value</anno>,
+          <anno>Iter2</anno>}</c>, where <c><anno>Key</anno></c> is the
+          smallest key referred to by iterator <c><anno>Iter1</anno></c>, and
+          <c><anno>Iter2</anno></c> is the new iterator to be used for
+          traversing the remaining nodes, or the atom <c>none</c> if no
+          nodes remain.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="set_parameter" arity="3"/>
+      <fsummary>Set a parameter value in an empty b-tree.</fsummary>
+      <desc>
+        <p>Set parameter <c><anno>Name</anno></c> to value <c><anno>Value</anno></c>
+          in <c><anno>B-Tree1</anno></c> and returns the new b-tree. 
+          Assumes that <c><anno>B-Tree1</anno></c> is an empty b-tree.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="size_key_values" arity="1"/>
+      <fsummary>Return the number of key-value pairs in a b-tree.</fsummary>
+      <desc>
+        <p>Returns the number of key-value pairs in <c><anno>B-Tree</anno></c>.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="size_nodes" arity="1"/>
+      <fsummary>Return the number of nodes in a b-tree.</fsummary>
+      <desc>
+        <p>Returns the number of nodes in <c><anno>B-Tree</anno></c>.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="smallest" arity="1"/>
+      <fsummary>Return smallest key and value.</fsummary>
+      <desc>
+        <p>Returns <c>{<anno>Key</anno>, <anno>Value</anno>}</c>, where
+          <c><anno>Key</anno></c> is the smallest
+          key in <c><anno>B-Tree</anno></c>, and <c><anno>Value</anno></c> is
+          the value associated
+          with this key. Assumes that the b-tree is not empty.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="sort_ascending" arity="2"/>
+      <fsummary>Check two keys for ascending sorting.</fsummary>
+      <desc>
+        <p>returns the atom <c>greater</c> if <c><anno>Key1</anno></c> &gt; <c><anno>Key2</anno></c>, 
+          the atom <c>less</c> if <c><anno>Key1</anno></c> &lt; <c><anno>Key2</anno></c> and 
+          the atom <c>equal</c> else-wise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="sort_descending" arity="2"/>
+      <fsummary>Check two keys for descending sorting.</fsummary>
+      <desc>
+        <p>returns the atom <c>greater</c> if <c><anno>Key1</anno></c> &lt; <c><anno>Key2</anno></c>,
+          the atom <c>less</c> if <c><anno>Key1</anno></c> &gt; <c><anno>Key2</anno></c> and
+          the atom <c>equal</c> else-wise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="take" arity="2"/>
+      <fsummary>Returns a value and a new b-tree without the key-value pair with key <c><anno>Key</anno></c>.</fsummary>
+      <desc>
+        <p>Returns a value <c>{<anno>Value</anno></c> from the key-value pair with key <c><anno>Key</anno></c>
+          and a new <c><anno>B-Tree2</anno></c> without this key-value pair.
+          Assumes that the key-value pair with the key is present in the b-tree,
+          crashes otherwise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="take_any" arity="2"/>
+      <fsummary>Returns a value and a new b-tree without the key-value pair with key <c><anno>Key</anno></c>.</fsummary>
+      <desc>
+        <p>Returns a value <c>{<anno>Value</anno></c> from the key-value pair with key <c><anno>Key</anno></c>
+          and a new <c><anno>B-Tree2</anno></c> without this key-value pair.
+          Returns <c>error</c> if the key-value pair with the key is not present in the b-tree,
+          crashes otherwise.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="take_largest" arity="1"/>
+      <fsummary>Extract largest key and value.</fsummary>
+      <desc>
+        <p>Returns <c>{<anno>Key</anno>, <anno>Value</anno>,
+          <anno>B-Tree2</anno>}</c>, where <c><anno>Key</anno></c> is the
+          largest key in <c><anno>B-Tree1</anno></c>, <c><anno>Value</anno></c>
+          is the value associated with this key, and <c><anno>B-Tree2</anno></c>
+          is this b-tree with the corresponding node deleted. Assumes that the
+          b-tree is not empty.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="take_smallest" arity="1"/>
+      <fsummary>Extract smallest key and value.</fsummary>
+      <desc>
+        <p>Returns <c>{<anno>Key</anno>, <anno>Value</anno>,
+          <anno>B-Tree2</anno>}</c>, where <c><anno>Key</anno></c> is the
+          smallest key in <c><anno>B-Tree1</anno></c>, <c><anno>Value</anno></c>
+          is the value associated with this key, and <c><anno>B-Tree2</anno></c>
+          is this b-tree with the corresponding node deleted. Assumes that the
+          b-tree is not empty.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="to_list" arity="1"/>
+      <fsummary>Convert a b-tree into a list.</fsummary>
+      <desc>
+        <p>Converts a b-tree into an ordered list of key-value tuples.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="update" arity="3"/>
+      <fsummary>Update a key to new value in a b-tree.</fsummary>
+      <desc>
+        <p>Updates <c><anno>Key</anno></c> to value <c><anno>Value</anno></c>
+          in <c><anno>B-Tree1</anno></c> and
+          returns the new b-tree. Assumes that the key is present in the b-tree.</p>
+      </desc>
+    </func>
+
+    <func>
+      <name name="values" arity="1"/>
+      <fsummary>Return a list of the values in a b-tree.</fsummary>
+      <desc>
+        <p>Returns the values in <c><anno>B-Tree</anno></c> as an ordered list,
+          sorted by their corresponding keys. Duplicates are not removed.</p>
+      </desc>
+    </func>
+  </funcs>
+
+
+  <section>
+    <title>See Also</title>
+    <p><seealso marker="gb_trees"><c>gb_trees(3)</c></seealso></p>
+  </section>
+
+</erlref>
+
