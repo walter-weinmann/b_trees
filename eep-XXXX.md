@@ -13,8 +13,9 @@ EEP XXX: B-trees: balanced search trees of order n.
 Abstract
 ========
 
-This EEP proposes the creation of a new module named b_trees for the administration of b-trees. 
-Both the optional persistence and the sort order should be implemented by pluggable functionality.
+This EEP proposes the creation of a new module named b_trees for the 
+administration of b-trees.  Both the optional persistence and the sort 
+order should be implemented by pluggable functionality.
 
 
 
@@ -28,13 +29,22 @@ This document has been placed in the public domain.
 Specification
 =============
 
-### Data Structure ###
 
-    {MinimumSubtrees, MaximumKeys, SizeKeyValues, SortFunction/2, State, Tree}
+## Data Structure ##
+
+    {MinimumSubtrees, 
+     MaximumKeys, 
+     SizeKeyValues, 
+     SortFunction/2, 
+     State, 
+     Tree}
 
 `Tree` is composed of nodes of the form 
 
-    {KeyNumber, SubtreeNumber, [{Key, Value}], [Tree]} 
+    {KeyNumber, 
+     SubtreeNumber, 
+     [{Key, Value}], 
+     [Tree]} 
 
 and the "empty b-tree" node 
 
@@ -42,14 +52,23 @@ and the "empty b-tree" node
 
 `State` is a tuple composed of the following parameters: 
 
-    {StateTarget, DeleteFunction/3, InsertFunction/3, LookupFunction/3} 
+    {StateTarget, 
+     DeleteFunction/3, 
+     InsertFunction/3, 
+     LookupFunction/3} 
 
-Since the b-trees are always balanced, there is no need for a balance operation.
+Since the b-trees are always balanced, there is no need for a balance 
+operation.
 
 
 ## DATA TYPES ##
 
-    b_tree() = {pos_integer(), pos_integer(), non_neg_integer(), sort_function(), state(), tree()}
+    b_tree() = {pos_integer(), 
+		pos_integer(), 
+		non_neg_integer(), 
+		sort_function(), 
+		state(), 
+		tree()}
 
 A general balanced tree.
 
@@ -67,7 +86,9 @@ Types:
     Key = any()
     B-Tree1 = B-Tree2 = b_tree()
 
-Removes the node with key Key from b-tree B-Tree1 and returns the new b-tree B-Tree2. Assumes that key Key is present in b-tree B-Tree1, crashes otherwise.
+Removes the node with key Key from b-tree B-Tree1 and returns the new 
+b-tree B-Tree2.  Assumes that key Key is present in b-tree B-Tree1, 
+crashes otherwise.
 
 ### delete_any (Key, B-Tree1) -> B-Tree2 ###
 
@@ -76,7 +97,8 @@ Types:
     Key = any()
     B-Tree1 = B-Tree2 = b_tree()
 
-Removes the node with key Key from b-tree B-Tree1 if key Key is present in b-tree B-Tree1, otherwise does nothing. Returns the new b-tree B-Tree2.
+Removes the node with key Key from b-tree B-Tree1 if key Key is present 
+in b-tree B-Tree1, otherwise does nothing.  Returns the new b-tree B-Tree2.
 
 ### empty (Order) -> B-Tree ###
 
@@ -85,7 +107,8 @@ Types:
     Order = pos_integer()
     B-Tree = b_tree()
 
-Returns a new empty b-tree. The order is defined as the maximum number of children nodes a non-leaf node may hold.
+Returns a new empty b-tree.  The order is defined as the maximum number 
+of children nodes a non-leaf node may hold.
 
 ### enter (Key, Value, B-Tree1) -> B-Tree2 ###
 
@@ -95,7 +118,9 @@ Types:
     Value = any()
     B-Tree1 = B-Tree2 = b_tree()
 
-Inserts key Key with value Value into b-tree B-Tree1 if key Key is not present in b-tree B-Tree1, otherwise updates the current value of key Key to value Value in b-tree B-Tree1. Returns a new b-tree B-Tree2.
+Inserts key Key with value Value into b-tree B-Tree1 if key Key is not 
+present in b-tree B-Tree1, otherwise updates the current value of key Key 
+to value Value in b-tree B-Tree1.  Returns a new b-tree B-Tree2.
 
 ### from_dict (B-Tree1, List) -> B-Tree2 ###
 
@@ -105,7 +130,8 @@ Types:
     List = [{Key, Value}]
 
 
-Turns an ordered list List of key value tuples into a b-tree. The given b-tree B-Tree1 must be empty. The list must not contain duplicate keys.
+Turns an ordered list List of key value tuples into a b-tree.  The given 
+b-tree B-Tree1 must be empty.  The list must not contain duplicate keys.
 
 ### get (Key, B-Tree) -> Value ###
 
@@ -115,7 +141,8 @@ Types:
     B-Tree = b_tree()
     Value = any()
     
-Retrieves the value stored with key Key in b-tree B-Tree. Assumes that key Key is present in b-tree B-Tree, crashes otherwise.
+Retrieves the value stored with key Key in b-tree B-Tree.  Assumes that 
+key Key is present in b-tree B-Tree, crashes otherwise.
 
 ### height (B-Tree) -> integer() >= 0 ###
 
@@ -123,7 +150,8 @@ Types:
 
     B-Tree = b_tree()
     
-Returns the height of b-tree B-Tree as an integer. Assumes that b-tree B-Tree is non-empty.
+Returns the height of b-tree B-Tree as an integer.  Assumes that b-tree 
+B-Tree is non-empty.
 
 ### insert (Key, Value, B-Tree1) -> B-Tree2 ###
 
@@ -133,7 +161,9 @@ Types:
     Value = any()
     B-Tree1 = B-Tree2 = b_tree()
     
-Inserts key Key with value Value into b-tree  B-Tree1 and returns the new b-tree B-Tree2. Assumes that key Key is **not** present in b-tree B-Tree1, crashes otherwise.
+Inserts key Key with value Value into b-tree  B-Tree1 and returns the new 
+b-tree B-Tree2.  Assumes that key Key is **not** present in b-tree B-Tree1, 
+crashes otherwise.
 
 ### is_defined (Key, B-Tree) -> boolean() ###
 
@@ -159,7 +189,13 @@ Types:
     B-Tree = b_tree()
     Iterator = iterator()
     
-Returns iterator Iterator that can be used for traversing the entries of b-tree B-Tree; see `next/1`. The implementation of this iterator is very efficient; traversing the whole b-tree using `next/1` is only slightly slower than getting the list of all key-value pairs using `to_list/1` and traversing that. The main advantage of the iterator approach is that it does not require the complete list of all key-value pairs to be built in memory at one time.
+Returns iterator Iterator that can be used for traversing the entries 
+of b-tree B-Tree; see `next/1`.  The implementation of this iterator is 
+very efficient; traversing the whole b-tree using `next/1` is only slightly
+slower than getting the list of all key-value pairs using `to_list/1` 
+and traversing that.  The main advantage of the iterator approach is that 
+it does not require the complete list of all key-value pairs to be built 
+in memory at one time.
 
 ### iterator_from (Key, B-Tree) -> Iterator ###
 
@@ -169,7 +205,10 @@ Types:
     B-Tree = b_tree()
     Iterator = iterator()
     
-Returns iterator Iterator that can be used for traversing the entries of b-tree B-Tree; see `next/1`. The difference, as compared to the iterator returned by iterator/1, is that the first key greater than or equal to key Key is returned.
+Returns iterator Iterator that can be used for traversing the entries 
+of b-tree B-Tree; see `next/1`.  The difference, as compared to the 
+iterator returned by iterator/1, is that the first key greater than 
+or equal to key Key is returned.
 
 ### keys (B-Tree) -> [Key] ###
 
@@ -188,7 +227,9 @@ Types:
     Key = any()
     Value = any()
     
-Returns a tuple {Key, Value}, where Key is the largest key in b-tree B-Tree, and Value is the value associated with this key. Assumes that b-tree B-Tree is not empty.
+Returns a tuple {Key, Value}, where Key is the largest key in b-tree 
+B-Tree, and Value is the value associated with this key.  Assumes that 
+b-tree B-Tree is not empty.
 
 ### lookup (Key, B-Tree) -> none | {value, Value} ###
 
@@ -198,7 +239,8 @@ Types:
     B-Tree = b_tree()
     Value = any()
     
-Looks up key Key in b-tree B-Tree. Returns {value, Value}, or none if key Key is not present.
+Looks up key Key in b-tree B-Tree. Returns {value, Value}, or none if 
+key Key is not present.
 
 ### map (Function, B-Tree1) -> B-Tree2 ###
 
@@ -209,7 +251,9 @@ Types:
     Key = any()
     Value1 = Value2 = any()
     
-Maps function Function(Key, Value1) -> Value2 to all key value pairs of b-tree B-Tree1. Returns the new b-tree B-Tree2 with the same set of keys as b-tree B-Tree1 and the new set of values.
+Maps function Function(Key, Value1) -> Value2 to all key value pairs of 
+b-tree B-Tree1.  Returns the new b-tree B-Tree2 with the same set of 
+keys as b-tree B-Tree1 and the new set of values.
 
 ### next (Iterator1) -> 'none' | {Key, Value, Iterator2} ###
 
@@ -220,19 +264,30 @@ Types:
     Value = any()
     
 
-Returns the tuple {Key, Value, Iterator2}, where Key is the smallest key referred to by iterator Iterator1, and iterator Iterator2 is the new iterator to be used for traversing the remaining nodes, or the atom '**none**' if no nodes remain.
+Returns the tuple {Key, Value, Iterator2}, where Key is the smallest 
+key referred to by iterator Iterator1, and iterator Iterator2 is the 
+new iterator to be used for traversing the remaining nodes, or the 
+atom '**none**' if no nodes remain.
 
 ### set_parameter (B-Tree1, Name, Value) -> B-Tree2 ###
 
 Types:
 
     B-Tree1 = B-Tree2 = b_tree()
-    Name : Value = sort  : Function = fun((Key1, Key2) -> equal | greater | less)
-                 | state : {StateTarget, Function = fun(StateTarget, delete, Key) -> true,
-                                         Function = fun(StateTarget, insert, Subtrees) -> Key,
-                                         Function = fun(StateTarget, lookup, Key) -> Subtrees}
+    Name : Value = sort  : Function = fun((Key1, Key2) -> equal | 
+                                                          greater | 
+                                                          less)
+                 | state : {StateTarget, 
+                            Function = fun(StateTarget, delete, Key) 
+                                     -> true,
+                            Function = fun(StateTarget, insert, Subtrees) 
+                                     -> Key,
+                            Function = fun(StateTarget, lookup, Key) 
+                                     -> Subtrees}
     
-Sets the parameter Name to value Value in the empty b-tree B-Tree1 and returns the new b-tree B-Tree2. This function can only be used in conjunction with an empty b-tree.
+Sets the parameter Name to value Value in the empty b-tree B-Tree1 and 
+returns the new b-tree B-Tree2.  This function can only be used in 
+conjunction with an empty b-tree.
 
 ### size_key_values (B-Tree) -> integer() >= 0 ###
 
@@ -240,7 +295,8 @@ Types:
 
     B-Tree = b_tree()
 
-Returns the number of key value pairs in b-tree B-Tree as an integer. Returns 0 (zero) if b-tree B-Tree is empty.
+Returns the number of key value pairs in b-tree B-Tree as an integer.  
+Returns 0 (zero) if b-tree B-Tree is empty.
 
 ### size_nodes (B-Tree) -> {integer() >= 0, integer() >= 0} ###
 
@@ -248,7 +304,9 @@ Types:
 
     B-Tree = b_tree()
 
-Returns the number of total nodes and the number of leaf nodes in b-tree B-Tree as a tuple of two integers. Returns {0, 0} (zero) if b-tree B-Tree is empty.
+Returns the number of total nodes and the number of leaf nodes in b-tree 
+B-Tree as a tuple of two integers.  Returns {0, 0} (zero) if b-tree B-Tree 
+is empty.
 
 ### smallest (B-Tree) -> {Key, Value} ###
 
@@ -258,7 +316,9 @@ Types:
     Key = any()
     Value = any()
     
-Returns tuple {Key, Value}, where Key is the smallest key in b-tree B-Tree, and Value is the value associated with this key. Assumes that b-tree B-Tree is not empty.
+Returns tuple {Key, Value}, where Key is the smallest key in b-tree 
+B-Tree, and Value is the value associated with this key.  Assumes that 
+b-tree B-Tree is not empty.
 
 ### sort_ascending (Key1, Key2) -> 'equal' | 'greater' | 'less' ###
 
@@ -267,7 +327,8 @@ Types:
     Key1 = Key2  = any()
     equal = greater = less = atom()
     
-Returns the atom '**greater**' if Key1 > Key2, the atom '**less**' if Key1 < Key2 and otherwise the atom '**equal**'.
+Returns the atom '**greater**' if Key1 > Key2, the atom '**less**' 
+if Key1 < Key2 and otherwise the atom '**equal**'.
 
 ### sort_descending (Key1, Key2) -> 'equal' | 'greater' | 'less' ###
 
@@ -276,7 +337,8 @@ Types:
     Key1 = Key2  = any()
     equal = greater = less = atom()
     
-Returns the atom '**less**' if Key1 > Key2, the atom '**greater**' if Key1 < Key2 and otherwise the atom '**equal**'.
+Returns the atom '**less**' if Key1 > Key2, the atom '**greater**' 
+if Key1 < Key2 and otherwise the atom '**equal**'.
 
 ### take(Key, B-Tree1) -> B-Tree2 ###
 
@@ -285,7 +347,9 @@ Types:
     Key = any()
     B-Tree1 = B-Tree2 = b_tree()
 
-Removes the node with key Key from b-tree B-Tree1 and returns the new b-tree B-Tree2. Assumes that key Key is present in b-tree B-Tree1, crashes otherwise.
+Removes the node with key Key from b-tree B-Tree1 and returns the new 
+b-tree B-Tree2.  Assumes that key Key is present in b-tree B-Tree1, 
+crashes otherwise.
 
 ### delete_any (Key, B-Tree1) -> B-Tree2 ###
 
@@ -294,7 +358,8 @@ Types:
     Key = any()
     B-Tree1 = B-Tree2 = b_tree()
 
-Removes the node with key Key from b-tree B-Tree1 if key Key is present in b-tree B-Tree1, otherwise does nothing. Returns the new b-tree B-Tree2.
+Removes the node with key Key from b-tree B-Tree1 if key Key is present 
+in b-tree B-Tree1, otherwise does nothing. Returns the new b-tree B-Tree2.
 
 ### take_largest (B-Tree1) -> {Key, Value, B-Tree2} ###
 
@@ -304,7 +369,10 @@ Types:
     Key = any()
     Value = any()
     
-Returns tuple {Key, Value, B-Tree2}, where Key is the largest key in b-tree B-Tree1, Value is the value associated with this key, and b-tree B-Tree2 is this b-tree with the corresponding key value pair deleted. Assumes that b-tree B-Tree1 is not empty.
+Returns tuple {Key, Value, B-Tree2}, where Key is the largest key in 
+b-tree B-Tree1, Value is the value associated with this key, and b-tree 
+B-Tree2 is this b-tree with the corresponding key value pair deleted.  
+Assumes that b-tree B-Tree1 is not empty.
 
 ### take_smallest (B-Tree1) -> {Key, Value, B-Tree2} ###
 
@@ -314,7 +382,10 @@ Types:
     Key = any()
     Value = any()
     
-Returns tuple {Key, Value, B-Tree2}, where Key is the smallest key in b-tree B-Tree1, Value is the value associated with this key, and b-tree B-Tree2 is this b-tree with the corresponding key value pair deleted. Assumes that b-tree B-Tree1 is not empty.
+Returns tuple {Key, Value, B-Tree2}, where Key is the smallest key in 
+b-tree B-Tree1, Value is the value associated with this key, and b-tree 
+B-Tree2 is this b-tree with the corresponding key value pair deleted.  
+Assumes that b-tree B-Tree1 is not empty.
 
 ### to_list (B-Tree) -> [{Key, Value}] ###
 
@@ -335,7 +406,8 @@ Types:
     B-Tree1 = B-Tree2 = b_tree()
 
 
-Updates key Key to value Value in b-tree B-Tree1 and returns the new b-tree B-Tree2. Assumes that key Key is present in b-tree B-Tree1.
+Updates key Key to value Value in b-tree B-Tree1 and returns the new 
+b-tree B-Tree2.  Assumes that key Key is present in b-tree B-Tree1.
 
 ### values (B-Tree) -> [Value] ###
 
@@ -344,7 +416,9 @@ Types:
     B-Tree = b_tree()
     Value = any()
 
-Returns the values in b-tree B-Tree as an ordered list, sorted by their corresponding keys. Duplicates are not removed.
+Returns the values in b-tree B-Tree as an ordered list, sorted by their 
+corresponding keys.  Duplicates are not removed.
+
 
 ## Pluggable Persistence Functionality ##
 
@@ -360,7 +434,13 @@ Returns the values in b-tree B-Tree as an ordered list, sorted by their correspo
     
     LookupFunction(StateTarget, lookup, Key) -> Subtrees
 
-Examples for state targets are a Dets table or a Mnesia table. The delete function takes a state target, the atom `delete` and a key as arguments and returns the atom `true` if successful. The insert function takes a state target, the atom `insert` and a subtrees data structure as arguments and returns a key if successful. The lookup function takes a state target, the atom `lookup` and a key as arguments and returns a subtrees data structure if successful.
+Examples for state targets are a Dets table or a Mnesia table.  The delete 
+function takes a state target, the atom `delete` and a key as arguments 
+and returns the atom `true` if successful.  The insert function takes a 
+state target, the atom `insert` and a subtrees data structure as arguments 
+and returns a key if successful.  The lookup function takes a state target, 
+the atom `lookup` and a key as arguments and returns a subtrees data 
+structure if successful.
 
 ### Example functions: ###
 
@@ -394,7 +474,7 @@ The following examples are based on Mnesia.
         end,
     mnesia:activity(transaction, F).
 
-## Pluggable Sort Functionality ##
+### Example usage: ###
 
 Creating the Mnesia table:
 
@@ -407,6 +487,7 @@ Creating the b-tree:
     BTree1 = b_trees:empty(500),
     BTree2 = b_trees:set_parameter(BTree1, state, {StateTargetName, fun persistence_by_mnesia/3, fun persistence_by_mnesia/3, fun persistence_by_mnesia/3}),
 
+
 ## Pluggable Sort Functionality ##
 
 ### Format: ###
@@ -415,7 +496,9 @@ Creating the b-tree:
     
     Key1 = Key2 = any()
 
-The sort function takes two keys as arguments and returns the atom `less` if Key1 < Key2, the atom `greater` if Key1 > Key2 and otherwise the atom `equal`.
+The sort function takes two keys as arguments and returns the atom `less` 
+if Key1 < Key2, the atom `greater` if Key1 > Key2 and otherwise the 
+atom `equal`.
 
 ### Example function: ###
 
@@ -438,10 +521,13 @@ The sort function takes two keys as arguments and returns the atom `less` if Key
 Motivation
 ==========
 
-B-trees are self-balancing tree data structures that keep data sorted and allow searches, sequential access, insertions, and deletions in logarithmic time. 
-B-trees are a generalization of a binary search trees in that a node can have more than two children. 
-Unlike self-balancing binary search trees, the b-tree is optimized for systems that read and write large blocks of data. 
-B-trees are a good example of a data structure for external memory.
+B-trees are self-balancing tree data structures that keep data sorted 
+and allow searches, sequential access, insertions, and deletions in 
+logarithmic time.  B-trees are a generalization of a binary search 
+trees in that a node can have more than two children.  Unlike self-balancing 
+binary search trees, the b-tree is optimized for systems that read and 
+write large blocks of data.  B-trees are a good example of a data structure 
+for external memory.
 
 
 
