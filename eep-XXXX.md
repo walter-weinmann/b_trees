@@ -64,11 +64,11 @@ operation.
 ## DATA TYPES ##
 
     b_tree() = {pos_integer(), 
-		pos_integer(), 
-		non_neg_integer(), 
-		sort_function(), 
-		state(), 
-		tree()}
+                pos_integer(), 
+                non_neg_integer(), 
+                sort_function(), 
+                state(), 
+                tree()}
 
 A general balanced tree.
 
@@ -446,7 +446,8 @@ structure if successful.
 
 The following examples are based on Mnesia.
 
-    persistence_by_mnesia(_, delete, SubtreesKey) when is_list(SubtreesKey) ->
+    persistence_by_mnesia(_, delete, SubtreesKey) 
+                         when is_list(SubtreesKey) ->
         true;
     persistence_by_mnesia(StateTarget, delete, SubtreesKey) ->
         F = fun() ->
@@ -457,19 +458,24 @@ The following examples are based on Mnesia.
         
     persistence_by_mnesia(_, insert, []) ->
         [];
-    persistence_by_mnesia(StateTarget, insert, [{_, _, [{Key, _} | _], _} | _] = Subtrees) ->
+    persistence_by_mnesia(StateTarget, insert, 
+                          [{_, _, [{Key, _} | _], _} | _] = Subtrees) ->
         SubtreesKey = list_to_binary(Key),
         F = fun() ->
-            ok = mnesia:write(StateTarget, #subtrees{subtreesKey = SubtreesKey, subtrees = Subtrees}, write),
+            ok = mnesia:write(StateTarget, 
+                              #subtrees{subtreesKey = SubtreesKey, 
+                              subtrees = Subtrees}, write),
             SubtreesKey
         end,
         mnesia:activity(transaction, F);
         
-    persistence_by_mnesia(_, lookup, SubtreesKey) when is_list(SubtreesKey) ->
+    persistence_by_mnesia(_, lookup, SubtreesKey) 
+                         when is_list(SubtreesKey) ->
         SubtreesKey;
     persistence_by_mnesia(StateTarget, lookup, SubtreesKey) ->
         F = fun() ->
-            [{subtrees, SubtreesKey, Subtrees}] = mnesia:read(StateTarget, SubtreesKey),
+            [{subtrees, SubtreesKey, Subtrees}] = mnesia:read(StateTarget, 
+                                                              SubtreesKey),
             Subtrees
         end,
     mnesia:activity(transaction, F).
@@ -480,12 +486,17 @@ Creating the Mnesia table:
 
     -record(subtrees, {subtreesKey, subtrees}).
         
-    {atomic, ok} = mnesia:create_table(StateTargetName, [{record_name, subtrees}]),
+    {atomic, ok} = mnesia:create_table(StateTargetName, [{record_name, 
+                                                          subtrees}]),
 
 Creating the b-tree:
 
     BTree1 = b_trees:empty(500),
-    BTree2 = b_trees:set_parameter(BTree1, state, {StateTargetName, fun persistence_by_mnesia/3, fun persistence_by_mnesia/3, fun persistence_by_mnesia/3}),
+    BTree2 = b_trees:set_parameter(BTree1, state, 
+                                   {StateTargetName, 
+                                    fun persistence_by_mnesia/3, 
+                                    fun persistence_by_mnesia/3, 
+                                    fun persistence_by_mnesia/3}),
 
 
 ## Pluggable Sort Functionality ##
@@ -534,11 +545,48 @@ for external memory.
 Rationale
 =========
 
-B-trees are self-balancing tree data structure that keep data sorted and allows searches, sequential access, 
-insertions, and deletions in logarithmic time. B-trees are a generalization of a binary search trees in that 
-a node can have more than two children. Unlike self-balancing binary search trees, the B-tree is optimized 
-for systems that read and write large blocks of data. B-trees are a good example of a data structure for 
-external memory.
+The functional design of the module b_trees is based on the module gb_trees.  
+
+<table>
+  <tr><th>b_trees</th>          <th>gb_trees</th></tr>
+
+  <tr><td>n/a/1</td>            <td>balance/1</td></tr>
+  <tr><td>delete/2/1</td>       <td>delete/2</td></tr>
+  <tr><td>delete_any/2</td>     <td>delete_any/2</td></tr>
+  <tr><td>empty/1</td>          <td>empty/0</td></tr>
+  <tr><td>enter/3/1</td>        <td>enter/3</td></tr>
+  <tr><td>from_dict/2</td>      <td>from_orddict/1</td></tr>
+  <tr><td>get/2</td>            <td>get/2</td></tr>
+  <tr><td>height/1</td>         <td>n/a</td></tr>
+  <tr><td>insert/3</td>         <td>insert/3</td></tr>
+  <tr><td>is_defined/2</td>     <td>is_defined/2</td></tr>
+  <tr><td>is_empty/1</td>       <td>is_empty/1</td></tr>
+  <tr><td>iterator/1</td>       <td>iterator/1</td></tr>
+  <tr><td>iterator_from/2</td>  <td>iterator_from/2</td></tr>
+  <tr><td>keys/1</td>           <td>keys/1</td></tr>
+  <tr><td>largest/1</td>        <td>largest/1</td></tr>
+  <tr><td>lookup/2</td>         <td>lookup/2</td></tr>
+  <tr><td>map/2</td>            <td>map/2</td></tr>
+  <tr><td>next/1</td>           <td>next/1</td></tr>
+  <tr><td>set_parameter/3</td>  <td>n/a</td></tr>
+  <tr><td>size_key_values/1</td><td>size/2</td></tr>
+  <tr><td>size_nodes/1</td>     <td>n/a</td></tr>
+  <tr><td>smallest/1</td>       <td>smallest/2</td></tr>
+  <tr><td>sort_ascending/2</td> <td>n/a</td></tr>
+  <tr><td>sort_descending/2</td><td>n/a</td></tr>
+  <tr><td>take/2/2</td>         <td>take/2</td></tr>
+  <tr><td>take_any/2/2</td>     <td>take_any/2</td></tr>
+  <tr><td>take_largest/1</td>   <td>take_largest/1</td></tr>
+  <tr><td>take_smallest/1</td>  <td>take_smallest/1</td></tr>
+  <tr><td>to_list/1</td>        <td>to_list/1</td></tr>
+  <tr><td>update/3</td>         <td>update/3</td></tr>
+  <tr><td>values/1</td>         <td>values/1</td></tr>
+</table>
+
+The functions delete / 2 and insert / 3 are an implementation of the algorithms 
+of Cormen, Thomas; Leiserson, Charles; Rivest, Ronald; Stein, Clifford (2009), 
+Introduction to Algorithms (Third ed.), MIT Press and McGraw-Hill, pp. 484-504, 
+ISBN 0-262-03384-4. Chapter 18: B-Trees.
 
 
 
