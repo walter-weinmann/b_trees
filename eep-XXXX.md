@@ -545,16 +545,17 @@ for external memory.
 Rationale
 =========
 
-The functional design of the module b_trees is based on the module gb_trees.  
+The functional design of the module b_trees is based on the module gb_trees:  
 
+<center>
 <table>
   <tr><th>b_trees</th>          <th>gb_trees</th></tr>
 
-  <tr><td>n/a/1</td>            <td>balance/1</td></tr>
-  <tr><td>delete/2/1</td>       <td>delete/2</td></tr>
+  <tr><td>n/a</td>              <td>balance/1</td></tr>
+  <tr><td>delete/2</td>         <td>delete/2</td></tr>
   <tr><td>delete_any/2</td>     <td>delete_any/2</td></tr>
   <tr><td>empty/1</td>          <td>empty/0</td></tr>
-  <tr><td>enter/3/1</td>        <td>enter/3</td></tr>
+  <tr><td>enter/3</td>          <td>enter/3</td></tr>
   <tr><td>from_dict/2</td>      <td>from_orddict/1</td></tr>
   <tr><td>get/2</td>            <td>get/2</td></tr>
   <tr><td>height/1</td>         <td>n/a</td></tr>
@@ -569,21 +570,22 @@ The functional design of the module b_trees is based on the module gb_trees.
   <tr><td>map/2</td>            <td>map/2</td></tr>
   <tr><td>next/1</td>           <td>next/1</td></tr>
   <tr><td>set_parameter/3</td>  <td>n/a</td></tr>
-  <tr><td>size_key_values/1</td><td>size/2</td></tr>
+  <tr><td>size_key_values/1</td><td>size/1</td></tr>
   <tr><td>size_nodes/1</td>     <td>n/a</td></tr>
-  <tr><td>smallest/1</td>       <td>smallest/2</td></tr>
+  <tr><td>smallest/1</td>       <td>smallest/1</td></tr>
   <tr><td>sort_ascending/2</td> <td>n/a</td></tr>
   <tr><td>sort_descending/2</td><td>n/a</td></tr>
-  <tr><td>take/2/2</td>         <td>take/2</td></tr>
-  <tr><td>take_any/2/2</td>     <td>take_any/2</td></tr>
+  <tr><td>take/2</td>           <td>take/2</td></tr>
+  <tr><td>take_any/2</td>       <td>take_any/2</td></tr>
   <tr><td>take_largest/1</td>   <td>take_largest/1</td></tr>
   <tr><td>take_smallest/1</td>  <td>take_smallest/1</td></tr>
   <tr><td>to_list/1</td>        <td>to_list/1</td></tr>
   <tr><td>update/3</td>         <td>update/3</td></tr>
   <tr><td>values/1</td>         <td>values/1</td></tr>
 </table>
+</center>
 
-The functions delete / 2 and insert / 3 are an implementation of the algorithms 
+The functions delete/2 and insert/3 are an implementation of the algorithms 
 of Cormen, Thomas; Leiserson, Charles; Rivest, Ronald; Stein, Clifford (2009), 
 Introduction to Algorithms (Third ed.), MIT Press and McGraw-Hill, pp. 484-504, 
 ISBN 0-262-03384-4. Chapter 18: B-Trees.
