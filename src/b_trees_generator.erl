@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%%% File        : test_generator.erl
+%%% File        : b_trees_generator.erl
 %%% Description : Generating B-trees for testing purposes.
 %%%
 %%% Created     : 09.09.2016
@@ -7,7 +7,7 @@
 %%% Copyright (C) 2016 Walter Weinmann
 %%%-------------------------------------------------------------------
 
--module(test_generator).
+-module(b_trees_generator).
 
 -include_lib("eunit/include/eunit.hrl").
 
