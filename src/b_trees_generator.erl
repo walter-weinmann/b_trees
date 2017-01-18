@@ -13,7 +13,7 @@
 
 -define(B_TREE_POS_SORT, 4).
 -define(B_TREE_POS_STATE, 5).
--define(DIRECTORY_DETS, "test/tmp/").
+-define(DIRECTORY_DETS, "/test/tmp/").
 -define(VALUE_UPDATE_SUFFIX, "_new").
 
 -export([
@@ -31,8 +31,10 @@
     delete_b_tree_from_odd/4,
     delete_b_tree_list/2,
     delete_b_tree_till/3,
+    delete_directory/1,
     delete_gb_tree_from/2,
     ets_owner/0,
+    generate_b_tree_by_key_1/4,
     generate_b_tree_from_number/3,
     generate_b_tree_from_number/4,
     generate_b_tree_from_number_desc/3,
@@ -746,6 +748,16 @@ delete_b_tree_1([], BTree) ->
     BTree;
 delete_b_tree_1([Key | Tail], BTree) ->
     delete_b_tree_1(Tail, b_trees:delete(Key, BTree)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+delete_directory(Dir) ->
+    Paths = filelib:wildcard(Dir ++ "/**"),
+    {Dirs, Files} = lists:partition(fun filelib:is_dir/1, Paths),
+    ok = lists:foreach(fun file:delete/1, Files),
+    Sorted = lists:reverse(lists:sort(Dirs)),
+    ok = lists:foreach(fun file:del_dir/1, Sorted),
+    file:del_dir(Dir).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
