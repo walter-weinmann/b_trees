@@ -73,6 +73,18 @@
 
   <funcs>
     <func>
+      <name name="copy" arity="2"/>
+      <fsummary>Copy a tree to an empty tree.</fsummary>
+      <desc>
+        <p>Copies tree <c><anno>Tree1</anno></c> to an empty tree 
+          <c><anno>Tree2</anno></c>. Both trees may be either of 
+          b-tree or binary tree (gb_trees). Returns the new tree 
+          <c><anno>Tree3</anno></c> of the same type as tree 
+          <c><anno>Tree2</anno></c>.</p>
+      </desc>
+    </func>
+
+    <func>
       <name name="delete" arity="2"/>
       <fsummary>Remove a node from a b-tree.</fsummary>
       <desc>

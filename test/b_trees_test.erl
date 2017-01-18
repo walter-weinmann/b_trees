@@ -13,7 +13,206 @@
 
 -include_lib("../include/b_trees_templates.hrl").
 
+-define(DIRECTORY_DETS, "/test/tmp/").
 -define(TIMEOUT, 60).
+
+%%--------------------------------------------------------------------
+%% TEST CASES: copy
+%%--------------------------------------------------------------------
+
+copy_test() ->
+
+    %%----------------------------------------------------------------
+    %% Initializing
+    %%----------------------------------------------------------------
+
+    ok = filelib:ensure_dir(?DIRECTORY_DETS),
+    ok = b_trees_generator:delete_directory(?DIRECTORY_DETS),
+    ok = filelib:ensure_dir(?DIRECTORY_DETS),
+    {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
+    {ok, _} = dets:open_file(b_tree_4_dets_empty, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets_empty"}]),
+
+    case ok == mnesia:create_schema([node()]) of
+        true ->
+            ok;
+        _ ->
+            ok = mnesia:delete_schema([node()]),
+            mnesia:create_schema([node()])
+    end,
+    ok = mnesia:start(),
+
+    %%----------------------------------------------------------------
+    %% Creating templates.
+    %%----------------------------------------------------------------
+
+    B_TREE_04_EMPTY = b_trees:empty(4),
+    B_TREE_04_EMPTY_DETS = b_trees:set_parameter(b_trees:empty(4), state, {b_tree_4_dets_empty, fun b_trees_generator:persistence_by_dets/3, fun b_trees_generator:persistence_by_dets/3, fun b_trees_generator:persistence_by_dets/3}),
+    B_TREE_04_EMPTY_ETS = b_trees_generator:generate_b_tree_from_number_ets(4, 0, 2, b_tree_4_ets_empty, spawn(fun b_trees_generator:ets_owner/0)),
+    B_TREE_04_EMPTY_MEMORY = b_trees:empty(4),
+    B_TREE_04_EMPTY_MNESIA = b_trees_generator:generate_b_tree_from_number_mnesia(4, 0, 2, b_tree_4_mnesia_empty),
+
+    B_TREE_04_64 = b_trees_generator:generate_b_tree_from_number(4, 64, 2),
+    B_TREE_04_64_DETS_0 = b_trees:set_parameter(b_trees:empty(4), state, {b_tree_4_dets_empty, fun b_trees_generator:persistence_by_dets/3, fun b_trees_generator:persistence_by_dets/3, fun b_trees_generator:persistence_by_dets/3}),
+    B_TREE_04_64_DETS = b_trees_generator:generate_b_tree_by_key_1(lists:seq(1, 64), [], 2, B_TREE_04_64_DETS_0),
+    B_TREE_04_64_ETS = b_trees_generator:generate_b_tree_from_number_ets(4, 64, 2, b_tree_4_ets, spawn(fun b_trees_generator:ets_owner/0)),
+    B_TREE_04_64_MNESIA = b_trees_generator:generate_b_tree_from_number_mnesia(4, 64, 2, b_tree_4_mnesia),
+
+    GB_TREE_EMPTY = gb_trees:empty(),
+    GB_TREE_64 = b_trees_generator:generate_gb_tree_from_number(64, 2),
+
+    %%----------------------------------------------------------------
+    %% binary tree ===>
+    %%----------------------------------------------------------------
+
+    % binary tree ===> binary_tree
+    GB_TREE_64_COPY_1 = b_trees:copy(GB_TREE_64, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_64, GB_TREE_64_COPY_1),
+
+    % binary tree ===> b_tree in memory
+    B_TREE_04_64_COPY = b_trees:copy(GB_TREE_64, B_TREE_04_EMPTY_MEMORY),
+    ?assertEqual(B_TREE_04_64, B_TREE_04_64_COPY),
+
+    % binary tree ===> b_tree in dets
+    B_TREE_04_64_DETS_COPY = b_trees:copy(GB_TREE_64, B_TREE_04_EMPTY_DETS),
+    b_trees_generator:check_equal(B_TREE_04_64_DETS, B_TREE_04_64_DETS_COPY),
+
+    % binary tree ===> b_tree in ets
+    B_TREE_04_64_ETS_COPY = b_trees:copy(GB_TREE_64, B_TREE_04_EMPTY_ETS),
+    b_trees_generator:check_equal(B_TREE_04_64_ETS, B_TREE_04_64_ETS_COPY),
+
+    % binary tree ===> b_tree in mnesia
+    B_TREE_04_64_MNESIA_COPY = b_trees:copy(GB_TREE_64, B_TREE_04_EMPTY_MNESIA),
+    b_trees_generator:check_equal(B_TREE_04_64_MNESIA, B_TREE_04_64_MNESIA_COPY),
+
+    %%----------------------------------------------------------------
+    %% binary tree empty ===>
+    %%----------------------------------------------------------------
+
+    % binary tree  ===> b_tree
+    B_TREE_COPY_1_1 = b_trees:copy(GB_TREE_EMPTY, B_TREE_04_EMPTY_DETS),
+    ?assertEqual(B_TREE_04_EMPTY_DETS, B_TREE_COPY_1_1),
+
+    % binary tree  ===> binary tree
+    GB_TREE_COPY_1_1 = b_trees:copy(GB_TREE_EMPTY, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_EMPTY, GB_TREE_COPY_1_1),
+
+    %%----------------------------------------------------------------
+    %% b_tree empty ===>
+    %%----------------------------------------------------------------
+
+    % b_tree  ===> b_tree
+    B_TREE_COPY_1_2 = b_trees:copy(B_TREE_04_EMPTY, B_TREE_04_EMPTY_DETS),
+    ?assertEqual(B_TREE_04_EMPTY_DETS, B_TREE_COPY_1_2),
+
+    % b_tree  ===> binary tree
+    GB_TREE_COPY_1_2 = b_trees:copy(B_TREE_04_EMPTY, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_EMPTY, GB_TREE_COPY_1_2),
+
+    %%----------------------------------------------------------------
+    %% b_tree memory ===>
+    %%----------------------------------------------------------------
+
+    % b-tree in memory ===> b-tree in memory
+    B_TREE_04_64_COPY_2_1 = b_trees:copy(B_TREE_04_64, B_TREE_04_EMPTY),
+    ?assertEqual(B_TREE_04_64, B_TREE_04_64_COPY_2_1),
+
+    % b-tree in memory ===> b-tree in dets
+    B_TREE_04_64_COPY_2_2 = b_trees:copy(B_TREE_04_64, B_TREE_04_EMPTY_DETS),
+    b_trees_generator:check_equal(B_TREE_04_64_DETS, B_TREE_04_64_COPY_2_2),
+
+    % b-tree in memory ===> b-tree in ets
+    B_TREE_04_64_COPY_2_3 = b_trees:copy(B_TREE_04_64, B_TREE_04_EMPTY_ETS),
+    b_trees_generator:check_equal(B_TREE_04_64_ETS, B_TREE_04_64_COPY_2_3),
+
+    % b-tree in memory ===> b-tree in mnesia
+    B_TREE_04_64_COPY_2_4 = b_trees:copy(B_TREE_04_64, B_TREE_04_EMPTY_MNESIA),
+    b_trees_generator:check_equal(B_TREE_04_64_MNESIA, B_TREE_04_64_COPY_2_4),
+
+    % b-tree in memory ===> binary_tree
+    GB_TREE_64_COPY_2 = b_trees:copy(B_TREE_04_64, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_64, GB_TREE_64_COPY_2),
+
+    %%----------------------------------------------------------------
+    %% b_tree dets ===>
+    %%----------------------------------------------------------------
+
+    % b-tree in dets ===> b-tree in memory
+    B_TREE_04_64_COPY_3_1 = b_trees:copy(B_TREE_04_64_DETS, B_TREE_04_EMPTY),
+    b_trees_generator:check_equal(B_TREE_04_64, B_TREE_04_64_COPY_3_1),
+
+    % b-tree in dets ===> b-tree in dets
+    B_TREE_04_64_COPY_3_2 = b_trees:copy(B_TREE_04_64_DETS, B_TREE_04_EMPTY_DETS),
+    b_trees_generator:check_equal(B_TREE_04_64_DETS, B_TREE_04_64_COPY_3_2),
+
+    % b-tree in dets ===> b-tree in ets
+    B_TREE_04_64_COPY_3_3 = b_trees:copy(B_TREE_04_64_DETS, B_TREE_04_EMPTY_ETS),
+    b_trees_generator:check_equal(B_TREE_04_64_ETS, B_TREE_04_64_COPY_3_3),
+
+    % b-tree in dets ===> b-tree in mnesia
+    B_TREE_04_64_COPY_3_4 = b_trees:copy(B_TREE_04_64_DETS, B_TREE_04_EMPTY_MNESIA),
+    b_trees_generator:check_equal(B_TREE_04_64_MNESIA, B_TREE_04_64_COPY_3_4),
+
+    % b-tree in dets ===> binary_tree
+    GB_TREE_64_COPY_3 = b_trees:copy(B_TREE_04_64_DETS, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_64, GB_TREE_64_COPY_3),
+
+    %%----------------------------------------------------------------
+    %% b_tree ets ===>
+    %%----------------------------------------------------------------
+
+    % b-tree in ets ===> b-tree in memory
+    B_TREE_04_64_COPY_4_1 = b_trees:copy(B_TREE_04_64_ETS, B_TREE_04_EMPTY),
+    b_trees_generator:check_equal(B_TREE_04_64, B_TREE_04_64_COPY_4_1),
+
+    % b-tree in ets ===> b-tree in dets
+    B_TREE_04_64_COPY_4_2 = b_trees:copy(B_TREE_04_64_ETS, B_TREE_04_EMPTY_DETS),
+    b_trees_generator:check_equal(B_TREE_04_64_ETS, B_TREE_04_64_COPY_4_2),
+
+    % b-tree in ets ===> b-tree in ets
+    B_TREE_04_64_COPY_4_3 = b_trees:copy(B_TREE_04_64_ETS, B_TREE_04_EMPTY_ETS),
+    b_trees_generator:check_equal(B_TREE_04_64_ETS, B_TREE_04_64_COPY_4_3),
+
+    % b-tree in ets ===> b-tree in mnesia
+    B_TREE_04_64_COPY_4_4 = b_trees:copy(B_TREE_04_64_ETS, B_TREE_04_EMPTY_MNESIA),
+    b_trees_generator:check_equal(B_TREE_04_64_MNESIA, B_TREE_04_64_COPY_4_4),
+
+    % b-tree in ets ===> binary_tree
+    GB_TREE_64_COPY_4 = b_trees:copy(B_TREE_04_64_ETS, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_64, GB_TREE_64_COPY_4),
+
+    %%----------------------------------------------------------------
+    %% b_tree mnesia ===>
+    %%----------------------------------------------------------------
+
+    % b-tree in mnesia ===> b-tree in memory
+    B_TREE_04_64_COPY_5_1 = b_trees:copy(B_TREE_04_64_MNESIA, B_TREE_04_EMPTY),
+    b_trees_generator:check_equal(B_TREE_04_64, B_TREE_04_64_COPY_5_1),
+
+    % b-tree in mnesia ===> b-tree in dets
+    B_TREE_04_64_COPY_5_2 = b_trees:copy(B_TREE_04_64_MNESIA, B_TREE_04_EMPTY_DETS),
+    b_trees_generator:check_equal(B_TREE_04_64_MNESIA, B_TREE_04_64_COPY_5_2),
+
+    % b-tree in mnesia ===> b-tree in ets
+    B_TREE_04_64_COPY_5_3 = b_trees:copy(B_TREE_04_64_MNESIA, B_TREE_04_EMPTY_ETS),
+    b_trees_generator:check_equal(B_TREE_04_64_ETS, B_TREE_04_64_COPY_5_3),
+
+    % b-tree in mnesia ===> b-tree in mnesia
+    B_TREE_04_64_COPY_5_4 = b_trees:copy(B_TREE_04_64_MNESIA, B_TREE_04_EMPTY_MNESIA),
+    b_trees_generator:check_equal(B_TREE_04_64_MNESIA, B_TREE_04_64_COPY_5_4),
+
+    % b-tree in mnesia ===> binary_tree
+    GB_TREE_64_COPY_5 = b_trees:copy(B_TREE_04_64_MNESIA, GB_TREE_EMPTY),
+    ?assertEqual(GB_TREE_64, GB_TREE_64_COPY_5),
+
+    %%----------------------------------------------------------------
+    %% Finalizing
+    %%----------------------------------------------------------------
+
+    ok = dets:close(b_tree_4_dets),
+    ok = dets:close(b_tree_4_dets_empty),
+
+    stopped = mnesia:stop(),
+    mnesia:delete_schema([node()]).
 
 %%--------------------------------------------------------------------
 %% TEST CASES: delete_any - persistence by ets
@@ -1922,6 +2121,21 @@ smallest_test() ->
     ok.
 
 %%--------------------------------------------------------------------
+%% TEST CASES: Store b-tree and retrieve it afterwards - ets.
+%%--------------------------------------------------------------------
+
+store_and_retrieve_ets_test() ->
+    {_, _, _, _, {StateTarget, _, _, _}, _} = B_TREE_04_64_ETS_ORIGINAL = b_trees_generator:generate_b_tree_from_number_ets(4, 64, 2, b_tree_4_ets, spawn(fun b_trees_generator:ets_owner/0)),
+
+    true = ets:insert(StateTarget, {"B_TREE_04_64_ETS_ORIGINAL", B_TREE_04_64_ETS_ORIGINAL}),
+
+    [{"B_TREE_04_64_ETS_ORIGINAL", B_TREE_04_64_ETS_COPY}] = ets:lookup(StateTarget, "B_TREE_04_64_ETS_ORIGINAL"),
+
+    ?assertEqual(B_TREE_04_64_ETS_ORIGINAL, B_TREE_04_64_ETS_COPY),
+
+    ok.
+
+%%--------------------------------------------------------------------
 %% TEST CASES: take_any
 %%--------------------------------------------------------------------
 
@@ -2385,4 +2599,3 @@ values_test() ->
     ?assertEqual(32, length(b_trees:values(b_trees_generator:prepare_template_desc(?B_TREE_06_32_DESC)))),
 
     ok.
-

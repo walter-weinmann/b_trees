@@ -15,7 +15,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(B_TREE_POS_STATE, 5).
--define(DIRECTORY_DETS, "test/tmp/").
+-define(DIRECTORY_DETS, "/test/tmp/").
 -define(OTP_RELEASE, erlang:system_info(otp_release)).
 
 %%% Performance tests
@@ -42,7 +42,10 @@ suite() ->
     ].
 
 init_per_suite(Config) ->
-    filelib:ensure_dir(?DIRECTORY_DETS),
+    ok = filelib:ensure_dir(?DIRECTORY_DETS),
+    ok = b_trees_generator:delete_directory(?DIRECTORY_DETS),
+    ok = filelib:ensure_dir(?DIRECTORY_DETS),
+
     case ok == mnesia:create_schema([node()]) of
         true ->
             ok;

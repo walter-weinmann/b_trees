@@ -53,6 +53,14 @@ A general balanced tree iterator.
 
 ## EXPORTS ##
 
+### copy(Tree1, Tree2) -> Tree3 ###
+
+Types:
+
+    Tree1 = Tree2 = Tree3 = b_tree() | gb_trees:tree()
+
+Copies tree Tree1 to an empty tree Tree2. Both trees may be either of type b-tree or binary tree (gb_trees). Returns the new tree Tree3 of the same type as tree Tree2.
+
 ### delete(Key, B-Tree1) -> B-Tree2 ###
 
 Types:
@@ -78,7 +86,7 @@ Types:
     Order = pos_integer()
     B-Tree = b_tree()
 
-Returns a new empty b-tree. The order is defined as the maximum number of children nodes a non-leaf node may hold.
+Returns a new empty b-tree. The order Order (min. 4) is defined as the maximum number of children nodes a non-leaf node may hold.
 
 ### enter (Key, Value, B-Tree1) -> B-Tree2 ###
 
