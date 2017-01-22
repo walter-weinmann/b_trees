@@ -15,22 +15,22 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(B_TREE_POS_STATE, 5).
--define(DIRECTORY_DETS, "/test/tmp/").
+-define(DIRECTORY_DETS, "test/tmp/").
 -define(OTP_RELEASE, erlang:system_info(otp_release)).
 
-% Performance tests
--define(LARGEST_KEY_VALUE, {"k_10000", ?LARGEST_VALUE}).
--define(LARGEST_VALUE, "v_10000").
--define(NUMBER_ACTIONS, 10000).
--define(SMALLEST_KEY_VALUE, {"k_00001", "v_00001"}).
--define(WIDTH, 5).
+%%% Performance tests
+%%-define(LARGEST_KEY_VALUE, {"k_10000", ?LARGEST_VALUE}).
+%%-define(LARGEST_VALUE, "v_10000").
+%%-define(NUMBER_ACTIONS, 10000).
+%%-define(SMALLEST_KEY_VALUE, {"k_00001", "v_00001"}).
+%%-define(WIDTH, 5).
 
-%%% Standard tests
-%%-define(LARGEST_KEY_VALUE, {"k_2000", ?LARGEST_VALUE}).
-%%-define(LARGEST_VALUE, "v_2000").
-%%-define(NUMBER_ACTIONS, 2000).
-%%-define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
-%%-define(WIDTH, 4).
+% Standard tests
+-define(LARGEST_KEY_VALUE, {"k_2000", ?LARGEST_VALUE}).
+-define(LARGEST_VALUE, "v_2000").
+-define(NUMBER_ACTIONS, 2000).
+-define(SMALLEST_KEY_VALUE, {"k_0001", "v_0001"}).
+-define(WIDTH, 4).
 
 %%--------------------------------------------------------------------
 %% COMMON TEST CALLBACK FUNCTIONS - SUITE

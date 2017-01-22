@@ -187,13 +187,16 @@
 
 -export_type([b_tree/0, iter/0]).
 
--opaque b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), tree()}.
+-type b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), subtree()}.
 
 -type delete_function() :: fun((state_target(), 'delete', subtrees_key()) -> 'ok').
 
+-type gb_iter() :: gb_trees:iter().
+-type gb_tree() :: gb_trees:tree().
+
 -type insert_function() :: fun((state_target(), 'insert', subtrees()) -> subtrees_key()).
 
--opaque iter() :: [{key_values(), subtrees(), state()}].
+-type iter() :: [{key_values(), subtrees(), state()}].
 
 -type key() :: any().
 -type keys() :: [key()].
@@ -212,20 +215,21 @@
 | {state_target(), delete_function(), insert_function(), lookup_function()}.
 -type state_target() :: any().
 
--type subtrees() :: subtrees_key()
-| [tree()].
--type subtrees_key() :: integer().
-
--type tree() :: 'nil'
+-type subtree() :: 'nil'
 | {KeyNo :: pos_integer(), SubtreeNo :: pos_integer(), key_values(), []}
 | {KeyNo :: pos_integer(), SubtreeNo :: pos_integer(), key_values(), subtrees()}.
+-type subtrees() :: subtrees_key()
+| [subtree()].
+-type subtrees_key() :: integer().
 
 -type value() :: any().
 -type values() :: [value()].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec copy(b_tree() | gb_trees:tree(), b_tree() | gb_trees:tree()) -> b_tree() | gb_trees:tree().
+-spec copy(b_tree(), b_tree()) -> b_tree()
+; (b_tree(), gb_tree()) -> gb_tree()
+; (gb_tree(), b_tree()) -> b_tree().
 
 % Copy tree to b-tree.
 copy(Tree1, {MinimumSubtrees2, _, 0, _, State2, nil} = Tree2) ->
@@ -255,39 +259,41 @@ copy(Tree1, {0, nil} = Tree2) ->
             Tree1
     end.
 
-% wwe -spec copy_b_tree_to_b_tree(b_tree(), b_tree()) -> b_tree().
+-spec copy_b_tree_to_b_tree(b_tree(), b_tree()) -> b_tree().
 
 % Copy b-tree to b-tree.
 copy_b_tree_to_b_tree(BTree1, BTree2) ->
     copy_b_tree_to_b_tree_iterator(next(iterator(BTree1)), BTree2).
 
-% wwe -spec copy_b_tree_to_b_tree_iterator({key(), value(), iter()}|none, b_tree()) -> b_tree().
+-spec copy_b_tree_to_b_tree_iterator('none' | iter(), b_tree()) -> b_tree().
 
 copy_b_tree_to_b_tree_iterator(none, BTree) ->
     BTree;
 copy_b_tree_to_b_tree_iterator({Key, Value, Iterator}, BTree) ->
     copy_b_tree_to_b_tree_iterator(next(Iterator), insert(Key, Value, BTree)).
 
-% wwe -spec copy_b_tree_to_binary_tree(b_tree(), gb_trees:tree(key(), value())) -> gb_trees:tree(key(), value()).
+-spec copy_b_tree_to_binary_tree(b_tree(), gb_tree()) -> gb_tree().
 
 % Copy b-tree to binary tree.
 copy_b_tree_to_binary_tree(BTree, GBTree) ->
     copy_b_tree_to_binary_tree_iterator(next(iterator(BTree)), GBTree).
 
-% wwe -spec copy_b_tree_to_binary_tree_iterator(none | {key(), value(), iter()}, gb_trees:tree(key(), value())) -> gb_trees:tree(key(), value()).
+-spec copy_b_tree_to_binary_tree_iterator('none', gb_tree()) -> gb_tree()
+; ({key(), value(), iter()}, gb_tree()) -> gb_tree().
 
 copy_b_tree_to_binary_tree_iterator(none, GBTree) ->
     GBTree;
 copy_b_tree_to_binary_tree_iterator({Key, Value, Iterator}, GBTree) ->
     copy_b_tree_to_binary_tree_iterator(next(Iterator), gb_trees:insert(Key, Value, GBTree)).
 
-% wwe -spec copy_binary_tree_to_b_tree(gb_trees:tree(), b_tree()) -> b_tree().
+-spec copy_binary_tree_to_b_tree(gb_tree(), b_tree()) -> b_tree().
 
 % Copy binary tree to b-tree.
 copy_binary_tree_to_b_tree(GBTree, BTree) ->
     copy_binary_tree_to_b_tree_iterator(gb_trees:next(gb_trees:iterator(GBTree)), BTree).
 
-% wwe -spec copy_binary_tree_to_b_tree_iterator({key(), value(), gb_trees:iter()}|none, b_tree()) -> b_tree().
+-spec copy_binary_tree_to_b_tree_iterator('none', b_tree()) -> b_tree()
+; ({key(), value(), gb_iter()}, b_tree()) -> b_tree().
 
 copy_binary_tree_to_b_tree_iterator(none, BTree) ->
     BTree;
@@ -325,7 +331,7 @@ delete(Key, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, {KeyNo,
 delete(Key, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) ->
     {SubtreeNoMin, KeyNoMax, SizeKeyValues - 1, SortFunction, State, delete_1(Key, Tree, SubtreeNoMin, KeyNoMax, SortFunction, State)}.
 
--spec combine(tree(), tree(), state()) -> tree().
+-spec combine(subtree(), subtree(), state()) -> subtree().
 
 combine({LeftKeyNo, 0, LeftKeyValues, []}, {RightKeyNo, 0, RightKeyValues, []}, _) ->
     {
@@ -356,7 +362,7 @@ combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtreesKey} = _TreeLeft, 
         )
     }.
 
--spec delete_1(key(), tree(), pos_integer(), pos_integer(), sort_function(), state()) -> tree().
+-spec delete_1(key(), subtree(), pos_integer(), pos_integer(), sort_function(), state()) -> subtree().
 
 % Leaf node.
 delete_1(Key, {KeyNo, 0, KeyValues, []} = _Tree, _, _, SortFunction, _) ->
@@ -382,7 +388,7 @@ delete_1(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees} = _Tree, SubtreeNoMin, Key
             delete_1_2(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, KeyPos, State)
     end.
 
--spec delete_1_2(key(), tree(), pos_integer(), pos_integer(), pos_integer(), state()) -> tree().
+-spec delete_1_2(key(), subtree(), pos_integer(), pos_integer(), pos_integer(), state()) -> subtree().
 
 delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, nil) ->
     {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesXC} = lists:nth(KeyPos, Subtrees),
@@ -685,7 +691,7 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
             end
     end.
 
--spec delete_1_3(key(), tree(), pos_integer(), pos_integer(), pos_integer(), sort_function(), state()) -> tree().
+-spec delete_1_3(key(), subtree(), pos_integer(), pos_integer(), pos_integer(), sort_function(), state()) -> subtree().
 
 delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction, nil) ->
     {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesXCLeft} = case KeyPos == 1 of
@@ -1096,7 +1102,7 @@ height({_, _, _, _, nil, Tree}) ->
 height({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}}) ->
     height_1({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, 0).
 
--spec height_1(tree(), state(), non_neg_integer()) -> non_neg_integer().
+-spec height_1(subtree(), state(), non_neg_integer()) -> non_neg_integer().
 
 % Leaf node.
 height_1({_, _, _, []}, _, Height) ->
@@ -1121,7 +1127,7 @@ insert(Key, Value, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, 
 insert(Key, Value, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) ->
     {SubtreeNoMin, KeyNoMax, SizeKeyValues + 1, SortFunction, State, insert_1({Key, Value}, Tree, SubtreeNoMin, KeyNoMax, SortFunction, State)}.
 
--spec insert_1(key_value(), tree(), pos_integer(), pos_integer(), sort_function(), state()) -> tree().
+-spec insert_1(key_value(), subtree(), pos_integer(), pos_integer(), sort_function(), state()) -> subtree().
 
 % Leaf node.
 insert_1(KeyValue, {KeyNo, 0, KeyValues, []}, _, _, SortFunction, _) ->
@@ -1233,7 +1239,7 @@ insert_key_value({Key, _} = KeyValue, KeyValues, KeyNo, SortFunction) ->
             erlang:error({key_exists, Key})
     end.
 
--spec split_node_non_root(pos_integer(), key_values(), subtrees(), tree(), pos_integer(), pos_integer(), sort_function(), state()) -> {key_values(), subtrees(), tree(), tree(), subtrees()}.
+-spec split_node_non_root(pos_integer(), key_values(), subtrees(), subtree(), pos_integer(), pos_integer(), sort_function(), state()) -> {key_values(), subtrees(), subtree(), subtree(), subtrees()}.
 
 split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeKeyValues, TreeSubtrees}, SubtreePos, SubtreeNoMin, SortFunction, nil) ->
     {
@@ -1334,7 +1340,7 @@ split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeK
         lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
     }.
 
--spec split_node_root(tree(), pos_integer(), state()) -> tree().
+-spec split_node_root(subtree(), pos_integer(), state()) -> subtree().
 
 % Leaf node.
 split_node_root({KeyNo, 0, KeyValues, []}, SubtreeNoMin, nil) ->
@@ -1493,7 +1499,7 @@ iterator_from(_, {_, _, 0, _, _, nil}) ->
 iterator_from(Key, {_, _, _, SortFunction, State, Tree}) ->
     iterator_from_1(Key, Tree, [], SortFunction, State).
 
--spec iterator_from_1(key(), tree(), iter(), sort_function(), state()) -> iter().
+-spec iterator_from_1(key(), subtree(), iter(), sort_function(), state()) -> iter().
 
 % The most left key / value.
 iterator_from_1(Key, {KeyNo, 0, KeyValues, []}, Iterator, SortFunction, State) ->
@@ -1551,7 +1557,7 @@ largest({_, _, _, _, nil, Tree}) ->
 largest({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}}) ->
     largest_1({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State).
 
--spec largest_1(tree(), state()) -> key_value().
+-spec largest_1(subtree(), state()) -> key_value().
 
 % The most right key / value.
 largest_1({KeyNo, 0, KeyValues, []}, _) ->
@@ -1565,7 +1571,8 @@ largest_1({_, SubtreeNo, _, Subtrees}, {StateTarget, _, _, LookupFunction} = Sta
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
+-spec lookup(key(), b_tree()) -> 'none'
+; (key(), b_tree()) -> {'value', value()}.
 
 lookup(_, {_, _, 0, _, _, nil}) ->
     none;
@@ -1579,7 +1586,7 @@ lookup(Key, {_, _, _, SortFunction, State, Tree}) ->
 map(_, {_, _, 0, _, _, nil} = BTree) ->
     erlang:error({empty_tree, BTree});
 map(Function, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) when is_function(Function, 2) ->
-    {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, map_tree(Function, State, Tree)}.
+    {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, map_subtree(Function, State, Tree)}.
 
 -spec map_key_values(map_function(), key_values(), key_values()) -> key_values().
 
@@ -1588,14 +1595,14 @@ map_key_values(_, [], KeyValuesMapped) ->
 map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
     map_key_values(Function, Tail, KeyValuesMapped ++ [{Key, Function(Key, Value)}]).
 
--spec map_tree(map_function(), state(), tree()) -> tree().
+-spec map_subtree(map_function(), state(), subtree()) -> subtree().
 
 % Leaf node.
-map_tree(Function, _, {KeyNo, 0, KeyValues, []}) ->
+map_subtree(Function, _, {KeyNo, 0, KeyValues, []}) ->
     {KeyNo, 0, map_key_values(Function, KeyValues, []), []};
-map_tree(Function, nil, {KeyNo, SubtreeNo, KeyValues, Subtrees}) ->
+map_subtree(Function, nil, {KeyNo, SubtreeNo, KeyValues, Subtrees}) ->
     {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), map_subtrees(Function, nil, Subtrees, [])};
-map_tree(Function, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}) ->
+map_subtree(Function, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
     true = DeleteFunction(StateTarget, delete, SubtreesKey),
     {KeyNo, SubtreeNo, map_key_values(Function, KeyValues, []), InsertFunction(StateTarget, insert, map_subtrees(Function, State, Subtrees, []))}.
@@ -1605,11 +1612,12 @@ map_tree(Function, {StateTarget, DeleteFunction, InsertFunction, LookupFunction}
 map_subtrees(_, _, [], TreesMapped) ->
     TreesMapped;
 map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
-    map_subtrees(Function, State, Tail, TreesMapped ++ [map_tree(Function, State, Tree)]).
+    map_subtrees(Function, State, Tail, TreesMapped ++ [map_subtree(Function, State, Tree)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec next(iter()) -> 'none' | {key(), value(), iter()}.
+-spec next(iter()) -> 'none'
+; (iter()) -> {key(), value(), iter()}.
 
 % One level up.
 next([{[], _, _}, {[], _, _} = Iterator | TailIterator]) ->
@@ -1658,7 +1666,7 @@ size_nodes({_, _, _, _, nil, Tree}) ->
 size_nodes({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}}) ->
     size_nodes_tree({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State, {0, 0}).
 
--spec size_nodes_tree(tree(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
+-spec size_nodes_tree(subtree(), state(), {non_neg_integer(), non_neg_integer()}) -> {non_neg_integer(), non_neg_integer()}.
 
 % Leaf node.
 size_nodes_tree({_, 0, _, []}, _, {SizeTotal, SizeLeaves}) ->
@@ -1686,7 +1694,7 @@ smallest({_, _, _, _, nil, Tree}) ->
 smallest({_, _, _, _, {StateTarget, _, _, LookupFunction} = State, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}}) ->
     smallest_1({KeyNo, SubtreeNo, KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey)}, State).
 
--spec smallest_1(tree(), state()) -> key_value().
+-spec smallest_1(subtree(), state()) -> key_value().
 
 % The most left key / value.
 smallest_1({_, 0, KeyValues, []}, _) ->
@@ -1708,7 +1716,8 @@ take(Key, BTree) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_any(key(), b_tree()) -> {value(), b_tree()} | error.
+-spec take_any(key(), b_tree()) -> error
+; (key(), b_tree()) -> {value(), b_tree()}.
 
 take_any(Key, BTree) ->
     case is_defined(Key, BTree) of
@@ -1772,7 +1781,7 @@ update(Key, _, {_, _, 0, _, _, nil}) ->
 update(Key, Value, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}) ->
     {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, update_1({Key, Value}, Tree, SortFunction, State)}.
 
--spec update_1(key_value(), tree(), sort_function(), state()) -> tree().
+-spec update_1(key_value(), subtree(), sort_function(), state()) -> subtree().
 
 % Leaf node.
 update_1({Key, _} = KeyValue, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
@@ -1873,7 +1882,8 @@ values_1([{_, Value} | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSub
 %% Helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {none, pos_integer()} | {any(), pos_integer()}.
+-spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {none, pos_integer()}
+; (key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {any(), pos_integer()}.
 
 binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) when Lower > Upper ->
     TreeNo = case Lower > KeyNo of
@@ -1910,7 +1920,8 @@ binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) ->
 %% equality, and also allows us to skip the test completely in the
 %% remaining case.
 
--spec lookup_1(key(), tree(), sort_function(), state()) -> 'none' | {'value', value()}.
+-spec lookup_1(key(), subtree(), sort_function(), state()) -> 'none'
+; (key(), subtree(), sort_function(), state()) -> {'value', value()}.
 
 % Leaf node.
 lookup_1(Key, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
