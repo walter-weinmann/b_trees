@@ -13,7 +13,7 @@
 
 -include_lib("../include/b_trees_templates.hrl").
 
--define(DIRECTORY_DETS, "/test/tmp/").
+-define(DIRECTORY_DETS, "test/tmp/").
 -define(TIMEOUT, 60).
 
 %%--------------------------------------------------------------------

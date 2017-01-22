@@ -1,4 +1,5 @@
 /_build
 /erl_crash.dump
 /rebar.lock
+/test/tmp
 /test/*.beam
