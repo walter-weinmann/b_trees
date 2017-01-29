@@ -13,7 +13,7 @@
 
 -define(B_TREE_POS_SORT, 4).
 -define(B_TREE_POS_STATE, 5).
--define(DIRECTORY_DETS, "/test/tmp/").
+-define(DIRECTORY_DETS, "test/tmp/").
 -define(VALUE_UPDATE_SUFFIX, "_new").
 
 -export([
