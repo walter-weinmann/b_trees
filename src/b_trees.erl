@@ -323,7 +323,10 @@ delete(Key, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, {KeyNo,
                                                                                      {
                                                                                          KeyNo - 1,
                                                                                          0,
-                                                                                             lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                                                                                         lists:append([
+                                                                                             lists:sublist(KeyValues, 1, KeyPos - 1),
+                                                                                             lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                                                                                         ]),
                                                                                          []
                                                                                      }
                                                                              end}
@@ -337,15 +340,25 @@ combine({LeftKeyNo, 0, LeftKeyValues, []}, {RightKeyNo, 0, RightKeyValues, []}, 
     {
         LeftKeyNo + RightKeyNo,
         0,
-            LeftKeyValues ++ RightKeyValues,
+        lists:append([
+            LeftKeyValues,
+            RightKeyValues
+        ]),
         []
     };
 combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtrees}, {RightKeyNo, RightSubtreeNo, RightKeyValues, RightSubtrees}, nil) ->
     {
         LeftKeyNo + RightKeyNo,
         LeftSubtreeNo + RightSubtreeNo - 1,
-            LeftKeyValues ++ RightKeyValues,
-            lists:sublist(LeftSubtrees, 1, LeftKeyNo) ++ [combine(lists:nth(LeftSubtreeNo, LeftSubtrees), lists:nth(1, RightSubtrees), nil)] ++ lists:sublist(RightSubtrees, 2, RightSubtreeNo)
+        lists:append([
+            LeftKeyValues,
+            RightKeyValues
+        ]),
+        lists:append([
+            lists:sublist(LeftSubtrees, 1, LeftKeyNo),
+            [combine(lists:nth(LeftSubtreeNo, LeftSubtrees), lists:nth(1, RightSubtrees), nil)],
+            lists:sublist(RightSubtrees, 2, RightSubtreeNo)
+        ])
     };
 combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtreesKey} = _TreeLeft, {RightKeyNo, RightSubtreeNo, RightKeyValues, RightSubtreesKey} = _TreeRight, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
     LeftSubtrees = LookupFunction(StateTarget, lookup, LeftSubtreesKey),
@@ -355,17 +368,24 @@ combine({LeftKeyNo, LeftSubtreeNo, LeftKeyValues, LeftSubtreesKey} = _TreeLeft, 
     {
         LeftKeyNo + RightKeyNo,
         LeftSubtreeNo + RightSubtreeNo - 1,
-            LeftKeyValues ++ RightKeyValues,
-        InsertFunction(StateTarget,
+        lists:append([
+            LeftKeyValues,
+            RightKeyValues
+        ]),
+        InsertFunction(
+            StateTarget,
             insert,
-            lists:sublist(LeftSubtrees, 1, LeftKeyNo) ++ [combine(lists:nth(LeftSubtreeNo, LeftSubtrees), lists:nth(1, RightSubtrees), State)] ++ lists:sublist(RightSubtrees, 2, RightSubtreeNo)
-        )
+            lists:append([
+                lists:sublist(LeftSubtrees, 1, LeftKeyNo),
+                [combine(lists:nth(LeftSubtreeNo, LeftSubtrees), lists:nth(1, RightSubtrees), State)],
+                lists:sublist(RightSubtrees, 2, RightSubtreeNo)
+            ]))
     }.
 
 -spec delete_1(key(), subtree(), pos_integer(), pos_integer(), sort_function(), state()) -> subtree().
 
 % Leaf node.
-delete_1(Key, {KeyNo, 0, KeyValues, []} = _Tree, _, _, SortFunction, _) ->
+delete_1(Key, {KeyNo, 0, KeyValues, []}, _, _, SortFunction, _) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
@@ -375,7 +395,10 @@ delete_1(Key, {KeyNo, 0, KeyValues, []} = _Tree, _, _, SortFunction, _) ->
             {
                 KeyNo - 1,
                 0,
-                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                lists:append([
+                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                ]),
                 []
             }
     end;
@@ -399,8 +422,13 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
             {
                 KeyNo,
                 SubtreeNo,
-                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                lists:append([
+                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                    [lists:nth(KeyNoXC, KeyValuesXC)],
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                ]),
+                lists:append([
+                    lists:sublist(Subtrees, 1, KeyPos - 1),
                     [
                         {
                             KeyNoXC - 1, case SubtreeNoXC == 0 of
@@ -423,10 +451,15 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                                 true ->
                                     [];
                                 _ ->
-                                    [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), nil)] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                    lists:append([
+                                        [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), nil)],
+                                        lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                    ])
                             end
                         }
-                    ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                    ],
+                    lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                ])
             };
         _ ->
             case KeyNoXCRight >= SubtreeNoMin of
@@ -435,8 +468,13 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                     {
                         KeyNo,
                         SubtreeNo,
-                            lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                            lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                        lists:append([
+                            lists:sublist(KeyValues, 1, KeyPos - 1),
+                            [lists:nth(1, KeyValuesXCRight)],
+                            lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                        ]),
+                        lists:append([
+                            lists:sublist(Subtrees, 1, KeyPos - 1),
                             [
                                 {
                                     KeyNoXC,
@@ -446,7 +484,10 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                                         true ->
                                             [];
                                         _ ->
-                                            lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), nil)]
+                                            lists:append([
+                                                lists:sublist(SubtreesXC, 1, KeyNoXC),
+                                                [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), nil)]
+                                            ])
                                     end
                                 },
                                 {
@@ -462,8 +503,9 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                                                                                                                      lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
                                                                                                              end
                                 }
-                            ] ++
+                            ],
                             lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                        ])
                     };
                 % CLRS: case 2c
                 _ ->
@@ -492,35 +534,54 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                                     _ ->
                                         SubtreeNoXC + SubtreeNoXCRight - 1
                                 end,
-                                    KeyValuesXC ++ KeyValuesXCRight,
+                                lists:append([
+                                    KeyValuesXC,
+                                    KeyValuesXCRight
+                                ]),
                                 case SubtreeNoXCRight == 0 of
                                     true ->
                                         [];
                                     _ ->
-                                        lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(LeftTree, RightTree, nil)] ++ lists:sublist(SubtreesXCRight, 2, KeyNoXCRight)
+                                        lists:append([
+                                            lists:sublist(SubtreesXC, 1, KeyNoXC),
+                                            [combine(LeftTree, RightTree, nil)],
+                                            lists:sublist(SubtreesXCRight, 2, KeyNoXCRight)
+                                        ])
                                 end
                             };
                         _ ->
                             {
                                 KeyNo - 1,
                                 SubtreeNo - 1,
-                                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                                    [
-                                        {
-                                            KeyNoXC + KeyNoXCRight, case SubtreeNoXCRight == 0 of
-                                                                        true ->
-                                                                            0;
-                                                                        _ ->
-                                                                            SubtreeNoXC + SubtreeNoXCRight - 1
-                                                                    end, KeyValuesXC ++ KeyValuesXCRight, case SubtreeNoXCRight == 0 of
-                                                                                                              true ->
-                                                                                                                  [];
-                                                                                                              _ ->
-                                                                                                                  lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(LeftTree, RightTree, nil)] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                                                                                          end
-                                        }
-                                    ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                                lists:append([
+                                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                                ]),
+                                lists:append([
+                                    lists:sublist(Subtrees, 1, KeyPos - 1),
+                                    [{
+                                        KeyNoXC + KeyNoXCRight, case SubtreeNoXCRight == 0 of
+                                                                    true ->
+                                                                        0;
+                                                                    _ ->
+                                                                        SubtreeNoXC + SubtreeNoXCRight - 1
+                                                                end, lists:append([
+                                            KeyValuesXC,
+                                            KeyValuesXCRight
+                                        ]),
+                                        case SubtreeNoXCRight == 0 of
+                                            true ->
+                                                [];
+                                            _ ->
+                                                lists:append([
+                                                    lists:sublist(SubtreesXC, 1, KeyNoXC),
+                                                    [combine(LeftTree, RightTree, nil)],
+                                                    lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                                ])
+                                        end
+                                    }],
+                                    lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                                ])
                             }
                     end
             end
@@ -540,24 +601,29 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
             {
                 KeyNo,
                 SubtreeNo,
-                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(KeyNoXC, KeyValuesXC)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                InsertFunction(StateTarget,
+                lists:append([
+                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                    [lists:nth(KeyNoXC, KeyValuesXC)],
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                ]),
+                InsertFunction(
+                    StateTarget,
                     insert,
-                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                        [
-                            {
-                                KeyNoXC - 1, case SubtreeNoXC == 0 of
-                                                 true ->
-                                                     0;
-                                                 _ ->
-                                                     SubtreeNoXC - 1
-                                             end, lists:sublist(KeyValuesXC, 1, KeyNoXC - 1), case SubtreeNoXC == 0 of
-                                                                                                  true ->
-                                                                                                      [];
-                                                                                                  _ ->
-                                                                                                      lists:sublist(SubtreesXC, 1, KeyNoXC)
-                                                                                              end
-                            },
+                    lists:append([
+                        lists:sublist(Subtrees, 1, KeyPos - 1),
+                        [{
+                            KeyNoXC - 1, case SubtreeNoXC == 0 of
+                                             true ->
+                                                 0;
+                                             _ ->
+                                                 SubtreeNoXC - 1
+                                         end, lists:sublist(KeyValuesXC, 1, KeyNoXC - 1), case SubtreeNoXC == 0 of
+                                                                                              true ->
+                                                                                                  [];
+                                                                                              _ ->
+                                                                                                  lists:sublist(SubtreesXC, 1, KeyNoXC)
+                                                                                          end
+                        },
                             {
                                 KeyNoXCRight,
                                 SubtreeNoXCRight,
@@ -566,14 +632,17 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
                                     true ->
                                         [];
                                     _ ->
-                                        InsertFunction(StateTarget,
+                                        InsertFunction(
+                                            StateTarget,
                                             insert,
-                                            [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), State)] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                        )
+                                            lists:append([
+                                                [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), State)],
+                                                lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                            ]))
                                 end
-                            }
-                        ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                )
+                            }],
+                        lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                    ]))
             };
         _ ->
             case KeyNoXCRight >= SubtreeNoMin of
@@ -582,25 +651,33 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
                     {
                         KeyNo,
                         SubtreeNo,
-                            lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                        InsertFunction(StateTarget,
+                        lists:append([
+                            lists:sublist(KeyValues, 1, KeyPos - 1),
+                            [lists:nth(1, KeyValuesXCRight)],
+                            lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                        ]),
+                        InsertFunction(
+                            StateTarget,
                             insert,
-                            lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                                [
-                                    {
-                                        KeyNoXC,
-                                        SubtreeNoXC,
-                                        KeyValuesXC,
-                                        case SubtreeNoXC == 0 of
-                                            true ->
-                                                [];
-                                            _ ->
-                                                InsertFunction(StateTarget,
-                                                    insert,
-                                                    lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), State)]
-                                                )
-                                        end
-                                    },
+                            lists:append([
+                                lists:sublist(Subtrees, 1, KeyPos - 1),
+                                [{
+                                    KeyNoXC,
+                                    SubtreeNoXC,
+                                    KeyValuesXC,
+                                    case SubtreeNoXC == 0 of
+                                        true ->
+                                            [];
+                                        _ ->
+                                            InsertFunction(
+                                                StateTarget,
+                                                insert,
+                                                lists:append([
+                                                    lists:sublist(SubtreesXC, 1, KeyNoXC),
+                                                    [combine(lists:nth(SubtreeNoXC, SubtreesXC), lists:nth(1, SubtreesXCRight), State)]
+                                                ]))
+                                    end
+                                },
                                     {
                                         KeyNoXCRight - 1, case SubtreeNoXCRight == 0 of
                                                               true ->
@@ -611,15 +688,15 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
                                                                                                                      true ->
                                                                                                                          [];
                                                                                                                      _ ->
-                                                                                                                         InsertFunction(StateTarget,
+                                                                                                                         InsertFunction(
+                                                                                                                             StateTarget,
                                                                                                                              insert,
-                                                                                                                             lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                                                                                                         )
+                                                                                                                             lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight))
                                                                                                                  end
                                     }
-                                ] ++
+                                ],
                                 lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                        )
+                            ]))
                     };
                 % CLRS: case 2c
                 _ ->
@@ -648,44 +725,61 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
                                     _ ->
                                         SubtreeNoXC + SubtreeNoXCRight - 1
                                 end,
-                                    KeyValuesXC ++ KeyValuesXCRight,
+                                lists:append([
+                                    KeyValuesXC,
+                                    KeyValuesXCRight
+                                ]),
                                 case SubtreeNoXCRight == 0 of
                                     true ->
                                         [];
                                     _ ->
-                                        InsertFunction(StateTarget,
+                                        InsertFunction(
+                                            StateTarget,
                                             insert,
-                                            lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(LeftTree, RightTree, State)] ++ lists:sublist(SubtreesXCRight, 2, KeyNoXCRight)
-                                        )
+                                            lists:append([
+                                                lists:sublist(SubtreesXC, 1, KeyNoXC),
+                                                [combine(LeftTree, RightTree, State)],
+                                                lists:sublist(SubtreesXCRight, 2, KeyNoXCRight)
+                                            ]))
                                 end
                             };
                         _ ->
                             {
                                 KeyNo - 1,
                                 SubtreeNo - 1,
-                                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                InsertFunction(StateTarget,
+                                lists:append([
+                                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                                ]),
+                                InsertFunction(
+                                    StateTarget,
                                     insert,
-                                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                                        [
-                                            {
-                                                KeyNoXC + KeyNoXCRight, case SubtreeNoXCRight == 0 of
-                                                                            true ->
-                                                                                0;
-                                                                            _ ->
-                                                                                SubtreeNoXC + SubtreeNoXCRight - 1
-                                                                        end, KeyValuesXC ++ KeyValuesXCRight, case SubtreeNoXCRight == 0 of
-                                                                                                                  true ->
-                                                                                                                      [];
-                                                                                                                  _ ->
-                                                                                                                      InsertFunction(StateTarget,
-                                                                                                                          insert,
-                                                                                                                          lists:sublist(SubtreesXC, 1, KeyNoXC) ++ [combine(LeftTree, RightTree, State)] ++ lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                                                                                                      )
-                                                                                                              end
-                                            }
-                                        ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                                )
+                                    lists:append([
+                                        lists:sublist(Subtrees, 1, KeyPos - 1),
+                                        [{
+                                            KeyNoXC + KeyNoXCRight, case SubtreeNoXCRight == 0 of
+                                                                        true ->
+                                                                            0;
+                                                                        _ ->
+                                                                            SubtreeNoXC + SubtreeNoXCRight - 1
+                                                                    end, lists:append([KeyValuesXC,
+                                                KeyValuesXCRight
+                                            ]), case SubtreeNoXCRight == 0 of
+                                                    true ->
+                                                        [];
+                                                    _ ->
+                                                        InsertFunction(
+                                                            StateTarget,
+                                                            insert,
+                                                            lists:append([
+                                                                lists:sublist(SubtreesXC, 1, KeyNoXC),
+                                                                [combine(LeftTree, RightTree, State)],
+                                                                lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
+                                                            ]))
+                                                end
+                                        }],
+                                        lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                                    ]))
                             }
                     end
             end
@@ -715,8 +809,13 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
                     {
                         KeyNo,
                         SubtreeNo,
-                            lists:sublist(KeyValues, 1, KeyPos - 2) ++ [lists:nth(KeyNoXCLeft, KeyValuesXCLeft)] ++ lists:sublist(KeyValues, KeyPos, KeyNo),
-                            lists:sublist(Subtrees, 1, KeyPos - 2) ++
+                        lists:append([
+                            lists:sublist(KeyValues, 1, KeyPos - 2),
+                            [lists:nth(KeyNoXCLeft, KeyValuesXCLeft)],
+                            lists:sublist(KeyValues, KeyPos, KeyNo)
+                        ]),
+                        lists:append([
+                            lists:sublist(Subtrees, 1, KeyPos - 2),
                             [{KeyNoXCLeft - 1, case SubtreeNoXCLeft == 0 of
                                                    true ->
                                                        0;
@@ -729,37 +828,78 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
                                                                                                                 lists:sublist(SubtreesXCLeft, 1, KeyNoXCLeft)
                                                                                                         end
                             },
-                                delete_1(Key, {KeyNoXC + 1, case SubtreeNoXC == 0 of
-                                                                true ->
-                                                                    0;
-                                                                _ ->
-                                                                    SubtreeNoXC + 1
-                                                            end, [lists:nth(KeyPos - 1, KeyValues)] ++ lists:sublist(KeyValuesXC, 1, KeyNoXC), case SubtreeNoXCLeft == 0 of
-                                                                                                                                                   true ->
-                                                                                                                                                       [];
-                                                                                                                                                   _ ->
-                                                                                                                                                       [lists:nth(SubtreeNoXCLeft, SubtreesXCLeft)]
-                                                                                                                                               end ++ SubtreesXC}, SubtreeNoMin, KeyNoMax, SortFunction, nil)
-                            ] ++ lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                                delete_1(
+                                    Key,
+                                    {
+                                        KeyNoXC + 1,
+                                        case SubtreeNoXC == 0 of
+                                            true ->
+                                                0;
+                                            _ ->
+                                                SubtreeNoXC + 1
+                                        end,
+                                        lists:append([
+                                            [lists:nth(KeyPos - 1, KeyValues)],
+                                            lists:sublist(KeyValuesXC, 1, KeyNoXC)
+                                        ]),
+                                        lists:append([
+                                            case SubtreeNoXCLeft == 0 of
+                                                true ->
+                                                    [];
+                                                _ ->
+                                                    [lists:nth(SubtreeNoXCLeft, SubtreesXCLeft)]
+                                            end,
+                                            SubtreesXC
+                                        ])
+                                    },
+                                    SubtreeNoMin,
+                                    KeyNoMax,
+                                    SortFunction,
+                                    nil)
+                            ],
+                            lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                        ])
                     };
                 KeyNoXCRight >= SubtreeNoMin ->
-                    % CLRS: case 3a - right
+% CLRS: case 3a - right
                     {
                         KeyNo,
                         SubtreeNo,
-                            lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                            lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                            [delete_1(Key, {KeyNoXC + 1, case SubtreeNoXC == 0 of
-                                                             true ->
-                                                                 0;
-                                                             _ ->
-                                                                 SubtreeNoXC + 1
-                                                         end, lists:sublist(KeyValuesXC, 1, KeyNoXC) ++ [lists:nth(KeyPos, KeyValues)], SubtreesXC ++ case SubtreeNoXCRight == 0 of
-                                                                                                                                                          true ->
-                                                                                                                                                              [];
-                                                                                                                                                          _ ->
-                                                                                                                                                              [lists:nth(1, SubtreesXCRight)]
-                                                                                                                                                      end}, SubtreeNoMin, KeyNoMax, SortFunction, nil),
+                        lists:append([
+                            lists:sublist(KeyValues, 1, KeyPos - 1),
+                            [lists:nth(1, KeyValuesXCRight)],
+                            lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                        ]),
+                        lists:append([
+                            lists:sublist(Subtrees, 1, KeyPos - 1),
+                            [delete_1(
+                                Key,
+                                {
+                                    KeyNoXC + 1,
+                                    case SubtreeNoXC == 0 of
+                                        true ->
+                                            0;
+                                        _ ->
+                                            SubtreeNoXC + 1
+                                    end,
+                                    lists:append([
+                                        lists:sublist(KeyValuesXC, 1, KeyNoXC),
+                                        [lists:nth(KeyPos, KeyValues)]
+                                    ]),
+                                    lists:append([
+                                        SubtreesXC,
+                                        case SubtreeNoXCRight == 0 of
+                                            true ->
+                                                [];
+                                            _ ->
+                                                [lists:nth(1, SubtreesXCRight)]
+                                        end
+                                    ])
+                                },
+                                SubtreeNoMin,
+                                KeyNoMax,
+                                SortFunction,
+                                nil),
                                 {KeyNoXCRight - 1, case SubtreeNoXCRight == 0 of
                                                        true ->
                                                            0;
@@ -772,58 +912,145 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
                                                                                                                   lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
                                                                                                           end
                                 }
-                            ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                            ],
+                            lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                        ])
                     };
                 KeyNoXCRight == 0 ->
-                    % CLRS: case 3b left
+% CLRS: case 3b left
                     case KeyNo == 1 of
                         true ->
-                            delete_1(Key, {KeyNoXCLeft + KeyNoXC + 1, SubtreeNoXCLeft + SubtreeNoXC, KeyValuesXCLeft ++ KeyValues ++ KeyValuesXC, SubtreesXCLeft ++ SubtreesXC}, SubtreeNoMin, KeyNoMax, SortFunction, nil);
+                            delete_1(
+                                Key,
+                                {
+                                    KeyNoXCLeft + KeyNoXC + 1, SubtreeNoXCLeft + SubtreeNoXC, lists:append([
+                                    KeyValuesXCLeft,
+                                    KeyValues,
+                                    KeyValuesXC
+                                ]),
+                                    lists:append([
+                                        SubtreesXCLeft,
+                                        SubtreesXC
+                                    ])
+                                },
+                                SubtreeNoMin,
+                                KeyNoMax,
+                                SortFunction,
+                                nil
+                            );
                         _ ->
                             {
                                 KeyNo - 1,
                                 SubtreeNo - 1,
-                                    lists:sublist(KeyValues, 1, KeyPos - 2) ++ lists:sublist(KeyValues, KeyPos, KeyNo),
-                                    lists:sublist(Subtrees, 1, KeyPos - 2) ++
+                                lists:append([
+                                    lists:sublist(KeyValues, 1, KeyPos - 2),
+                                    lists:sublist(KeyValues, KeyPos, KeyNo)
+                                ]),
+                                lists:append([
+                                    lists:sublist(Subtrees, 1, KeyPos - 2),
                                     [
-                                        delete_1(Key, {KeyNoXCLeft + KeyNoXC + 1, case SubtreeNoXC == 0 of
-                                                                                      true ->
-                                                                                          0;
-                                                                                      _ ->
-                                                                                          SubtreeNoXCLeft + SubtreeNoXC
-                                                                                  end, KeyValuesXCLeft ++ [lists:nth(KeyPos - 1, KeyValues)] ++ KeyValuesXC, SubtreesXCLeft ++ SubtreesXC}, SubtreeNoMin, KeyNoMax, SortFunction, nil)
-                                    ] ++ lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                                        delete_1(
+                                            Key,
+                                            {
+                                                KeyNoXCLeft + KeyNoXC + 1,
+                                                case SubtreeNoXC == 0 of
+                                                    true ->
+                                                        0;
+                                                    _ ->
+                                                        SubtreeNoXCLeft + SubtreeNoXC
+                                                end,
+                                                lists:append([
+                                                    KeyValuesXCLeft, [lists:nth(KeyPos - 1, KeyValues)], KeyValuesXC
+                                                ]),
+                                                lists:append([
+                                                    SubtreesXCLeft,
+                                                    SubtreesXC
+                                                ])},
+                                            SubtreeNoMin,
+                                            KeyNoMax,
+                                            SortFunction,
+                                            nil)
+                                    ],
+                                    lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                                ])
                             }
                     end;
                 true ->
-                    % CLRS: case 3b right
+% CLRS: case 3b right
                     case KeyNo == 1 of
                         true ->
-                            delete_1(Key, {KeyNoXC + KeyNoXCRight + 1, SubtreeNoXC + SubtreeNoXCRight, KeyValuesXC ++ KeyValues ++ KeyValuesXCRight, SubtreesXC ++ SubtreesXCRight}, SubtreeNoMin, KeyNoMax, SortFunction, nil);
+                            delete_1(
+                                Key,
+                                {
+                                    KeyNoXC + KeyNoXCRight + 1,
+                                    SubtreeNoXC + SubtreeNoXCRight,
+                                    lists:append([
+                                        KeyValuesXC,
+                                        KeyValues,
+                                        KeyValuesXCRight
+                                    ]),
+                                    lists:append([
+                                        SubtreesXC,
+                                        SubtreesXCRight
+                                    ])
+                                },
+                                SubtreeNoMin,
+                                KeyNoMax,
+                                SortFunction,
+                                nil
+                            );
                         _ ->
                             {
                                 KeyNo - 1,
                                 SubtreeNo - 1,
-                                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                                lists:append([
+                                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                                ]),
+                                lists:append([
+                                    lists:sublist(Subtrees, 1, KeyPos - 1),
                                     [
-                                        delete_1(Key, {KeyNoXC + KeyNoXCRight + 1, case SubtreeNoXC == 0 of
-                                                                                       true ->
-                                                                                           0;
-                                                                                       _ ->
-                                                                                           SubtreeNoXC + SubtreeNoXCRight
-                                                                                   end, KeyValuesXC ++ [lists:nth(KeyPos, KeyValues)] ++ KeyValuesXCRight, SubtreesXC ++ SubtreesXCRight}, SubtreeNoMin, KeyNoMax, SortFunction, nil)
-                                    ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                                        delete_1(
+                                            Key,
+                                            {
+                                                KeyNoXC + KeyNoXCRight + 1,
+                                                case SubtreeNoXC == 0 of
+                                                    true ->
+                                                        0;
+                                                    _ ->
+                                                        SubtreeNoXC + SubtreeNoXCRight
+                                                end,
+                                                lists:append([
+                                                    KeyValuesXC,
+                                                    [lists:nth(KeyPos, KeyValues)],
+                                                    KeyValuesXCRight
+                                                ]),
+                                                lists:append([
+                                                    SubtreesXC,
+                                                    SubtreesXCRight
+                                                ])
+                                            },
+                                            SubtreeNoMin,
+                                            KeyNoMax,
+                                            SortFunction,
+                                            nil)
+                                    ],
+                                    lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                                ])
                             }
                     end
             end;
         _ ->
-            % CLRS: case 3 else
+% CLRS: case 3 else
             {
                 KeyNo,
                 SubtreeNo,
                 KeyValues,
-                    lists:sublist(Subtrees, 1, KeyPos - 1) ++ [delete_1(Key, TreeXC, SubtreeNoMin, KeyNoMax, SortFunction, nil)] ++ lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                lists:append([
+                    lists:sublist(Subtrees, 1, KeyPos - 1),
+                    [delete_1(Key, TreeXC, SubtreeNoMin, KeyNoMax, SortFunction, nil)],
+                    lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                ])
             }
     end;
 delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
@@ -849,171 +1076,293 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin
         true ->
             if
                 KeyNoXCLeft >= SubtreeNoMin ->
-                    % CLRS: case 3a - left
+% CLRS: case 3a - left
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXCLeft),
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     {
                         KeyNo,
                         SubtreeNo,
-                            lists:sublist(KeyValues, 1, KeyPos - 2) ++ [lists:nth(KeyNoXCLeft, KeyValuesXCLeft)] ++ lists:sublist(KeyValues, KeyPos, KeyNo),
-                        InsertFunction(StateTarget,
+                        lists:append([
+                            lists:sublist(KeyValues, 1, KeyPos - 2),
+                            [lists:nth(KeyNoXCLeft, KeyValuesXCLeft)],
+                            lists:sublist(KeyValues, KeyPos, KeyNo)
+                        ]),
+                        InsertFunction(
+                            StateTarget,
                             insert,
-                            lists:sublist(Subtrees, 1, KeyPos - 2) ++
+                            lists:append([
+                                lists:sublist(Subtrees, 1, KeyPos - 2),
                                 [{KeyNoXCLeft - 1, case SubtreeNoXCLeft == 0 of
                                                        true ->
                                                            0;
                                                        _ ->
                                                            SubtreeNoXCLeft - 1
                                                    end, lists:sublist(KeyValuesXCLeft, 1, KeyNoXCLeft - 1),
-                                    InsertFunction(StateTarget,
+                                    InsertFunction(
+                                        StateTarget,
                                         insert,
                                         case SubtreeNoXCLeft == 0 of
                                             true ->
                                                 [];
                                             _ ->
                                                 lists:sublist(SubtreesXCLeft, 1, KeyNoXCLeft)
-                                        end
-                                    )
+                                        end)
                                 },
-                                    delete_1(Key, {KeyNoXC + 1, case SubtreeNoXC == 0 of
-                                                                    true ->
-                                                                        0;
-                                                                    _ ->
-                                                                        SubtreeNoXC + 1
-                                                                end,
-                                            [lists:nth(KeyPos - 1, KeyValues)] ++ lists:sublist(KeyValuesXC, 1, KeyNoXC),
-                                        InsertFunction(StateTarget,
-                                            insert,
-                                            case SubtreeNoXCLeft == 0 of
+                                    delete_1(
+                                        Key,
+                                        {
+                                            KeyNoXC + 1,
+                                            case SubtreeNoXC == 0 of
                                                 true ->
-                                                    [];
+                                                    0;
                                                 _ ->
-                                                    [lists:nth(SubtreeNoXCLeft, SubtreesXCLeft)]
-                                            end ++ SubtreesXC
-                                        )
-                                    }, SubtreeNoMin, KeyNoMax, SortFunction, State)
-                                ] ++ lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
-                        )
+                                                    SubtreeNoXC + 1
+                                            end,
+                                            lists:append([
+                                                [lists:nth(KeyPos - 1, KeyValues)],
+                                                lists:sublist(KeyValuesXC, 1, KeyNoXC)
+                                            ]),
+                                            InsertFunction(
+                                                StateTarget,
+                                                insert,
+                                                lists:append([
+                                                    case SubtreeNoXCLeft == 0 of
+                                                        true ->
+                                                            [];
+                                                        _ ->
+                                                            [lists:nth(SubtreeNoXCLeft, SubtreesXCLeft)]
+                                                    end,
+                                                    SubtreesXC
+                                                ]))
+                                        }, SubtreeNoMin, KeyNoMax, SortFunction, State)
+                                ],
+                                lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                            ]))
                     };
                 KeyNoXCRight >= SubtreeNoMin ->
-                    % CLRS: case 3a - right
+% CLRS: case 3a - right
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXCRight),
                     {
                         KeyNo,
                         SubtreeNo,
-                            lists:sublist(KeyValues, 1, KeyPos - 1) ++ [lists:nth(1, KeyValuesXCRight)] ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                        InsertFunction(StateTarget,
+                        lists:append([
+                            lists:sublist(KeyValues, 1, KeyPos - 1),
+                            [lists:nth(1, KeyValuesXCRight)],
+                            lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                        ]),
+                        InsertFunction(
+                            StateTarget,
                             insert,
-                            lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                                [delete_1(Key, {KeyNoXC + 1, case SubtreeNoXC == 0 of
-                                                                 true ->
-                                                                     0;
-                                                                 _ ->
-                                                                     SubtreeNoXC + 1
-                                                             end, lists:sublist(KeyValuesXC, 1, KeyNoXC) ++ [lists:nth(KeyPos, KeyValues)],
-                                    InsertFunction(StateTarget,
-                                        insert,
-                                        SubtreesXC ++ case SubtreeNoXCRight == 0 of
-                                                          true ->
-                                                              [];
-                                                          _ ->
-                                                              [lists:nth(1, SubtreesXCRight)]
-                                                      end
-                                    )
-                                }, SubtreeNoMin, KeyNoMax, SortFunction, State),
+                            lists:append([
+                                lists:sublist(Subtrees, 1, KeyPos - 1),
+                                [delete_1(
+                                    Key,
+                                    {
+                                        KeyNoXC + 1,
+                                        case SubtreeNoXC == 0 of
+                                            true ->
+                                                0;
+                                            _ ->
+                                                SubtreeNoXC + 1
+                                        end,
+                                        lists:append([
+                                            lists:sublist(KeyValuesXC, 1, KeyNoXC),
+                                            [lists:nth(KeyPos, KeyValues)]
+                                        ]),
+                                        InsertFunction(
+                                            StateTarget,
+                                            insert,
+                                            lists:append([
+                                                SubtreesXC,
+                                                case SubtreeNoXCRight == 0 of
+                                                    true ->
+                                                        [];
+                                                    _ ->
+                                                        [lists:nth(1, SubtreesXCRight)]
+                                                end
+                                            ]))
+                                    }, SubtreeNoMin, KeyNoMax, SortFunction, State),
                                     {KeyNoXCRight - 1, case SubtreeNoXCRight == 0 of
                                                            true ->
                                                                0;
                                                            _ ->
                                                                SubtreeNoXCRight - 1
                                                        end, lists:sublist(KeyValuesXCRight, 2, KeyNoXCRight),
-                                        InsertFunction(StateTarget,
+                                        InsertFunction(
+                                            StateTarget,
                                             insert,
                                             case SubtreeNoXCRight == 0 of
                                                 true ->
                                                     [];
                                                 _ ->
                                                     lists:sublist(SubtreesXCRight, 2, SubtreeNoXCRight)
-                                            end
-                                        )
+                                            end)
                                     }
-                                ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                        )
+                                ],
+                                lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                            ]))
                     };
                 KeyNoXCRight == 0 ->
-                    % CLRS: case 3b left
+% CLRS: case 3b left
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXCLeft),
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     case KeyNo == 1 of
                         true ->
-                            delete_1(Key, {KeyNoXCLeft + KeyNoXC + 1, SubtreeNoXCLeft + SubtreeNoXC, KeyValuesXCLeft ++ KeyValues ++ KeyValuesXC, SubtreesXCLeft ++ SubtreesXC}, SubtreeNoMin, KeyNoMax, SortFunction, State);
+                            delete_1(
+                                Key,
+                                {
+                                    KeyNoXCLeft + KeyNoXC + 1,
+                                    SubtreeNoXCLeft + SubtreeNoXC,
+                                    lists:append([
+                                        KeyValuesXCLeft,
+                                        KeyValues,
+                                        KeyValuesXC
+                                    ]),
+                                    lists:append([
+                                        SubtreesXCLeft,
+                                        SubtreesXC
+                                    ])
+                                },
+                                SubtreeNoMin,
+                                KeyNoMax,
+                                SortFunction,
+                                State);
                         _ ->
                             {
                                 KeyNo - 1,
                                 SubtreeNo - 1,
-                                    lists:sublist(KeyValues, 1, KeyPos - 2) ++ lists:sublist(KeyValues, KeyPos, KeyNo),
-                                InsertFunction(StateTarget,
+                                lists:append([
+                                    lists:sublist(KeyValues, 1, KeyPos - 2),
+                                    lists:sublist(KeyValues, KeyPos, KeyNo)
+                                ]),
+                                InsertFunction(
+                                    StateTarget,
                                     insert,
-                                    lists:sublist(Subtrees, 1, KeyPos - 2) ++
+                                    lists:append([
+                                        lists:sublist(Subtrees, 1, KeyPos - 2),
                                         [
-                                            delete_1(Key, {KeyNoXCLeft + KeyNoXC + 1, case SubtreeNoXC == 0 of
-                                                                                          true ->
-                                                                                              0;
-                                                                                          _ ->
-                                                                                              SubtreeNoXCLeft + SubtreeNoXC
-                                                                                      end, KeyValuesXCLeft ++ [lists:nth(KeyPos - 1, KeyValues)] ++ KeyValuesXC,
-                                                InsertFunction(StateTarget,
-                                                    insert,
-                                                    SubtreesXCLeft ++ SubtreesXC
-                                                )
-                                            }, SubtreeNoMin, KeyNoMax, SortFunction, State)
-                                        ] ++ lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
-                                )
+                                            delete_1(
+                                                Key,
+                                                {
+                                                    KeyNoXCLeft + KeyNoXC + 1,
+                                                    case SubtreeNoXC == 0 of
+                                                        true ->
+                                                            0;
+                                                        _ ->
+                                                            SubtreeNoXCLeft + SubtreeNoXC
+                                                    end,
+                                                    lists:append([
+                                                        KeyValuesXCLeft,
+                                                        [lists:nth(KeyPos - 1, KeyValues)],
+                                                        KeyValuesXC
+                                                    ]),
+                                                    InsertFunction(
+                                                        StateTarget,
+                                                        insert,
+                                                        lists:append([
+                                                            SubtreesXCLeft,
+                                                            SubtreesXC
+                                                        ]))
+                                                }, SubtreeNoMin, KeyNoMax, SortFunction, State)
+                                        ],
+                                        lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                                    ]))
                             }
                     end;
                 true ->
-                    % CLRS: case 3b right
+% CLRS: case 3b right
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXCRight),
                     case KeyNo == 1 of
                         true ->
-                            delete_1(Key, {KeyNoXC + KeyNoXCRight + 1, SubtreeNoXC + SubtreeNoXCRight, KeyValuesXC ++ KeyValues ++ KeyValuesXCRight, SubtreesXC ++ SubtreesXCRight}, SubtreeNoMin, KeyNoMax, SortFunction, State);
+                            delete_1(
+                                Key,
+                                {
+                                    KeyNoXC + KeyNoXCRight + 1,
+                                    SubtreeNoXC + SubtreeNoXCRight,
+                                    lists:append([
+                                        KeyValuesXC,
+                                        KeyValues,
+                                        KeyValuesXCRight
+                                    ]),
+                                    lists:append([
+                                        SubtreesXC,
+                                        SubtreesXCRight
+                                    ])
+                                },
+                                SubtreeNoMin,
+                                KeyNoMax,
+                                SortFunction,
+                                State
+                            );
                         _ ->
                             {
                                 KeyNo - 1,
                                 SubtreeNo - 1,
-                                    lists:sublist(KeyValues, 1, KeyPos - 1) ++ lists:sublist(KeyValues, KeyPos + 1, KeyNo),
-                                InsertFunction(StateTarget,
+                                lists:append([
+                                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                                ]),
+                                InsertFunction(
+                                    StateTarget,
                                     insert,
-                                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
+                                    lists:append([
+                                        lists:sublist(Subtrees, 1, KeyPos - 1),
                                         [
-                                            delete_1(Key, {KeyNoXC + KeyNoXCRight + 1, case SubtreeNoXC == 0 of
-                                                                                           true ->
-                                                                                               0;
-                                                                                           _ ->
-                                                                                               SubtreeNoXC + SubtreeNoXCRight
-                                                                                       end, KeyValuesXC ++ [lists:nth(KeyPos, KeyValues)] ++ KeyValuesXCRight,
-                                                InsertFunction(StateTarget,
-                                                    insert,
-                                                    SubtreesXC ++ SubtreesXCRight
-                                                )
-                                            }, SubtreeNoMin, KeyNoMax, SortFunction, State)
-                                        ] ++ lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
-                                )
+                                            delete_1(
+                                                Key,
+                                                {
+                                                    KeyNoXC + KeyNoXCRight + 1,
+                                                    case SubtreeNoXC == 0 of
+                                                        true ->
+                                                            0;
+                                                        _ ->
+                                                            SubtreeNoXC + SubtreeNoXCRight
+                                                    end,
+                                                    lists:append([
+                                                        KeyValuesXC,
+                                                        [lists:nth(KeyPos, KeyValues)],
+                                                        KeyValuesXCRight
+                                                    ]),
+                                                    InsertFunction(
+                                                        StateTarget,
+                                                        insert,
+                                                        lists:append([
+                                                            SubtreesXC,
+                                                            SubtreesXCRight
+                                                        ]))
+                                                },
+                                                SubtreeNoMin,
+                                                KeyNoMax,
+                                                SortFunction,
+                                                State)
+                                        ],
+                                        lists:sublist(Subtrees, KeyPos + 2, SubtreeNo)
+                                    ]))
                             }
                     end
             end;
         _ ->
-            % CLRS: case 3 else
+% CLRS: case 3 else
             {
                 KeyNo,
                 SubtreeNo,
                 KeyValues,
-                InsertFunction(StateTarget,
+                InsertFunction(
+                    StateTarget,
                     insert,
-                    lists:sublist(Subtrees, 1, KeyPos - 1) ++ [delete_1(Key, TreeXC, SubtreeNoMin, KeyNoMax, SortFunction, State)] ++ lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
-                )
+                    lists:append([
+                        lists:sublist(Subtrees, 1, KeyPos - 1),
+                        [delete_1(
+                            Key,
+                            TreeXC,
+                            SubtreeNoMin,
+                            KeyNoMax,
+                            SortFunction,
+                            State)],
+                        lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                    ]))
             }
     end.
 
@@ -1147,7 +1496,8 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNo
                         KeyNo + 1,
                         SubtreeNo + 1,
                         SplitKeyValues,
-                            SplitSubtrees1 ++
+                        lists:append([
+                            SplitSubtrees1,
                             case SortFunction(KeyValue, lists:nth(SubtreeNoMin, SubtreeKeyValues)) of
                                 less ->
                                     [
@@ -1159,17 +1509,20 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNo
                                         SplitTree1,
                                         insert_1(KeyValue, SplitTree2, SubtreeNoMin, KeyNoMax, SortFunction, nil)
                                     ]
-                            end ++
+                            end,
                             SplitSubtrees2
+                        ])
                     };
                 _ ->
                     {
                         KeyNo,
                         SubtreeNo,
                         KeyValues,
-                            lists:sublist(Subtrees, 1, SubtreePos - 1) ++
-                            [insert_1(KeyValue, Subtree, SubtreeNoMin, KeyNoMax, SortFunction, nil)] ++
+                        lists:append([
+                            lists:sublist(Subtrees, 1, SubtreePos - 1),
+                            [insert_1(KeyValue, Subtree, SubtreeNoMin, KeyNoMax, SortFunction, nil)],
                             lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
+                        ])
                     }
             end;
         _ ->
@@ -1192,9 +1545,11 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, Subtre
                         KeyNo + 1,
                         SubtreeNo + 1,
                         SplitKeyValues,
-                        InsertFunction(StateTarget,
+                        InsertFunction(
+                            StateTarget,
                             insert,
-                            SplitSubtrees1 ++
+                            lists:append([
+                                SplitSubtrees1,
                                 case SortFunction(KeyValue, lists:nth(SubtreeNoMin, SubtreeKeyValues)) of
                                     less ->
                                         [
@@ -1206,22 +1561,23 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, Subtre
                                             SplitTree1,
                                             insert_1(KeyValue, SplitTree2, SubtreeNoMin, KeyNoMax, SortFunction, State)
                                         ]
-                                end ++
+                                end,
                                 SplitSubtrees2
-                        )
-
+                            ]))
                     };
                 _ ->
                     {
                         KeyNo,
                         SubtreeNo,
                         KeyValues,
-                        InsertFunction(StateTarget,
+                        InsertFunction(
+                            StateTarget,
                             insert,
-                            lists:sublist(Subtrees, 1, SubtreePos - 1) ++
-                                [insert_1(KeyValue, Subtree, SubtreeNoMin, KeyNoMax, SortFunction, State)] ++
+                            lists:append([
+                                lists:sublist(Subtrees, 1, SubtreePos - 1),
+                                [insert_1(KeyValue, Subtree, SubtreeNoMin, KeyNoMax, SortFunction, State)],
                                 lists:sublist(Subtrees, SubtreePos + 1, KeyNo + 1)
-                        )
+                            ]))
                     }
             end;
         _ ->
@@ -1234,7 +1590,11 @@ insert_key_value({Key, _} = KeyValue, KeyValues, KeyNo, SortFunction) ->
     {ValueFound, KeyPos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
     case ValueFound of
         none ->
-            lists:sublist(KeyValues, 1, KeyPos - 1) ++ [KeyValue] ++ lists:sublist(KeyValues, KeyPos, KeyNo);
+            lists:append([
+                lists:sublist(KeyValues, 1, KeyPos - 1),
+                [KeyValue],
+                lists:sublist(KeyValues, KeyPos, KeyNo)
+            ]);
         _ ->
             erlang:error({key_exists, Key})
     end.
@@ -1309,10 +1669,10 @@ split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeK
                 true ->
                     [];
                 _ ->
-                    InsertFunction(StateTarget,
+                    InsertFunction(
+                        StateTarget,
                         insert,
-                        lists:sublist(TreeSubtrees, 1, SubtreeNoMin)
-                    )
+                        lists:sublist(TreeSubtrees, 1, SubtreeNoMin))
             end
         },
         % SplitTree 2 ..........................................................
@@ -1330,10 +1690,10 @@ split_node_non_root(KeyNo, KeyValues, Subtrees, {TreeKeyNo, TreeSubtreeNo, TreeK
                 true ->
                     [];
                 _ ->
-                    InsertFunction(StateTarget,
+                    InsertFunction(
+                        StateTarget,
                         insert,
-                        lists:sublist(TreeSubtrees, SubtreeNoMin + 1, TreeKeyNo + 1)
-                    )
+                        lists:sublist(TreeSubtrees, SubtreeNoMin + 1, TreeKeyNo + 1))
             end
         },
         % SplitSubtrees2 .......................................................
@@ -1368,7 +1728,8 @@ split_node_root({KeyNo, 0, KeyValues, []}, SubtreeNoMin, {StateTarget, _, Insert
         1,
         2,
         [lists:nth(SubtreeNoMin, KeyValues)],
-        InsertFunction(StateTarget,
+        InsertFunction(
+            StateTarget,
             insert,
             [
                 {
@@ -1383,8 +1744,7 @@ split_node_root({KeyNo, 0, KeyValues, []}, SubtreeNoMin, {StateTarget, _, Insert
                     lists:sublist(KeyValues, SubtreeNoMin + 1, KeyNo),
                     []
                 }
-            ]
-        )
+            ])
     };
 split_node_root({KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, nil) ->
     {
@@ -1413,29 +1773,29 @@ split_node_root({KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, {State
         1,
         2,
         [lists:nth(SubtreeNoMin, KeyValues)],
-        InsertFunction(StateTarget,
+        InsertFunction(
+            StateTarget,
             insert,
             [
                 {
                     SubtreeNoMin - 1,
                     SubtreeNoMin,
                     lists:sublist(KeyValues, 1, SubtreeNoMin - 1),
-                    InsertFunction(StateTarget,
+                    InsertFunction(
+                        StateTarget,
                         insert,
-                        lists:sublist(Subtrees, 1, SubtreeNoMin)
-                    )
+                        lists:sublist(Subtrees, 1, SubtreeNoMin))
                 },
                 {
                     KeyNo - SubtreeNoMin,
                     KeyNo - SubtreeNoMin + 1,
                     lists:sublist(KeyValues, SubtreeNoMin + 1, KeyNo),
-                    InsertFunction(StateTarget,
+                    InsertFunction(
+                        StateTarget,
                         insert,
-                        lists:sublist(Subtrees, SubtreeNoMin + 1, SubtreeNo)
-                    )
+                        lists:sublist(Subtrees, SubtreeNoMin + 1, SubtreeNo))
                 }
-            ]
-        )
+            ])
     }.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1534,17 +1894,42 @@ keys_1([], [], _, Keys) ->
     Keys;
 % Leaf node.
 keys_1([{Key, _} | Tail], [], State, Keys) ->
-    keys_1(Tail, [], State, Keys ++ [Key]);
+    keys_1(Tail, [], State, lists:append([
+        Keys,
+        [Key]
+    ]));
 % The most right subtree.
 keys_1([], [{_, _, KeyValues, Subtrees}], nil, Keys) ->
-    Keys ++ keys_1(KeyValues, Subtrees, nil, []);
+    lists:append([
+        Keys,
+        keys_1(KeyValues, Subtrees, nil, [])
+    ]);
 keys_1([], [{_, _, KeyValues, SubtreesKey}], {StateTarget, _, _, LookupFunction} = State, Keys) ->
-    Keys ++ keys_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []);
+    lists:append([
+        Keys,
+        keys_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, [])
+    ]);
 % Left subtree and current key.
 keys_1([{Key, _} | TailKeyValues], [{_, _, KeyValues, Subtrees} | TailSubtrees], nil, Keys) ->
-    keys_1(TailKeyValues, TailSubtrees, nil, Keys ++ keys_1(KeyValues, Subtrees, nil, []) ++ [Key]);
+    keys_1(
+        TailKeyValues,
+        TailSubtrees,
+        nil,
+        lists:append([
+            Keys,
+            keys_1(KeyValues, Subtrees, nil, []),
+            [Key]
+        ]));
 keys_1([{Key, _} | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSubtrees], {StateTarget, _, _, LookupFunction} = State, Keys) ->
-    keys_1(TailKeyValues, TailSubtrees, State, Keys ++ keys_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []) ++ [Key]).
+    keys_1(
+        TailKeyValues,
+        TailSubtrees,
+        State,
+        lists:append([
+            Keys,
+            keys_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []),
+            [Key]
+        ])).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1593,7 +1978,13 @@ map(Function, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, Tree}
 map_key_values(_, [], KeyValuesMapped) ->
     KeyValuesMapped;
 map_key_values(Function, [{Key, Value} | Tail], KeyValuesMapped) ->
-    map_key_values(Function, Tail, KeyValuesMapped ++ [{Key, Function(Key, Value)}]).
+    map_key_values(
+        Function,
+        Tail,
+        lists:append([
+            KeyValuesMapped,
+            [{Key, Function(Key, Value)}]
+        ])).
 
 -spec map_subtree(map_function(), state(), subtree()) -> subtree().
 
@@ -1612,7 +2003,14 @@ map_subtree(Function, {StateTarget, DeleteFunction, InsertFunction, LookupFuncti
 map_subtrees(_, _, [], TreesMapped) ->
     TreesMapped;
 map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
-    map_subtrees(Function, State, Tail, TreesMapped ++ [map_subtree(Function, State, Tree)]).
+    map_subtrees(
+        Function,
+        State,
+        Tail,
+        lists:append([
+            TreesMapped,
+            [map_subtree(Function, State, Tree)]
+        ])).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1621,7 +2019,10 @@ map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
 
 % One level up.
 next([{[], _, _}, {[], _, _} = Iterator | TailIterator]) ->
-    next([Iterator] ++ TailIterator);
+    next(lists:append([
+        [Iterator],
+        TailIterator
+    ]));
 % End of leaf node.
 next([{[], _, _}, {[{Key, Value} | TailKeyValues], [_ | TailSubtrees], State} | TailIterator]) ->
     {Key, Value, iterator_1({TailKeyValues, TailSubtrees, State}, TailIterator)};
@@ -1760,17 +2161,46 @@ to_list_1([], [], _, KeyValueList) ->
     KeyValueList;
 % Leaf node.
 to_list_1([KeyValue | Tail], [], State, KeyValueList) ->
-    to_list_1(Tail, [], State, KeyValueList ++ [KeyValue]);
+    to_list_1(
+        Tail,
+        [],
+        State,
+        lists:append([
+            KeyValueList,
+            [KeyValue]
+        ]));
 % The most right subtree.
 to_list_1([], [{_, _, KeyValues, Subtrees}], nil, KeyValueList) ->
-    KeyValueList ++ to_list_1(KeyValues, Subtrees, nil, []);
+    lists:append([
+        KeyValueList,
+        to_list_1(KeyValues, Subtrees, nil, [])
+    ]);
 to_list_1([], [{_, _, KeyValues, SubtreesKey}], {StateTarget, _, _, LookupFunction} = State, KeyValueList) ->
-    KeyValueList ++ to_list_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []);
+    lists:append([
+        KeyValueList,
+        to_list_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, [])
+    ]);
 % Left subtree and key / value from current key.
 to_list_1([KeyValue | TailKeyValues], [{_, _, KeyValues, Subtrees} | TailSubtrees], nil, KeyValueList) ->
-    to_list_1(TailKeyValues, TailSubtrees, nil, KeyValueList ++ to_list_1(KeyValues, Subtrees, nil, []) ++ [KeyValue]);
+    to_list_1(
+        TailKeyValues,
+        TailSubtrees,
+        nil,
+        lists:append([
+            KeyValueList,
+            to_list_1(KeyValues, Subtrees, nil, []),
+            [KeyValue]
+        ]));
 to_list_1([KeyValue | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSubtrees], {StateTarget, _, _, LookupFunction} = State, KeyValueList) ->
-    to_list_1(TailKeyValues, TailSubtrees, State, KeyValueList ++ to_list_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []) ++ [KeyValue]).
+    to_list_1(
+        TailKeyValues,
+        TailSubtrees,
+        State,
+        lists:append([
+            KeyValueList,
+            to_list_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []),
+            [KeyValue]
+        ])).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1793,9 +2223,11 @@ update_1({Key, _} = KeyValue, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
             {
                 KeyNo,
                 0,
-                    lists:sublist(KeyValues, 1, KeyPos - 1) ++
-                    [KeyValue] ++
-                    lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                lists:append([
+                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                    [KeyValue],
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                ]),
                 []
             }
     end;
@@ -1807,17 +2239,21 @@ update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SortFunct
                 KeyNo,
                 SubtreeNo,
                 KeyValues,
-                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                    [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction, nil)] ++
+                lists:append([
+                    lists:sublist(Subtrees, 1, KeyPos - 1),
+                    [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction, nil)],
                     lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
+                ])
             };
         _ ->
             {
                 KeyNo,
                 SubtreeNo,
-                    lists:sublist(KeyValues, 1, KeyPos - 1) ++
-                    [KeyValue] ++
-                    lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                lists:append([
+                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                    [KeyValue],
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                ]),
                 Subtrees
             }
     end;
@@ -1831,20 +2267,24 @@ update_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SortFu
                 KeyNo,
                 SubtreeNo,
                 KeyValues,
-                InsertFunction(StateTarget,
+                InsertFunction(
+                    StateTarget,
                     insert,
-                    lists:sublist(Subtrees, 1, KeyPos - 1) ++
-                        [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction, State)] ++
+                    lists:append([
+                        lists:sublist(Subtrees, 1, KeyPos - 1),
+                        [update_1(KeyValue, lists:nth(KeyPos, Subtrees), SortFunction, State)],
                         lists:sublist(Subtrees, KeyPos + 1, SubtreeNo)
-                )
+                    ]))
             };
         _ ->
             {
                 KeyNo,
                 SubtreeNo,
-                    lists:sublist(KeyValues, 1, KeyPos - 1) ++
-                    [KeyValue] ++
-                    lists:sublist(KeyValues, KeyPos + 1, KeyNo),
+                lists:append([
+                    lists:sublist(KeyValues, 1, KeyPos - 1),
+                    [KeyValue],
+                    lists:sublist(KeyValues, KeyPos + 1, KeyNo)
+                ]),
                 SubtreesKey
             }
     end.
@@ -1866,17 +2306,46 @@ values_1([], [], _, Values) ->
     Values;
 % Leaf node.
 values_1([{_, Value} | Tail], [], State, Values) ->
-    values_1(Tail, [], State, Values ++ [Value]);
+    values_1(
+        Tail,
+        [],
+        State,
+        lists:append([
+            Values,
+            [Value]
+        ]));
 % The most right subtree.
 values_1([], [{_, _, KeyValues, Subtrees}], nil, Values) ->
-    Values ++ values_1(KeyValues, Subtrees, nil, []);
+    lists:append([
+        Values,
+        values_1(KeyValues, Subtrees, nil, [])
+    ]);
 values_1([], [{_, _, KeyValues, SubtreesKey}], {StateTarget, _, _, LookupFunction} = State, Values) ->
-    Values ++ values_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []);
+    lists:append([
+        Values,
+        values_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, [])
+    ]);
 % Left subtree and value from current key.
 values_1([{_, Value} | TailKeyValues], [{_, _, KeyValues, Subtrees} | TailSubtrees], nil, Values) ->
-    values_1(TailKeyValues, TailSubtrees, nil, Values ++ values_1(KeyValues, Subtrees, nil, []) ++ [Value]);
+    values_1(
+        TailKeyValues,
+        TailSubtrees,
+        nil,
+        lists:append([
+            Values,
+            values_1(KeyValues, Subtrees, nil, []),
+            [Value]
+        ]));
 values_1([{_, Value} | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSubtrees], {StateTarget, _, _, LookupFunction} = State, Values) ->
-    values_1(TailKeyValues, TailSubtrees, State, Values ++ values_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []) ++ [Value]).
+    values_1(
+        TailKeyValues,
+        TailSubtrees,
+        State,
+        lists:append([
+            Values,
+            values_1(KeyValues, LookupFunction(StateTarget, lookup, SubtreesKey), State, []),
+            [Value]
+        ])).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Helper functions.

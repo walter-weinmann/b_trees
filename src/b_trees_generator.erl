@@ -661,6 +661,7 @@ persistence_by_dets(StateTarget, lookup, SubtreesKey) ->
         true ->
             SubtreesKey;
         _ ->
+            ct:pal("wwe debugging persistence_by_dets ===> ~n StateTarget: ~p~n SubtreesKey: ~p~n", [StateTarget, SubtreesKey]),
             [{SubtreesKey, Subtrees}] = dets:lookup(StateTarget, SubtreesKey),
             Subtrees
     end.
