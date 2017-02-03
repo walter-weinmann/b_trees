@@ -795,8 +795,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
                                                                               lists:nth(KeyPos - 1, Subtrees)
                                                                       end,
     {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesXC} = TreeXC = lists:nth(KeyPos, Subtrees),
-    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = case KeyPos == SubtreeNo of
-                                                                              true ->
+    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesXCRight} = case KeyPos of
+                                                                              SubtreeNo ->
                                                                                   {0, 0, [], []};
                                                                               _ ->
                                                                                   lists:nth(KeyPos + 1, Subtrees)
@@ -1065,8 +1065,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin
     SubtreesXCLeft = LookupFunction(StateTarget, lookup, SubtreesKeyXCLeft),
     {KeyNoXC, SubtreeNoXC, KeyValuesXC, SubtreesKeyXC} = TreeXC = lists:nth(KeyPos, Subtrees),
     SubtreesXC = LookupFunction(StateTarget, lookup, SubtreesKeyXC),
-    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesKeyXCRight} = case KeyPos == SubtreeNo of
-                                                                                 true ->
+    {KeyNoXCRight, SubtreeNoXCRight, KeyValuesXCRight, SubtreesKeyXCRight} = case KeyPos of
+                                                                                 SubtreeNo ->
                                                                                      {0, 0, [], []};
                                                                                  _ ->
                                                                                      lists:nth(KeyPos + 1, Subtrees)
@@ -1432,8 +1432,7 @@ from_dict_1([{Key, Value} | Tail], BTree) ->
 get(Key, {_, _, 0, _, _, nil}) ->
     erlang:error({key_not_found, Key});
 get(Key, {_, _, _, SortFunction, State, Tree}) ->
-    case lookup_1(Key, Tree, SortFunction, State)
-    of
+    case lookup_1(Key, Tree, SortFunction, State) of
         {value, Value} ->
             Value;
         _ ->
@@ -1488,9 +1487,9 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNo
         none ->
             % Look ahead.
             {SubtreeKeyNo, _, SubtreeKeyValues, _} = Subtree = lists:nth(SubtreePos, Subtrees),
-            case SubtreeKeyNo == KeyNoMax of
+            case SubtreeKeyNo of
                 % Split node.
-                true ->
+                KeyNoMax ->
                     {SplitKeyValues, SplitSubtrees1, SplitTree1, SplitTree2, SplitSubtrees2} = split_node_non_root(KeyNo, KeyValues, Subtrees, Subtree, SubtreePos, SubtreeNoMin, SortFunction, nil),
                     {
                         KeyNo + 1,
@@ -1537,9 +1536,9 @@ insert_1({Key, _} = KeyValue, {KeyNo, SubtreeNo, KeyValues, SubtreesKey}, Subtre
         none ->
             % Look ahead.
             {SubtreeKeyNo, _, SubtreeKeyValues, _} = Subtree = lists:nth(SubtreePos, Subtrees),
-            case SubtreeKeyNo == KeyNoMax of
+            case SubtreeKeyNo of
                 % Split node.
-                true ->
+                KeyNoMax ->
                     {SplitKeyValues, SplitSubtrees1, SplitTree1, SplitTree2, SplitSubtrees2} = split_node_non_root(KeyNo, KeyValues, Subtrees, Subtree, SubtreePos, SubtreeNoMin, SortFunction, State),
                     {
                         KeyNo + 1,
@@ -1807,8 +1806,8 @@ split_node_root({KeyNo, SubtreeNo, KeyValues, SubtreesKey}, SubtreeNoMin, {State
 is_defined(_, {_, _, 0, _, _, nil}) ->
     false;
 is_defined(Key, {_, _, _, SortFunction, State, Tree}) ->
-    case lookup_1(Key, Tree, SortFunction, State) == none of
-        true ->
+    case lookup_1(Key, Tree, SortFunction, State) of
+        none ->
             false;
         _ ->
             true
@@ -2395,8 +2394,8 @@ binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) ->
 % Leaf node.
 lookup_1(Key, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
     {Value, _} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
-    case Value == none of
-        true ->
+    case Value of
+        none ->
             Value;
         _ ->
             {value, Value}
@@ -2404,16 +2403,16 @@ lookup_1(Key, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
 % Non-Leaf node.
 lookup_1(Key, {KeyNo, _, KeyValues, Subtrees}, SortFunction, nil) ->
     {Value, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
-    case Value == none of
-        true ->
+    case Value of
+        none ->
             lookup_1(Key, lists:nth(Pos, Subtrees), SortFunction, nil);
         _ ->
             {value, Value}
     end;
 lookup_1(Key, {KeyNo, _, KeyValues, SubtreesKey}, SortFunction, {StateTarget, _, _, LookupFunction} = State) ->
     {Value, Pos} = binary_search(Key, KeyValues, KeyNo, 1, KeyNo, SortFunction),
-    case Value == none of
-        true ->
+    case Value of
+        none ->
             lookup_1(Key, lists:nth(Pos, LookupFunction(StateTarget, lookup, SubtreesKey)), SortFunction, State);
         _ ->
             {value, Value}
