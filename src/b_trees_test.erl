@@ -32,8 +32,8 @@ copy_test() ->
     {ok, _} = dets:open_file(b_tree_4_dets, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets"}]),
     {ok, _} = dets:open_file(b_tree_4_dets_empty, [{file, ?DIRECTORY_DETS ++ "b_tree_4_dets_empty"}]),
 
-    case ok == mnesia:create_schema([node()]) of
-        true ->
+    case mnesia:create_schema([node()]) of
+        ok ->
             ok;
         _ ->
             ok = mnesia:delete_schema([node()]),
