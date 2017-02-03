@@ -316,8 +316,8 @@ delete(Key, {SubtreeNoMin, KeyNoMax, SizeKeyValues, SortFunction, State, {KeyNo,
         none ->
             erlang:error({key_not_found, Key});
         _ ->
-            {SubtreeNoMin, KeyNoMax, SizeKeyValues - 1, SortFunction, State, case KeyNo == 1 of
-                                                                                 true ->
+            {SubtreeNoMin, KeyNoMax, SizeKeyValues - 1, SortFunction, State, case KeyNo of
+                                                                                 1 ->
                                                                                      nil;
                                                                                  _ ->
                                                                                      {
@@ -524,8 +524,8 @@ delete_1_2(_, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, _, KeyPos, 
                                     lists:nth(1, SubtreesXCRight)
                                 }
                         end,
-                    case KeyNo == 1 of
-                        true ->
+                    case KeyNo of
+                        1 ->
                             {
                                 KeyNoXC + KeyNoXCRight,
                                 case SubtreeNoXCRight == 0 of
@@ -715,8 +715,8 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
                                     lists:nth(1, SubtreesXCRight)
                                 }
                         end,
-                    case KeyNo == 1 of
-                        true ->
+                    case KeyNo of
+                        1 ->
                             {
                                 KeyNoXC + KeyNoXCRight,
                                 case SubtreeNoXCRight == 0 of
@@ -788,8 +788,8 @@ delete_1_2(_Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMi
 -spec delete_1_3(key(), subtree(), pos_integer(), pos_integer(), pos_integer(), sort_function(), state()) -> subtree().
 
 delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction, nil) ->
-    {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesXCLeft} = case KeyPos == 1 of
-                                                                          true ->
+    {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesXCLeft} = case KeyPos of
+                                                                          1 ->
                                                                               {0, 0, [], []};
                                                                           _ ->
                                                                               lists:nth(KeyPos - 1, Subtrees)
@@ -918,8 +918,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
                     };
                 KeyNoXCRight == 0 ->
 % CLRS: case 3b left
-                    case KeyNo == 1 of
-                        true ->
+                    case KeyNo of
+                        1 ->
                             delete_1(
                                 Key,
                                 {
@@ -977,8 +977,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
                     end;
                 true ->
 % CLRS: case 3b right
-                    case KeyNo == 1 of
-                        true ->
+                    case KeyNo of
+                        1 ->
                             delete_1(
                                 Key,
                                 {
@@ -1056,8 +1056,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, Subtrees}, SubtreeNoMin, KeyNoMax,
 delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin, KeyNoMax, KeyPos, SortFunction, {StateTarget, DeleteFunction, InsertFunction, LookupFunction} = State) ->
     Subtrees = LookupFunction(StateTarget, lookup, SubtreesKey),
     true = DeleteFunction(StateTarget, delete, SubtreesKey),
-    {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesKeyXCLeft} = case KeyPos == 1 of
-                                                                             true ->
+    {KeyNoXCLeft, SubtreeNoXCLeft, KeyValuesXCLeft, SubtreesKeyXCLeft} = case KeyPos of
+                                                                             1 ->
                                                                                  {0, 0, [], []};
                                                                              _ ->
                                                                                  lists:nth(KeyPos - 1, Subtrees)
@@ -1207,8 +1207,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin
 % CLRS: case 3b left
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXCLeft),
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
-                    case KeyNo == 1 of
-                        true ->
+                    case KeyNo of
+                        1 ->
                             delete_1(
                                 Key,
                                 {
@@ -1274,8 +1274,8 @@ delete_1_3(Key, {KeyNo, SubtreeNo, KeyValues, SubtreesKey} = _Tree, SubtreeNoMin
 % CLRS: case 3b right
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXC),
                     true = DeleteFunction(StateTarget, delete, SubtreesKeyXCRight),
-                    case KeyNo == 1 of
-                        true ->
+                    case KeyNo of
+                        1 ->
                             delete_1(
                                 Key,
                                 {
