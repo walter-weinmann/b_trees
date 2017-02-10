@@ -1,5 +1,5 @@
-/_build
-/erl_crash.dump
-/rebar.lock
-/test/tmp
-/test/*.beam
+_build
+erl_crash.dump
+rebar.lock
+test/tmp
+test/*.beam
