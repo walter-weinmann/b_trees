@@ -192,7 +192,7 @@
 -type delete_function() :: fun((state_target(), 'delete', subtrees_key()) -> 'ok').
 
 -type gb_iter() :: gb_trees:iter().
--type gb_tree() :: gb_trees:tree().
+-type gb_tree() :: gb_trees:tree() | {0, nil}.
 
 -type insert_function() :: fun((state_target(), 'insert', subtrees()) -> subtrees_key()).
 
@@ -1955,8 +1955,7 @@ largest_1({_, SubtreeNo, _, Subtrees}, {StateTarget, _, _, LookupFunction} = Sta
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec lookup(key(), b_tree()) -> 'none'
-; (key(), b_tree()) -> {'value', value()}.
+-spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
 
 lookup(_, {_, _, 0, _, _, nil}) ->
     none;
@@ -2013,8 +2012,7 @@ map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec next(iter()) -> 'none'
-; (iter()) -> {key(), value(), iter()}.
+-spec next(iter()) -> 'none' | {key(), value(), iter()}.
 
 % One level up.
 next([{[], _, _}, {[], _, _} = Iterator | TailIterator]) ->
@@ -2116,8 +2114,7 @@ take(Key, BTree) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_any(key(), b_tree()) -> error
-; (key(), b_tree()) -> {value(), b_tree()}.
+-spec take_any(key(), b_tree()) -> 'error' | {value(), b_tree()}.
 
 take_any(Key, BTree) ->
     case is_defined(Key, BTree) of
@@ -2350,8 +2347,7 @@ values_1([{_, Value} | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSub
 %% Helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {none, pos_integer()}
-; (key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {any(), pos_integer()}.
+-spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {'none', pos_integer()} | {any(), pos_integer()}.
 
 binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) when Lower > Upper ->
     TreeNo = case Lower > KeyNo of
@@ -2388,8 +2384,7 @@ binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) ->
 %% equality, and also allows us to skip the test completely in the
 %% remaining case.
 
--spec lookup_1(key(), subtree(), sort_function(), state()) -> 'none'
-; (key(), subtree(), sort_function(), state()) -> {'value', value()}.
+-spec lookup_1(key(), subtree(), sort_function(), state()) -> 'none' |  {'value', value()}.
 
 % Leaf node.
 lookup_1(Key, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->

@@ -471,7 +471,7 @@ generate_keys_till(Number, Width) when Number >= 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_any_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+-spec take_any_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> {any(), b_trees:b_tree()}.
 
 take_any_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
     BTree = generate_b_tree_from_number(Order, Number, Width),
@@ -480,7 +480,7 @@ take_any_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_any_gb_tree_from(pos_integer(), pos_integer()) -> gb_trees:tree().
+-spec take_any_gb_tree_from(pos_integer(), pos_integer()) -> {any(), gb_trees:tree()}.
 
 take_any_gb_tree_from(Number, Width) when Number > 0 ->
     GBTree = generate_gb_tree_from_number(Number, Width),
@@ -489,7 +489,7 @@ take_any_gb_tree_from(Number, Width) when Number > 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> b_trees:b_tree().
+-spec take_b_tree_from(pos_integer(), pos_integer(), pos_integer()) -> {any(), b_trees:b_tree()}.
 
 take_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
     BTree = generate_b_tree_from_number(Order, Number, Width),
@@ -498,7 +498,7 @@ take_b_tree_from(Order, Number, Width) when Order > 3, Number > 0 ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_gb_tree_from(pos_integer(), pos_integer()) -> gb_trees:tree().
+-spec take_gb_tree_from(pos_integer(), pos_integer()) -> {any(), gb_trees:tree()}.
 
 take_gb_tree_from(Number, Width) when Number > 0 ->
     GBTree = generate_gb_tree_from_number(Number, Width),
