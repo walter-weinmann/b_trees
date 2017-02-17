@@ -8,11 +8,7 @@
             ]
         },
         {description, "B-trees in Erlang"},
-        {modules,
-            [
-                b_trees
-            ]
-        },
-        {vsn, "1.4.4"}
+        {modules, [b_trees]},
+        {vsn, "1.4.5"}
     ]
 }.

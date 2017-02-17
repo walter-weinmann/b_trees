@@ -187,16 +187,13 @@
 
 -export_type([b_tree/0, iter/0]).
 
--type b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), subtree()}.
+-opaque b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), subtree()}.
 
 -type delete_function() :: fun((state_target(), 'delete', subtrees_key()) -> 'ok').
 
--type gb_iter() :: gb_trees:iter().
--type gb_tree() :: gb_trees:tree().
-
 -type insert_function() :: fun((state_target(), 'insert', subtrees()) -> subtrees_key()).
 
--type iter() :: [{key_values(), subtrees(), state()}].
+-opaque iter() :: [{key_values(), subtrees(), state()}].
 
 -type key() :: any().
 -type keys() :: [key()].
@@ -227,9 +224,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec copy(b_tree(), b_tree()) -> b_tree()
-; (b_tree(), gb_tree()) -> gb_tree()
-; (gb_tree(), b_tree()) -> b_tree().
+-spec copy(b_tree(), b_tree()) -> b_tree();
+    (b_tree(), gb_trees:tree()) -> gb_trees:tree();
+    (gb_trees:tree(), b_tree()) -> b_tree().
 
 % Copy tree to b-tree.
 copy(Tree1, {MinimumSubtrees2, _, 0, _, State2, nil} = Tree2) ->
@@ -249,7 +246,7 @@ copy(Tree1, {MinimumSubtrees2, _, 0, _, State2, nil} = Tree2) ->
             copy_binary_tree_to_b_tree(Tree1, Tree2)
     end;
 % Copy tree to binary tree.
-copy(Tree1, {0, nil} = Tree2) ->
+copy(Tree1, Tree2) ->
     case Tree1 of
         {_, _, 0, _, _, nil} ->
             Tree2;
@@ -272,28 +269,26 @@ copy_b_tree_to_b_tree_iterator(none, BTree) ->
 copy_b_tree_to_b_tree_iterator({Key, Value, Iterator}, BTree) ->
     copy_b_tree_to_b_tree_iterator(next(Iterator), insert(Key, Value, BTree)).
 
--spec copy_b_tree_to_binary_tree(b_tree(), gb_tree()) -> gb_tree().
+-spec copy_b_tree_to_binary_tree(b_tree(), gb_trees:tree()) -> gb_trees:tree().
 
 % Copy b-tree to binary tree.
 copy_b_tree_to_binary_tree(BTree, GBTree) ->
     copy_b_tree_to_binary_tree_iterator(next(iterator(BTree)), GBTree).
 
--spec copy_b_tree_to_binary_tree_iterator('none', gb_tree()) -> gb_tree()
-; ({key(), value(), iter()}, gb_tree()) -> gb_tree().
+-spec copy_b_tree_to_binary_tree_iterator('none' | {key(), value(), iter()}, gb_trees:tree()) -> gb_trees:tree().
 
 copy_b_tree_to_binary_tree_iterator(none, GBTree) ->
     GBTree;
 copy_b_tree_to_binary_tree_iterator({Key, Value, Iterator}, GBTree) ->
     copy_b_tree_to_binary_tree_iterator(next(Iterator), gb_trees:insert(Key, Value, GBTree)).
 
--spec copy_binary_tree_to_b_tree(gb_tree(), b_tree()) -> b_tree().
+-spec copy_binary_tree_to_b_tree(gb_trees:tree(), b_tree()) -> b_tree().
 
 % Copy binary tree to b-tree.
 copy_binary_tree_to_b_tree(GBTree, BTree) ->
     copy_binary_tree_to_b_tree_iterator(gb_trees:next(gb_trees:iterator(GBTree)), BTree).
 
--spec copy_binary_tree_to_b_tree_iterator('none', b_tree()) -> b_tree()
-; ({key(), value(), gb_iter()}, b_tree()) -> b_tree().
+-spec copy_binary_tree_to_b_tree_iterator('none' | {key(), value(), gb_trees:iter()}, b_tree()) -> b_tree().
 
 copy_binary_tree_to_b_tree_iterator(none, BTree) ->
     BTree;
@@ -1955,8 +1950,7 @@ largest_1({_, SubtreeNo, _, Subtrees}, {StateTarget, _, _, LookupFunction} = Sta
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec lookup(key(), b_tree()) -> 'none'
-; (key(), b_tree()) -> {'value', value()}.
+-spec lookup(key(), b_tree()) -> 'none' | {'value', value()}.
 
 lookup(_, {_, _, 0, _, _, nil}) ->
     none;
@@ -2013,8 +2007,7 @@ map_subtrees(Function, State, [Tree | Tail], TreesMapped) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec next(iter()) -> 'none'
-; (iter()) -> {key(), value(), iter()}.
+-spec next(iter()) -> 'none' | {key(), value(), iter()}.
 
 % One level up.
 next([{[], _, _}, {[], _, _} = Iterator | TailIterator]) ->
@@ -2116,8 +2109,7 @@ take(Key, BTree) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec take_any(key(), b_tree()) -> error
-; (key(), b_tree()) -> {value(), b_tree()}.
+-spec take_any(key(), b_tree()) -> 'error' | {value(), b_tree()}.
 
 take_any(Key, BTree) ->
     case is_defined(Key, BTree) of
@@ -2350,8 +2342,7 @@ values_1([{_, Value} | TailKeyValues], [{_, _, KeyValues, SubtreesKey} | TailSub
 %% Helper functions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {none, pos_integer()}
-; (key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {any(), pos_integer()}.
+-spec binary_search(key(), key_values(), pos_integer(), pos_integer(), pos_integer(), sort_function()) -> {'none', pos_integer()} | {any(), pos_integer()}.
 
 binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) when Lower > Upper ->
     TreeNo = case Lower > KeyNo of
@@ -2388,8 +2379,7 @@ binary_search(Key, KeyValues, KeyNo, Lower, Upper, SortFunction) ->
 %% equality, and also allows us to skip the test completely in the
 %% remaining case.
 
--spec lookup_1(key(), subtree(), sort_function(), state()) -> 'none'
-; (key(), subtree(), sort_function(), state()) -> {'value', value()}.
+-spec lookup_1(key(), subtree(), sort_function(), state()) -> 'none' |  {'value', value()}.
 
 % Leaf node.
 lookup_1(Key, {KeyNo, 0, KeyValues, []}, SortFunction, _) ->
