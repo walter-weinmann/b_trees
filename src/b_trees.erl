@@ -187,16 +187,13 @@
 
 -export_type([b_tree/0, iter/0]).
 
--type b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), subtree()}.
+-opaque b_tree() :: {MinimumSubtrees :: pos_integer(), MaximumKeys :: pos_integer(), SizeKeyValues :: non_neg_integer(), sort_function(), state(), subtree()}.
 
 -type delete_function() :: fun((state_target(), 'delete', subtrees_key()) -> 'ok').
 
--type gb_iter() :: gb_trees:iter().
--type gb_tree() :: gb_trees:tree() | {0, nil}.
-
 -type insert_function() :: fun((state_target(), 'insert', subtrees()) -> subtrees_key()).
 
--type iter() :: [{key_values(), subtrees(), state()}].
+-opaque iter() :: [{key_values(), subtrees(), state()}].
 
 -type key() :: any().
 -type keys() :: [key()].
@@ -227,9 +224,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec copy(b_tree(), b_tree()) -> b_tree()
-; (b_tree(), gb_tree()) -> gb_tree()
-; (gb_tree(), b_tree()) -> b_tree().
+-spec copy(b_tree(), b_tree()) -> b_tree();
+    (b_tree(), gb_trees:tree()) -> gb_trees:tree();
+    (gb_trees:tree(), b_tree()) -> b_tree().
 
 % Copy tree to b-tree.
 copy(Tree1, {MinimumSubtrees2, _, 0, _, State2, nil} = Tree2) ->
@@ -249,7 +246,7 @@ copy(Tree1, {MinimumSubtrees2, _, 0, _, State2, nil} = Tree2) ->
             copy_binary_tree_to_b_tree(Tree1, Tree2)
     end;
 % Copy tree to binary tree.
-copy(Tree1, {0, nil} = Tree2) ->
+copy(Tree1, Tree2) ->
     case Tree1 of
         {_, _, 0, _, _, nil} ->
             Tree2;
@@ -272,28 +269,26 @@ copy_b_tree_to_b_tree_iterator(none, BTree) ->
 copy_b_tree_to_b_tree_iterator({Key, Value, Iterator}, BTree) ->
     copy_b_tree_to_b_tree_iterator(next(Iterator), insert(Key, Value, BTree)).
 
--spec copy_b_tree_to_binary_tree(b_tree(), gb_tree()) -> gb_tree().
+-spec copy_b_tree_to_binary_tree(b_tree(), gb_trees:tree()) -> gb_trees:tree().
 
 % Copy b-tree to binary tree.
 copy_b_tree_to_binary_tree(BTree, GBTree) ->
     copy_b_tree_to_binary_tree_iterator(next(iterator(BTree)), GBTree).
 
--spec copy_b_tree_to_binary_tree_iterator('none', gb_tree()) -> gb_tree()
-; ({key(), value(), iter()}, gb_tree()) -> gb_tree().
+-spec copy_b_tree_to_binary_tree_iterator('none' | {key(), value(), iter()}, gb_trees:tree()) -> gb_trees:tree().
 
 copy_b_tree_to_binary_tree_iterator(none, GBTree) ->
     GBTree;
 copy_b_tree_to_binary_tree_iterator({Key, Value, Iterator}, GBTree) ->
     copy_b_tree_to_binary_tree_iterator(next(Iterator), gb_trees:insert(Key, Value, GBTree)).
 
--spec copy_binary_tree_to_b_tree(gb_tree(), b_tree()) -> b_tree().
+-spec copy_binary_tree_to_b_tree(gb_trees:tree(), b_tree()) -> b_tree().
 
 % Copy binary tree to b-tree.
 copy_binary_tree_to_b_tree(GBTree, BTree) ->
     copy_binary_tree_to_b_tree_iterator(gb_trees:next(gb_trees:iterator(GBTree)), BTree).
 
--spec copy_binary_tree_to_b_tree_iterator('none', b_tree()) -> b_tree()
-; ({key(), value(), gb_iter()}, b_tree()) -> b_tree().
+-spec copy_binary_tree_to_b_tree_iterator('none' | {key(), value(), gb_trees:iter()}, b_tree()) -> b_tree().
 
 copy_binary_tree_to_b_tree_iterator(none, BTree) ->
     BTree;
