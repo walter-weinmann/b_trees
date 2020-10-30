@@ -1,6 +1,8 @@
+.idea/
 _build
+b_trees.iml
 erl_crash.dump
 rebar.lock
 rebar3.crashdump
-test/tmp
 test/*.beam
+test/tmp
